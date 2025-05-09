@@ -152,7 +152,9 @@ def main():
             orig_preds = model(orig_batch.to(device)).cpu()
             perm_preds = model(perm_batch.to(device)).cpu()
             
-            scd = torch.sqrt(0.5 * ((perm_preds - orig_preds) ** 2).sum(dim=(1, 2)))
+            # there is no 1/2 multiplication,
+            # since vectors not maps are used to calculate SCD
+            scd = torch.sqrt(((perm_preds - orig_preds) ** 2).sum(dim=(1, 2)))
             
             maps = from_upper_triu_batch(orig_preds - perm_preds)
             boundary_strength = np.nanmean(maps[:, 0:256, 256:512], axis=(1, 2))  # shape: [B]
@@ -161,7 +163,7 @@ def main():
             for i in range(len(scd)):
                 results.append({
                     "SCD": scd[i].item(),
-                    "DeltaBoundaryStrength": boundary_strength[i]
+                    "RUQ_mean": boundary_strength[i]
                 })
             
     results_df = pd.DataFrame(results)

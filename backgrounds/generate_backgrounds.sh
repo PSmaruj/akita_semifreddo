@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=nat_bound
+#SBATCH --job-name=shuffle
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -14,4 +14,4 @@
 eval "$(conda shell.bash hook)"
 conda activate pytorch_cuda11.8
 
-python boundary_strength.py
+python generate_backgrounds.py
