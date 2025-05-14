@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=50
 #SBATCH --gpus-per-node=1
 #SBATCH --mem=450000MB
-#SBATCH --time=1:00:00
+#SBATCH --time=2:00:00
 
 # Conda env activation
 eval "$(conda shell.bash hook)"

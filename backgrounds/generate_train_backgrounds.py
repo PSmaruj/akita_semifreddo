@@ -88,7 +88,7 @@ def main():
     MAX_TRIES_PER_SEQ = 20
     TARGET_SCD_THRESHOLD = 30
     TARGET_VAR_THRESHOLD = 1500
-    TARGET_COUNT = 250
+    TARGET_COUNT = 300
 
     # === LOAD ===
     df = pd.read_csv(TSV_PATH, sep='\t')
@@ -97,7 +97,7 @@ def main():
     scd_scores = []
     totvar_scores = []
 
-    fasta_file = "/project/fudenber_735/genomes/hg38/hg38.fa"
+    fasta_file = "/project/fudenber_735/genomes/mm10/mm10.fa"
     genome = Fasta(fasta_file)
 
     # === Model (assumes already loaded and on CUDA) ===

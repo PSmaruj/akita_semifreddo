@@ -41,11 +41,12 @@ def one_hot_encode_sequence(sequence_obj):
 
 
 def total_variation(pred):
-    """
-    Total variation across the map. Lower → flatter.
-    """
     dx = pred[:, 1:] - pred[:, :-1]
     dy = pred[1:, :] - pred[:-1, :]
+    
+    dx = dx[~np.isnan(dx)]
+    dy = dy[~np.isnan(dy)]
+
     return np.sum(np.abs(dx)) + np.sum(np.abs(dy))
 
 
@@ -56,6 +57,7 @@ def set_diag(matrix, value, k):
     for i in range(rows):
         if 0 <= i + k < cols:
             matrix[i, i + k] = value
+
 
 def from_upper_triu(vector_repr, matrix_len, num_diags):
     # Ensure vector_repr is a NumPy array (if it's a PyTorch tensor, convert it)
@@ -82,7 +84,7 @@ def from_upper_triu(vector_repr, matrix_len, num_diags):
 def main():
     # === CONFIG ===
     TSV_PATH = "/home1/smaruj/akitaV2-analyses/experiments/background_generation/background_generation/input_data/50seqs_GCuniform_maxSCD35.tsv"
-    OUTPUT_FASTA = "/scratch1/smaruj/background_generation/background_sequences_test.fasta"
+    OUTPUT_FASTA = "/scratch1/smaruj/background_generation/background_sequences_scd30_totvar1300.fasta"
     K = 8
     MAX_TRIES_PER_SEQ = 20
     TARGET_SCD_THRESHOLD = 30
@@ -96,7 +98,7 @@ def main():
     scd_scores = []
     totvar_scores = []
 
-    fasta_file = "/project/fudenber_735/genomes/hg38/hg38.fa"
+    fasta_file = "/project/fudenber_735/genomes/mm10/mm10.fa"
     genome = Fasta(fasta_file)
 
     # === Model (assumes already loaded and on CUDA) ===
@@ -127,9 +129,11 @@ def main():
 
                 preds = model(batch).cpu()
                 scd = torch.sqrt((preds ** 2).sum(dim=(1, 2))).item()
-
+                
                 map = from_upper_triu(preds.squeeze(0), matrix_len=512, num_diags=2)
                 total_var = total_variation(map)
+                
+                print(f"Attempt {attempt+1} for idx={idx}: SCD={scd:.2f}, tot_var={total_var:.2f}")
                 
                 if scd < TARGET_SCD_THRESHOLD and total_var < TARGET_VAR_THRESHOLD:
                     saved_seqs.append((chrom, start, end, shuffled_seq))

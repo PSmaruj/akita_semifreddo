@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=shuffle
+#SBATCH --job-name=backgrounds
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1

@@ -165,9 +165,9 @@ def main():
     df = pd.read_csv("/home1/smaruj/akitaV2-analyses/experiments/background_generation/sequence_shuffling/input_data/shuffled_600seqs.tsv", sep="\t")
     
     # testing
-    df = df[:32]
+    # df = df[:32]
     
-    fasta_file = "/project/fudenber_735/genomes/hg38/hg38.fa"
+    fasta_file = "/project/fudenber_735/genomes/mm10/mm10.fa"
     genome = Fasta(fasta_file)
     
     orig_dataset = GenomicSequenceDataset(df, genome)
@@ -175,7 +175,12 @@ def main():
     
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = SeqNN()
-    model.load_state_dict(torch.load("/home1/smaruj/pytorch_akita/model_0_v2_finetuned_correctly.pt", map_location=device))
+    # fine-tuned model
+    # model.load_state_dict(torch.load("/home1/smaruj/pytorch_akita/model_0_v2_finetuned_correctly.pt", map_location=device))
+    # fine-tuned model with backgrounds
+    model.load_state_dict(torch.load("/scratch1/smaruj/train_pytorch_akita/mouse_models/model_0_v2_finetuned_backgrounds.pt", map_location=device))
+    # transferred model
+    # model = torch.load("/home1/smaruj/pytorch_akita/model_v2_mouse_model0_target0.pth", map_location=device)
     model.eval()
 
     scd_values = []
@@ -210,7 +215,7 @@ def main():
     df["total_var"] = total_var_values
     
     # saving
-    df.to_csv("/scratch1/smaruj/background_generation/shuffled_results_test.tsv", sep="\t", index=False)
+    df.to_csv("/scratch1/smaruj/background_generation/seqpro_shuffling_finetuned_backgrounds.tsv", sep="\t", index=False)
     
     
 if __name__ == "__main__":
