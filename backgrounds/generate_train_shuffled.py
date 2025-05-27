@@ -77,10 +77,11 @@ def main():
     # === CONFIG ===
     TSV_PATH = "/home1/smaruj/akitaV2-analyses/experiments/background_generation/sequence_shuffling/input_data/shuffled_600seqs.tsv"
     K_choices = [2, 4, 8, 16]
-    TARGET_COUNT = 250
+    TARGET_COUNT = 590
 
     # === LOAD ===
     df = pd.read_csv(TSV_PATH, sep='\t')
+    df = df[df["shuffle_parameter"] == 1]
     seen_indices = set()
     saved_seqs = []
 
@@ -111,7 +112,7 @@ def main():
             saved_seqs.append((chrom, start, end, shuffled_seq))
 
             # === Flush to disk every 50 sequences ===
-            if len(saved_seqs) == chunk_size or (len(saved_seqs) + chunk_idx * chunk_size) == TARGET_COUNT:
+            if len(saved_seqs) == chunk_size or (len(saved_seqs) + chunk_idx * chunk_size) >= TARGET_COUNT:
                 output_path = f"/scratch1/smaruj/background_generation/train_shuffled/shuffled_sequences_chunk_{chunk_idx}.fasta"
                 with open(output_path, "w") as f:
                     for i, (chrom, start, end, seq) in enumerate(saved_seqs):

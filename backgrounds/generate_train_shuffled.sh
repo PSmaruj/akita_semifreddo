@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=train_back
+#SBATCH --job-name=train_shuffle
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=50
 #SBATCH --gpus-per-node=1
 #SBATCH --mem=450000MB
-#SBATCH --time=5:00:00
+#SBATCH --time=8:00:00
 
 # Conda env activation
 eval "$(conda shell.bash hook)"

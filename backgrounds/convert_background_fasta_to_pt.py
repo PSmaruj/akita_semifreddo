@@ -6,8 +6,8 @@ import random
 
 
 # === Config ===
-fasta_dir = "/scratch1/smaruj/background_generation/train_backgrounds"  # path to .fasta files
-output_dir = "/scratch1/smaruj/background_generation/training_pt_files"  # where to save .pt files
+fasta_dir = "/scratch1/smaruj/background_generation/train_shuffled"  # path to .fasta files
+output_dir = "/scratch1/smaruj/background_generation/training_shuffled_pt_files"  # where to save .pt files
 matrix_len = 512
 diag_offset = 2
 chunk_size = 100  # how many (seq, label) pairs to save per .pt file
@@ -38,8 +38,8 @@ data_list = []
 file_count = 0
 global_idx = 0
 
-for chunk_id in range(5):  # You have chunks 0 to 4
-    fasta_path = os.path.join(fasta_dir, f"background_sequences_chunk_{chunk_id}.fasta")
+for chunk_id in range(12):  # You have chunks 0 to 4
+    fasta_path = os.path.join(fasta_dir, f"shuffled_sequences_chunk_{chunk_id}.fasta")
     print(f"Processing: {fasta_path}")
 
     for record in SeqIO.parse(fasta_path, "fasta"):
@@ -54,7 +54,7 @@ for chunk_id in range(5):  # You have chunks 0 to 4
 
         # Save in chunks
         if len(data_list) >= chunk_size:
-            output_path = os.path.join(output_dir, f"background_fold{fold}_{file_count}.pt")
+            output_path = os.path.join(output_dir, f"shuffled_fold{fold}_{file_count}.pt")
             torch.save(data_list, output_path)
             print(f"Saved {len(data_list)} samples to {output_path}")
             data_list = []
@@ -64,6 +64,6 @@ for chunk_id in range(5):  # You have chunks 0 to 4
 
 # Save remaining data
 if data_list:
-    output_path = os.path.join(output_dir, f"background_fold{fold}_{file_count}.pt")
+    output_path = os.path.join(output_dir, f"shuffled_fold{fold}_{file_count}.pt")
     torch.save(data_list, output_path)
     print(f"Saved final {len(data_list)} samples to {output_path}")

@@ -92,6 +92,7 @@ def main():
 
     # === LOAD ===
     df = pd.read_csv(TSV_PATH, sep='\t')
+    df = df[df["shuffle_parameter"] == 1]
     seen_indices = set()
     saved_seqs = []
     scd_scores = []
