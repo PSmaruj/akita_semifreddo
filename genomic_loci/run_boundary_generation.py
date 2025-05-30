@@ -14,6 +14,7 @@ from ledidi import Ledidi
 def parse_args():
     parser = argparse.ArgumentParser(description="Run Ledidi on selected genomic loci.")
     parser.add_argument("--fold", type=int, required=True, help="Fold number to process")
+    parser.add_argument("--target", type=str, required=True, help="Desired target constant value")
     parser.add_argument("--model_path", type=str, required=True, help="Path to model .pt file")
     parser.add_argument("--input_dir", type=str, required=True, help="Base path to input .pt and .tsv files")
     parser.add_argument("--output_dir", type=str, required=True, help="Base path to write output")
@@ -30,7 +31,8 @@ def parse_args():
 
 def main():
     args = parse_args()
-
+    target_c = float(args.target)
+    
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
     model = SeqNN()
@@ -60,7 +62,7 @@ def main():
         print(f"Boundary generation for genome location: {chrom}:{pred_start}-{pred_end}")
         
         X = torch.load(f"{args.input_dir}/ohe_X/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_X.pt", weights_only=True, map_location=device)
-        target = torch.load(f"{args.input_dir}/targets/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        target = torch.load(f"{args.input_dir}/targets_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
         tower_output_path = f"{args.input_dir}/tower_outputs/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_tower_out.pt"
         
         wrapper = Ledidi(model, 
@@ -88,9 +90,9 @@ def main():
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update
         
-        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.output_dir}/results/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
+        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.output_dir}/results_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
 
-    df.to_csv(f"{args.output_dir}/fold{FOLD}_selected_genomic_windows_centered_with_steps.tsv", sep="\t", index=False)
+    df.to_csv(f"{args.output_dir}/fold{FOLD}_{target_c}_selected_genomic_windows_centered_with_steps.tsv", sep="\t", index=False)
     
     
 if __name__ == "__main__":
