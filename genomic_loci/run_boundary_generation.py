@@ -25,6 +25,7 @@ def parse_args():
     parser.add_argument("--padding_bins", type=int, default=2, help="Number of bins to pad input slices")
     parser.add_argument("--max_iter", type=int, default=4000, help="Maximum number of optimization steps")
     parser.add_argument("--early_stopping_iter", type=int, default=100, help="Early stopping threshold")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
     
     return parser.parse_args()
 
@@ -32,6 +33,12 @@ def parse_args():
 def main():
     args = parse_args()
     target_c = float(args.target)
+    
+    # Set seed
+    torch.manual_seed(args.seed)
+    torch.cuda.manual_seed_all(args.seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
     
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
@@ -91,7 +98,10 @@ def main():
         df.at[i, "last_accepted_step"] = last_update
         
         torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.output_dir}/results_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
-
+        
+        # saving for a particular seed
+        # torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.output_dir}/reproducibility_fold0_-0.5/seed{args.seed}/{chrom}_{pred_start}_{pred_end}_slice.pt")
+        
     df.to_csv(f"{args.output_dir}/fold{FOLD}_{target_c}_selected_genomic_windows_centered_with_steps.tsv", sep="\t", index=False)
     
     

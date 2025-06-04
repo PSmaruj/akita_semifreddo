@@ -117,6 +117,7 @@ def from_upper_triu_batch(batch_vectors, matrix_len=512, num_diags=2):
 def main():
     # --- Load and process data ---
     sensitive_boundaries_path = "/scratch1/smaruj/sensitive_bins_boundaries.tsv"
+    # sensitive_boundaries_path = "/scratch1/smaruj/single_bins_boundaries.tsv"
     sensitive_boundaries_df = pd.read_csv(sensitive_boundaries_path, sep="\t")
 
     sensitive_boundaries_df["disrupted_bin"] = sensitive_boundaries_df["disrupted_bin"].apply(ast.literal_eval)
@@ -124,7 +125,7 @@ def main():
     # testing
     # sensitive_boundaries_df = sensitive_boundaries_df[:32]
     
-    fasta_file = "/project/fudenber_735/genomes/hg38/hg38.fa"
+    fasta_file = "/project/fudenber_735/genomes/mm10/mm10.fa"
     genome = Fasta(fasta_file)
 
     # --- Prepare datasets ---
@@ -156,14 +157,18 @@ def main():
             # since vectors not maps are used to calculate SCD
             scd = torch.sqrt(((perm_preds - orig_preds) ** 2).sum(dim=(1, 2)))
             
-            maps = from_upper_triu_batch(orig_preds - perm_preds)
-            boundary_strength = np.nanmean(maps[:, 0:256, 256:512], axis=(1, 2))  # shape: [B]
+            og_maps = from_upper_triu_batch(orig_preds)
+            perm_maps = from_upper_triu_batch(perm_preds)
+            
+            og_urq_mean = np.nanmean(og_maps[:, 0:256, 256:512], axis=(1, 2))  # shape: [B]
+            perm_urq_mean = np.nanmean(perm_maps[:, 0:256, 256:512], axis=(1, 2))  # shape: [B]
             
             # Combine into results
             for i in range(len(scd)):
                 results.append({
                     "SCD": scd[i].item(),
-                    "RUQ_mean": boundary_strength[i]
+                    "URQ_mean_og": og_urq_mean[i],
+                    "URQ_mean_perm": perm_urq_mean[i]
                 })
             
     results_df = pd.DataFrame(results)
