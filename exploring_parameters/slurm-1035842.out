@@ -1,0 +1,60 @@
+==========================================
+SLURM_JOB_ID = 1035842
+SLURM_JOB_NODELIST = b23-18
+TMPDIR = /tmp/SLURM_1035842
+==========================================
+/home1/smaruj/ledidi_akita/exploring_parameters/run_boundary_generation.py:68: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  model.load_state_dict(torch.load(args.model_path, map_location=device))
+Boundary generation for genome location: chr1:37799936-39110656
+Model in train mode: False
+Gradients enabled for weights - slice 0: True
+Weights shape - slice 0: torch.Size([1, 4, 2048])
+Local loss applied.
+iter=I	input_loss=0.0	output_loss=3.277e+04	total_loss=3.277e+04	time=0.0
+iter=100	input_loss=907.0	output_loss=2.321e+04	total_loss=2.33e+04	time=15.22
+iter=200	input_loss=931.0	output_loss=2.254e+04	total_loss=2.264e+04	time=15.14
+iter=300	input_loss=985.0	output_loss=2.199e+04	total_loss=2.209e+04	time=15.14
+iter=400	input_loss=1.049e+03	output_loss=2.179e+04	total_loss=2.189e+04	time=15.14
+iter=500	input_loss=1.079e+03	output_loss=2.167e+04	total_loss=2.177e+04	time=15.15
+iter=600	input_loss=1.124e+03	output_loss=2.165e+04	total_loss=2.176e+04	time=15.15
+iter=700	input_loss=1.137e+03	output_loss=2.161e+04	total_loss=2.172e+04	time=15.14
+iter=800	input_loss=1.154e+03	output_loss=2.159e+04	total_loss=2.171e+04	time=15.13
+iter=900	input_loss=1.177e+03	output_loss=2.157e+04	total_loss=2.169e+04	time=15.13
+iter=1000	input_loss=1.188e+03	output_loss=2.157e+04	total_loss=2.169e+04	time=15.13
+iter=1100	input_loss=1.199e+03	output_loss=2.155e+04	total_loss=2.167e+04	time=15.14
+iter=1200	input_loss=1.184e+03	output_loss=2.154e+04	total_loss=2.166e+04	time=15.14
+iter=1300	input_loss=1.193e+03	output_loss=2.154e+04	total_loss=2.165e+04	time=15.13
+iter=1400	input_loss=1.189e+03	output_loss=2.153e+04	total_loss=2.165e+04	time=15.12
+iter=1500	input_loss=1.199e+03	output_loss=2.153e+04	total_loss=2.165e+04	time=15.13
+iter=1600	input_loss=1.204e+03	output_loss=2.153e+04	total_loss=2.165e+04	time=15.16
+iter=1700	input_loss=1.2e+03	output_loss=2.153e+04	total_loss=2.165e+04	time=15.15
+iter=1800	input_loss=1.217e+03	output_loss=2.153e+04	total_loss=2.165e+04	time=15.13
+iter=1900	input_loss=1.216e+03	output_loss=2.152e+04	total_loss=2.164e+04	time=15.13
+iter=2000	input_loss=1.225e+03	output_loss=2.152e+04	total_loss=2.164e+04	time=15.13
+iter=2100	input_loss=1.225e+03	output_loss=2.153e+04	total_loss=2.166e+04	time=15.13
+iter=2200	input_loss=1.23e+03	output_loss=2.151e+04	total_loss=2.163e+04	time=15.12
+iter=2300	input_loss=1.233e+03	output_loss=2.151e+04	total_loss=2.163e+04	time=15.13
+iter=2400	input_loss=1.232e+03	output_loss=2.15e+04	total_loss=2.163e+04	time=15.13
+iter=2500	input_loss=1.234e+03	output_loss=2.153e+04	total_loss=2.166e+04	time=15.12
+iter=2600	input_loss=1.239e+03	output_loss=2.151e+04	total_loss=2.163e+04	time=15.12
+iter=2700	input_loss=1.226e+03	output_loss=2.151e+04	total_loss=2.163e+04	time=15.12
+iter=2800	input_loss=1.231e+03	output_loss=2.15e+04	total_loss=2.162e+04	time=15.12
+iter=2900	input_loss=1.237e+03	output_loss=2.15e+04	total_loss=2.163e+04	time=15.12
+iter=3000	input_loss=1.233e+03	output_loss=2.15e+04	total_loss=2.162e+04	time=15.12
+iter=F	input_loss=1.223e+03	output_loss=2.149e+04	total_loss=2.161e+04	time=454.1
+Last iteration with update:  2974
+Traceback (most recent call last):
+  File "/home1/smaruj/ledidi_akita/exploring_parameters/run_boundary_generation.py", line 141, in <module>
+    main()
+  File "/home1/smaruj/ledidi_akita/exploring_parameters/run_boundary_generation.py", line 132, in main
+    torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.output_dir}/tau_{args.tau}/{chrom}_{pred_start}_{pred_end}_slice.pt")
+  File "/home1/smaruj/miniconda3/envs/pytorch_cuda11.8/lib/python3.12/site-packages/torch/serialization.py", line 849, in save
+    with _open_zipfile_writer(f) as opened_zipfile:
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home1/smaruj/miniconda3/envs/pytorch_cuda11.8/lib/python3.12/site-packages/torch/serialization.py", line 716, in _open_zipfile_writer
+    return container(name_or_buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home1/smaruj/miniconda3/envs/pytorch_cuda11.8/lib/python3.12/site-packages/torch/serialization.py", line 687, in __init__
+    super().__init__(torch._C.PyTorchFileWriter(self.name))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Parent directory /scratch1/smaruj/exploring_parameters/tau_10.0 does not exist.
