@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=tau10
+#SBATCH --job-name=tau3.0
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -24,5 +24,4 @@ python run_boundary_generation.py \
   --max_iter 3000 \
   --early_stopping_iter 3000  \
   --seed 5 \
-  --tau 10.0
-  
+  --tau 3.0
