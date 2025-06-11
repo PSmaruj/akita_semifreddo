@@ -18,7 +18,7 @@ def parse_args():
     parser.add_argument("--model_path", type=str, required=True, help="Path to model .pt file")
     parser.add_argument("--input_dir", type=str, required=True, help="Base path to input .pt and .tsv files")
     parser.add_argument("--output_dir", type=str, required=True, help="Base path to write output")
-    parser.add_argument("--boundary_mask_path", type=str, required=True, help="Path to boundary mask .pt file")
+    parser.add_argument("--dots_mask_path", type=str, required=True, help="Path to dots mask .pt file")
     
     parser.add_argument("--bin_size", type=int, default=2048, help="Bin size for model input")
     parser.add_argument("--cropping_applied", type=int, default=64, help="Cropping applied in the model")
@@ -27,34 +27,12 @@ def parse_args():
     parser.add_argument("--early_stopping_iter", type=int, default=100, help="Early stopping threshold")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
     
-    parser.add_argument("--input_loss", type=str, default="l1", choices=["l1", "mse"],
-                        help="Loss function for input (l1, mse)")
-    parser.add_argument("--output_loss", type=str, default="l1", choices=["l1", "mse"],
-                        help="Loss function for output (l1, mse)")
-    parser.add_argument("--tau", type=float, default=1.0, help="Tau for Gumbel softmax")
-    parser.add_argument("--l", type=float, default=0.1, help="Lambda to balance input/output losses")
-    parser.add_argument("--lr", type=float, default=1.0, help="Learning rate for optimizer")
-    parser.add_argument("--eps", type=float, default=1e-4, help="Epsilon for convergence criterion")
-    parser.add_argument("--batch_size", type=int, default=1, help="Batch size")
-    
     return parser.parse_args()
-
-
-def get_loss_fn(name):
-    if name == "l1":
-        return torch.nn.L1Loss(reduction='sum')
-    elif name == "mse":
-        return torch.nn.MSELoss(reduction='sum')
-    else:
-        raise ValueError(f"Unsupported loss function: {name}")
 
 
 def main():
     args = parse_args()
     target_c = float(args.target)
-    
-    input_loss_fn = get_loss_fn(args.input_loss)
-    output_loss_fn = get_loss_fn(args.output_loss)
     
     # Set seed
     torch.manual_seed(args.seed)
@@ -72,47 +50,46 @@ def main():
     
     df = pd.read_csv(f"{args.input_dir}/fold{FOLD}_selected_genomic_windows_centered.tsv", sep="\t")
     
-    boundary_mask_path = args.boundary_mask_path
+    dots_mask_path = args.dots_mask_path
     
     bin_size = args.bin_size
     cropping_applied = args.cropping_applied
     padding_bins = args.padding_bins
     padding = padding_bins * bin_size
 
-    slice_0_bins = [256]
+    slice_0_bins = [256-25]
     slice_0_start = (min(slice_0_bins) + cropping_applied - padding_bins) * bin_size
     slice_0_end = (max(slice_0_bins) + 1 + cropping_applied + padding_bins) * bin_size
     
+    slice_1_bins =[256+25]
+    slice_1_start = (min(slice_1_bins) + cropping_applied - padding_bins) * bin_size
+    slice_1_end = (max(slice_1_bins) + 1 + cropping_applied + padding_bins) * bin_size
+    
     df["last_accepted_step"] = -1  # initialize with placeholder
-    df["best_output_loss"] = -1.0  # initialize with placeholder
-    df["num_edits"] = -1  # initialize with placeholder
-    df["best_PearsonR"] = -1.0  # initialize with placeholder
     
     for i, row in enumerate(df.itertuples(index=False)):
         chrom, pred_start, pred_end = row.chrom, row.centered_start, row.centered_end
         
-        print(f"Boundary generation for genome location: {chrom}:{pred_start}-{pred_end}")
+        print(f"Dots generation for genome location: {chrom}:{pred_start}-{pred_end}")
         
         X = torch.load(f"{args.input_dir}/ohe_X/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_X.pt", weights_only=True, map_location=device)
-        target = torch.load(f"{args.input_dir}/targets_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        target = torch.load(f"/scratch1/smaruj/generate_genomic_dots/targets_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        
         tower_output_path = f"{args.input_dir}/tower_outputs/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_tower_out.pt"
         
         wrapper = Ledidi(model, 
-                    input_loss=input_loss_fn, 
-                    output_loss=output_loss_fn,
-                    tau=args.tau, 
-                    l=args.l, 
-                    lr=args.lr, 
-                    eps=args.eps, 
-                    batch_size=args.batch_size,
+                    input_loss=torch.nn.L1Loss(reduction='sum'), 
+                    output_loss=torch.nn.L1Loss(reduction='sum'),
+                    batch_size=1,
                     max_iter=args.max_iter,
                     early_stopping_iter=args.early_stopping_iter,
                     return_history=False,
                     verbose=True,
                     bin_size=args.bin_size,
-                    input_mask_slices_0=[256], # mid-bin
+                    input_mask_slices_0=[256-25],
+                    input_mask_slices_1=[256+25],
                     cropping_applied=args.cropping_applied,
-                    output_mask_path=boundary_mask_path,
+                    output_mask_path=dots_mask_path,
                     use_semifreddo=True,
                     semifreddo_temp_output_path=tower_output_path,
                     punish_ctcf=False,
@@ -120,21 +97,17 @@ def main():
                     ).cuda()
         
         slice_0_torch = X[:, :, slice_0_start:slice_0_end]
+        slice_1_torch = X[:, :, slice_1_start:slice_1_end]
         
-        x_bar_slice_0, last_update, best_output_loss, num_edits, best_PearsonR = wrapper.fit_transform(X=slice_0_torch, y_bar=target)
+        x_bar_slice_0, x_bar_slice_1, last_update = wrapper.fit_transform(X=slice_0_torch, y_bar=target, X1=slice_1_torch)
         
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update
-        df.at[i, "best_output_loss"] = best_output_loss
-        df.at[i, "num_edits"] = num_edits
-        df.at[i, "best_PearsonR"] = best_PearsonR
         
-        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.output_dir}/lr_{args.lr}/{chrom}_{pred_start}_{pred_end}_slice.pt")
+        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.output_dir}/results_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice0.pt")
+        torch.save(x_bar_slice_1[:,:,padding:-padding], f"{args.output_dir}/results_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice1.pt")
         
-        # saving for a particular seed
-        # torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.output_dir}/reproducibility_fold0_-0.5/seed{args.seed}/{chrom}_{pred_start}_{pred_end}_slice.pt")
-        
-    df.to_csv(f"{args.output_dir}/lr_{args.lr}_df.tsv", sep="\t", index=False)
+    df.to_csv(f"{args.output_dir}/fold{FOLD}_{target_c}_selected_genomic_windows_centered_with_steps.tsv", sep="\t", index=False)
     
     
 if __name__ == "__main__":
