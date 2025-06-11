@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=lr2.0
+#SBATCH --job-name=mi5000
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -21,7 +21,6 @@ python run_boundary_generation.py \
   --input_dir /scratch1/smaruj/genomic_insertion_loci \
   --output_dir /scratch1/smaruj/exploring_parameters \
   --boundary_mask_path /scratch1/smaruj/genomic_insertion_loci/boundary_indices.pt \
-  --max_iter 3000 \
-  --early_stopping_iter 3000  \
+  --max_iter 5000 \
+  --early_stopping_iter 5000  \
   --seed 5 \
-  --lr 2.0
