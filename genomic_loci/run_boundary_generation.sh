@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=0.2fold2
+#SBATCH --job-name=10.0fol2
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -16,7 +16,7 @@ conda activate pytorch_cuda11.8
 
 python run_boundary_generation.py \
   --fold 2 \
-  --target "-0.2" \
+  --target "-10.0" \
   --model_path /home1/smaruj/pytorch_akita/model_0_v2_finetuned_correctly.pt \
   --input_dir /scratch1/smaruj/genomic_insertion_loci \
   --output_dir /scratch1/smaruj/genomic_insertion_loci \

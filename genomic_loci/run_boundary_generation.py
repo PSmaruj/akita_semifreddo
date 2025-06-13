@@ -92,7 +92,8 @@ def main():
         
         slice_0_torch = X[:, :, slice_0_start:slice_0_end]
         
-        x_bar_slice_0, last_update = wrapper.fit_transform(X=slice_0_torch, y_bar=target)
+        # x_bar_slice_0, last_update = wrapper.fit_transform(X=slice_0_torch, y_bar=target)
+        x_bar_slice_0, last_update, _, _, _ = wrapper.fit_transform(X=slice_0_torch, y_bar=target)
         
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update

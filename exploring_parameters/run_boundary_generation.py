@@ -129,12 +129,12 @@ def main():
         df.at[i, "num_edits"] = num_edits
         df.at[i, "best_PearsonR"] = best_PearsonR
         
-        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.output_dir}/max_iter_{args.max_iter}/{chrom}_{pred_start}_{pred_end}_slice.pt")
+        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.output_dir}/early_stop_{args.early_stopping_iter}/{chrom}_{pred_start}_{pred_end}_slice.pt")
         
         # saving for a particular seed
         # torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.output_dir}/reproducibility_fold0_-0.5/seed{args.seed}/{chrom}_{pred_start}_{pred_end}_slice.pt")
         
-    df.to_csv(f"{args.output_dir}/max_iter_{args.max_iter}_df.tsv", sep="\t", index=False)
+    df.to_csv(f"{args.output_dir}/early_stop_{args.early_stopping_iter}_df.tsv", sep="\t", index=False)
     
     
 if __name__ == "__main__":
