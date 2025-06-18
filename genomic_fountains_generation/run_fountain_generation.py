@@ -69,7 +69,10 @@ def main():
         print(f"Fountain generation for genome location: {chrom}:{pred_start}-{pred_end}")
         
         X = torch.load(f"{args.input_dir}/ohe_X/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_X.pt", weights_only=True, map_location=device)
-        target = torch.load(f"{args.input_dir}/targets_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        # target = torch.load(f"{args.input_dir}/targets_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        # target = torch.load(f"/scratch1/smaruj/generate_genomic_fountains/targets_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        target = torch.load(f"/scratch1/smaruj/generate_genomic_fountains/targets_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        
         tower_output_path = f"{args.input_dir}/tower_outputs/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_tower_out.pt"
         
         wrapper = Ledidi(model, 
@@ -102,7 +105,7 @@ def main():
         # saving for a particular seed
         # torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.output_dir}/reproducibility_fold0_-0.5/seed{args.seed}/{chrom}_{pred_start}_{pred_end}_slice.pt")
         
-    df.to_csv(f"{args.output_dir}/fold{FOLD}_{target_c}_selected_genomic_windows_centered_with_steps.tsv", sep="\t", index=False)
+    df.to_csv(f"{args.output_dir}/fold{FOLD}_{target_c}_CONE_selected_genomic_windows_centered_with_steps.tsv", sep="\t", index=False)
     
     
 if __name__ == "__main__":

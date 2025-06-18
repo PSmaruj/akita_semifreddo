@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=es1500
+#SBATCH --job-name=l1.4
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=50
 #SBATCH --gpus-per-node=1
 #SBATCH --mem=450000MB
-#SBATCH --time=7:00:00
+#SBATCH --time=5:00:00
 
 # Conda env activation
 eval "$(conda shell.bash hook)"
@@ -22,5 +22,6 @@ python run_boundary_generation.py \
   --output_dir /scratch1/smaruj/exploring_parameters \
   --boundary_mask_path /scratch1/smaruj/genomic_insertion_loci/boundary_indices.pt \
   --max_iter 3000 \
-  --early_stopping_iter 1500  \
+  --early_stopping_iter 300  \
   --seed 5 \
+  --l 1.4 \

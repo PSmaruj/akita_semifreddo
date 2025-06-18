@@ -44,14 +44,15 @@ def permute_disrupted_bins(seq, row, bin_size=2048, cropping=64):
     # Make seq mutable
     seq = list(seq)
     
-    for bin_idx in row["disrupted_bin"]:
-        start = (bin_idx + cropping) * bin_size
-        end = start + bin_size
-        if end > len(seq):  # Avoid index error
-            continue
-        region = seq[start:end]
-        np.random.shuffle(region)
-        seq[start:end] = region  # Replace with shuffled region
+    # for bin_idx in row["disrupted_bin"]:
+    bin_idx = int(row["disrupted_bin"])
+    start = (bin_idx + cropping) * bin_size
+    end = start + bin_size
+    # if end > len(seq):  # Avoid index error
+    #     continue
+    region = seq[start:end]
+    np.random.shuffle(region)
+    seq[start:end] = region  # Replace with shuffled region
 
     return ''.join(seq)
 
@@ -116,11 +117,11 @@ def from_upper_triu_batch(batch_vectors, matrix_len=512, num_diags=2):
 
 def main():
     # --- Load and process data ---
-    sensitive_boundaries_path = "/scratch1/smaruj/sensitive_bins_boundaries.tsv"
-    # sensitive_boundaries_path = "/scratch1/smaruj/single_bins_boundaries.tsv"
+    # sensitive_boundaries_path = "/scratch1/smaruj/sensitive_bins_boundaries.tsv"
+    sensitive_boundaries_path = "/scratch1/smaruj/single_bins_boundaries.tsv"
     sensitive_boundaries_df = pd.read_csv(sensitive_boundaries_path, sep="\t")
 
-    sensitive_boundaries_df["disrupted_bin"] = sensitive_boundaries_df["disrupted_bin"].apply(ast.literal_eval)
+    # sensitive_boundaries_df["disrupted_bin"] = sensitive_boundaries_df["disrupted_bin"].apply(ast.literal_eval)
 
     # testing
     # sensitive_boundaries_df = sensitive_boundaries_df[:32]
@@ -175,7 +176,7 @@ def main():
     combined_df = pd.concat([sensitive_boundaries_df.reset_index(drop=True), results_df], axis=1)
 
     # --- Save results (optional) ---
-    combined_df.to_csv("/scratch1/smaruj/sensitive_boundary_results.tsv", sep="\t", index=False)
+    combined_df.to_csv("/scratch1/smaruj/single_sensitive_boundary_results.tsv", sep="\t", index=False)
 
 if __name__ == "__main__":
     main()
