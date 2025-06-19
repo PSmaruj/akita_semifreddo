@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import random
-import ast
+# import ast
 from pyfaidx import Fasta
 from torch.utils.data import Dataset, DataLoader
 import torch
@@ -54,6 +54,14 @@ def permute_disrupted_bins(seq, row, bin_size=2048, cropping=64):
     np.random.shuffle(region)
     seq[start:end] = region  # Replace with shuffled region
 
+    # SAVING
+    # Convert shuffled region to one-hot
+    shuffled_seq = ''.join(region)
+    one_hot_bin = one_hot_encode_sequence(shuffled_seq)  # shape: (4, bin_size)
+    
+    # Save as .npy file
+    np.save(f"/scratch1/smaruj/natural_boundaries/permuted_bins/{row["chrom"]}_{row["window_start"]}-{row["window_end"]}.npy", one_hot_bin)
+    
     return ''.join(seq)
 
 
@@ -118,7 +126,7 @@ def from_upper_triu_batch(batch_vectors, matrix_len=512, num_diags=2):
 def main():
     # --- Load and process data ---
     # sensitive_boundaries_path = "/scratch1/smaruj/sensitive_bins_boundaries.tsv"
-    sensitive_boundaries_path = "/scratch1/smaruj/single_bins_boundaries.tsv"
+    sensitive_boundaries_path = "/scratch1/smaruj/natural_boundaries/single_bins_boundaries.tsv"
     sensitive_boundaries_df = pd.read_csv(sensitive_boundaries_path, sep="\t")
 
     # sensitive_boundaries_df["disrupted_bin"] = sensitive_boundaries_df["disrupted_bin"].apply(ast.literal_eval)
@@ -176,7 +184,7 @@ def main():
     combined_df = pd.concat([sensitive_boundaries_df.reset_index(drop=True), results_df], axis=1)
 
     # --- Save results (optional) ---
-    combined_df.to_csv("/scratch1/smaruj/single_sensitive_boundary_results.tsv", sep="\t", index=False)
+    combined_df.to_csv("/scratch1/smaruj/natural_boundaries/single_sensitive_boundary_results.tsv", sep="\t", index=False)
 
 if __name__ == "__main__":
     main()

@@ -4,6 +4,7 @@ import argparse
 import sys
 import os
 import numpy as np
+import math
 
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
 from model_v2_compatible import SeqNN
@@ -123,6 +124,16 @@ def main():
         slice_0_torch = X[:, :, slice_0_start:slice_0_end]
         
         x_bar_slice_0, last_update, best_output_loss, num_edits, best_PearsonR = wrapper.fit_transform(X=slice_0_torch, y_bar=target)
+        
+        # Defensive casting just in case
+        last_update = int(last_update)
+        best_output_loss = float(best_output_loss)
+        num_edits = int(num_edits)
+        best_PearsonR = float(best_PearsonR)
+
+        # Optional: replace NaN with None to avoid CSV or dtype issues
+        if math.isnan(best_PearsonR):
+            best_PearsonR = None
         
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update

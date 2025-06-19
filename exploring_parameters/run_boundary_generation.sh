@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=l1.4
+#SBATCH --job-name=l2.0
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -24,4 +24,4 @@ python run_boundary_generation.py \
   --max_iter 3000 \
   --early_stopping_iter 300  \
   --seed 5 \
-  --l 1.4 \
+  --l 2.0 \
