@@ -38,17 +38,33 @@ def main():
     
     df = pd.read_csv(f"{args.input_dir}/fold{FOLD}_selected_genomic_windows_centered.tsv", sep="\t")
     
+    # shifting genomic cordinates and assigning them as a target folding
+    df['target_chrom'] = df['chrom'].shift(-1)
+    df['target_centered_start'] = df['centered_start'].shift(-1)
+    df['target_centered_end'] = df['centered_end'].shift(-1)
+    
+    # Fill last row with values from the first row
+    df.loc[df.index[-1], 'target_chrom'] = df.loc[df.index[0], 'chrom']
+    df.loc[df.index[-1], 'target_centered_start'] = df.loc[df.index[0], 'centered_start']
+    df.loc[df.index[-1], 'target_centered_end'] = df.loc[df.index[0], 'centered_end']
+    
+    # Convert to int
+    df['target_centered_start'] = df['target_centered_start'].astype(int)
+    df['target_centered_end'] = df['target_centered_end'].astype(int)
+    
     df["last_accepted_step"] = -1  # initialize with placeholder
     
     for i, row in enumerate(df.itertuples(index=False)):
         chrom, pred_start, pred_end = row.chrom, row.centered_start, row.centered_end
+        target_chrom, target_start, target_end = row.target_chrom, row.target_centered_start, row.target_centered_end
         
-        print(f"Boundary generation for genome location: {chrom}:{pred_start}-{pred_end}")
+        print(f"Map transformation starting from genome location: {chrom}:{pred_start}-{pred_end}")
+        print(f"To a genome location: {target_chrom}:{target_start}-{target_end}")
         
-        # a background seq
-        X = torch.load("/scratch1/smaruj/ledidi_targets/constant_boundary_background/X.pt", weights_only=True, map_location=device)
+        # starting from genomic folding
+        X = torch.load(f"/scratch1/smaruj/genomic_insertion_loci/ohe_X/fold0/{chrom}_{pred_start}_{pred_end}_X.pt", weights_only=True, map_location=device)
         
-        target = torch.load(f"{args.input_dir}/genomic_targets/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        target = torch.load(f"/scratch1/smaruj/genomic_insertion_loci/genomic_targets/fold0/{target_chrom}_{target_start}_{target_end}_target.pt", weights_only=True, map_location=device)
         
         wrapper = Ledidi(model, 
                     input_loss=torch.nn.L1Loss(reduction='sum'), 
@@ -66,7 +82,7 @@ def main():
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update
         
-        torch.save(generated_seq, f"{args.output_dir}/genomic_optimization_results/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_seq.pt")
+        torch.save(generated_seq, f"/scratch1/smaruj/genomic_insertion_loci/genomic_optimization_results/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_seq.pt")
 
     df.to_csv(f"{args.output_dir}/genomic_optimization_results/fold{FOLD}_with_steps.tsv", sep="\t", index=False)
     
