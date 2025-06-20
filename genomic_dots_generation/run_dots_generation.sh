@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=fold2
+#SBATCH --job-name=dgn0
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -15,12 +15,12 @@ eval "$(conda shell.bash hook)"
 conda activate pytorch_cuda11.8
 
 python run_dots_generation.py \
-  --fold 2 \
+  --fold 0 \
   --target "0.5" \
   --model_path /home1/smaruj/pytorch_akita/model_0_v2_finetuned_correctly.pt \
   --input_dir /scratch1/smaruj/genomic_insertion_loci \
   --output_dir /scratch1/smaruj/generate_genomic_dots \
-  --dots_mask_path /scratch1/smaruj/generate_genomic_dots/dots_indices.pt \
+  --dots_mask_path /scratch1/smaruj/generate_genomic_dots/doughnut_dots_indices.pt \
   --max_iter 3000 \
   --early_stopping_iter 300  \
   --seed 5
