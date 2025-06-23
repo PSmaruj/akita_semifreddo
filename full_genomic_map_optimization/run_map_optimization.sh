@@ -17,8 +17,8 @@ conda activate pytorch_cuda11.8
 python run_map_optimization.py \
   --fold 0 \
   --model_path /home1/smaruj/pytorch_akita/model_0_v2_finetuned_correctly.pt \
-  --input_dir /scratch1/smaruj/genomic_insertion_loci \
-  --output_dir /scratch1/smaruj/genomic_insertion_loci \
+  --input_dir /scratch1/smaruj/genomic_map_transformation \
+  --output_dir /scratch1/smaruj/genomic_map_transformation \
   --max_iter 2000 \
   --early_stopping_iter 2000
   

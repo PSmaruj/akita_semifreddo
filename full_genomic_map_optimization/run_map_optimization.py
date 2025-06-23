@@ -19,8 +19,8 @@ def parse_args():
     parser.add_argument("--input_dir", type=str, required=True, help="Base path to input .pt and .tsv files")
     parser.add_argument("--output_dir", type=str, required=True, help="Base path to write output")
     
-    parser.add_argument("--max_iter", type=int, default=4000, help="Maximum number of optimization steps")
-    parser.add_argument("--early_stopping_iter", type=int, default=100, help="Early stopping threshold")
+    parser.add_argument("--max_iter", type=int, default=2000, help="Maximum number of optimization steps")
+    parser.add_argument("--early_stopping_iter", type=int, default=2000, help="Early stopping threshold")
     
     return parser.parse_args()
 
@@ -36,35 +36,38 @@ def main():
 
     FOLD = args.fold
     
-    df = pd.read_csv(f"{args.input_dir}/fold{FOLD}_selected_genomic_windows_centered.tsv", sep="\t")
+    df = pd.read_csv(f"{args.input_dir}/df_select_fold{FOLD}.tsv", sep="\t")
+    
+    # test
+    df = df[:5]
     
     # shifting genomic cordinates and assigning them as a target folding
     df['target_chrom'] = df['chrom'].shift(-1)
-    df['target_centered_start'] = df['centered_start'].shift(-1)
-    df['target_centered_end'] = df['centered_end'].shift(-1)
+    df['target_start'] = df['start'].shift(-1)
+    df['target_end'] = df['end'].shift(-1)
     
     # Fill last row with values from the first row
     df.loc[df.index[-1], 'target_chrom'] = df.loc[df.index[0], 'chrom']
-    df.loc[df.index[-1], 'target_centered_start'] = df.loc[df.index[0], 'centered_start']
-    df.loc[df.index[-1], 'target_centered_end'] = df.loc[df.index[0], 'centered_end']
+    df.loc[df.index[-1], 'target_start'] = df.loc[df.index[0], 'start']
+    df.loc[df.index[-1], 'target_end'] = df.loc[df.index[0], 'end']
     
     # Convert to int
-    df['target_centered_start'] = df['target_centered_start'].astype(int)
-    df['target_centered_end'] = df['target_centered_end'].astype(int)
+    df['target_start'] = df['target_start'].astype(int)
+    df['target_end'] = df['target_end'].astype(int)
     
     df["last_accepted_step"] = -1  # initialize with placeholder
     
     for i, row in enumerate(df.itertuples(index=False)):
-        chrom, pred_start, pred_end = row.chrom, row.centered_start, row.centered_end
-        target_chrom, target_start, target_end = row.target_chrom, row.target_centered_start, row.target_centered_end
+        chrom, pred_start, pred_end = row.chrom, row.start, row.end
+        target_chrom, target_start, target_end = row.target_chrom, row.target_start, row.target_end
         
         print(f"Map transformation starting from genome location: {chrom}:{pred_start}-{pred_end}")
         print(f"To a genome location: {target_chrom}:{target_start}-{target_end}")
         
         # starting from genomic folding
-        X = torch.load(f"/scratch1/smaruj/genomic_insertion_loci/ohe_X/fold0/{chrom}_{pred_start}_{pred_end}_X.pt", weights_only=True, map_location=device)
+        X = torch.load(f"{args.input_dir}/ohe_X_fold{FOLD}/{chrom}_{pred_start}_{pred_end}_X.pt", weights_only=True, map_location=device)
         
-        target = torch.load(f"/scratch1/smaruj/genomic_insertion_loci/genomic_targets/fold0/{target_chrom}_{target_start}_{target_end}_target.pt", weights_only=True, map_location=device)
+        target = torch.load(f"{args.input_dir}/genomic_targets_fold{FOLD}/{target_chrom}_{target_start}_{target_end}_target.pt", weights_only=True, map_location=device)
         
         wrapper = Ledidi(model, 
                     input_loss=torch.nn.L1Loss(reduction='sum'), 
@@ -82,9 +85,9 @@ def main():
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update
         
-        torch.save(generated_seq, f"/scratch1/smaruj/genomic_insertion_loci/genomic_optimization_results/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_seq.pt")
+        torch.save(generated_seq, f"{args.output_dir}/results_fold{FOLD}/{chrom}_{pred_start}_{pred_end}_seq.pt")
 
-    df.to_csv(f"{args.output_dir}/genomic_optimization_results/fold{FOLD}_with_steps.tsv", sep="\t", index=False)
+    df.to_csv(f"{args.output_dir}/genomic_optimization_results_fold{FOLD}_with_steps.tsv", sep="\t", index=False)
     
     
 if __name__ == "__main__":
