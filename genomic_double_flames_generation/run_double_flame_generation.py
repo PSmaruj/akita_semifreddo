@@ -66,10 +66,10 @@ def main():
     for i, row in enumerate(df.itertuples(index=False)):
         chrom, pred_start, pred_end = row.chrom, row.centered_start, row.centered_end
         
-        print(f"Flame generation for genome location: {chrom}:{pred_start}-{pred_end}")
+        print(f"Double-flame generation for genome location: {chrom}:{pred_start}-{pred_end}")
         
         X = torch.load(f"{args.input_dir}/ohe_X/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_X.pt", weights_only=True, map_location=device)
-        target = torch.load(f"/scratch1/smaruj/generate_genomic_flame/OW_targets_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        target = torch.load(f"/scratch1/smaruj/generate_genomic_double_flame/OW_targets_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
 
         tower_output_path = f"{args.input_dir}/tower_outputs/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_tower_out.pt"
         

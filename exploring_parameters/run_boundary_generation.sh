@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=l2.5
+#SBATCH --job-name=l5.0
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=50
 #SBATCH --gpus-per-node=1
 #SBATCH --mem=450000MB
-#SBATCH --time=7:00:00
+#SBATCH --time=5:00:00
 
 # Conda env activation
 eval "$(conda shell.bash hook)"
@@ -24,4 +24,4 @@ python run_boundary_generation.py \
   --max_iter 2000 \
   --early_stopping_iter 2000  \
   --seed 5 \
-  --l 2.5 \
+  --l 5.0 \

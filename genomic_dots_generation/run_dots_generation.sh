@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=50
 #SBATCH --gpus-per-node=1
 #SBATCH --mem=450000MB
-#SBATCH --time=4:00:00
+#SBATCH --time=6:00:00
 
 # Conda env activation
 eval "$(conda shell.bash hook)"
@@ -21,7 +21,7 @@ python run_dots_generation.py \
   --input_dir /scratch1/smaruj/genomic_insertion_loci \
   --output_dir /scratch1/smaruj/generate_genomic_dots \
   --dots_mask_path /scratch1/smaruj/generate_genomic_dots/doughnut_dots_indices.pt \
-  --max_iter 3000 \
-  --early_stopping_iter 300  \
+  --max_iter 2000 \
+  --early_stopping_iter 2000  \
   --seed 5
   
