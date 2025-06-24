@@ -39,7 +39,7 @@ def main():
     df = pd.read_csv(f"{args.input_dir}/df_select_fold{FOLD}.tsv", sep="\t")
     
     # test
-    df = df[:5]
+    # df = df[:5]
     
     # shifting genomic cordinates and assigning them as a target folding
     df['target_chrom'] = df['chrom'].shift(-1)
