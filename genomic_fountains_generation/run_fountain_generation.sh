@@ -18,10 +18,10 @@ python run_fountain_generation.py \
   --fold 2 \
   --target "0.5" \
   --model_path /home1/smaruj/pytorch_akita/model_0_v2_finetuned_correctly.pt \
-  --input_dir /scratch1/smaruj/genomic_insertion_loci \
-  --output_dir /scratch1/smaruj/generate_genomic_fountains \
-  --fountain_mask_path /scratch1/smaruj/generate_genomic_fountains/fountain_120cone_indices.pt \
+  --input_tsv_dir /scratch1/smaruj/genomic_flat_regions/flat_regions_chrom_states_tsv \
+  --pt_files_dir /scratch1/smaruj/generate_genomic_fountain \
+  --fountain_mask_path /scratch1/smaruj/generate_genomic_fountain/fountain_indices.pt \
   --max_iter 3000 \
   --early_stopping_iter 300  \
-  --seed 5
-  
+  --seed 5  \
+  --l 100.0

@@ -16,8 +16,8 @@ def parse_args():
     parser.add_argument("--fold", type=int, required=True, help="Fold number to process")
     parser.add_argument("--target", type=str, required=True, help="Desired target constant value")
     parser.add_argument("--model_path", type=str, required=True, help="Path to model .pt file")
-    parser.add_argument("--input_dir", type=str, required=True, help="Base path to input .pt and .tsv files")
-    parser.add_argument("--output_dir", type=str, required=True, help="Base path to write output")
+    parser.add_argument("--input_tsv_dir", type=str, required=True, help="Base path to input .tsv files")
+    parser.add_argument("--pt_files_dir", type=str, required=True, help="Base path to input and output .pt files")
     parser.add_argument("--fountain_mask_path", type=str, required=True, help="Path to boundary mask .pt file")
     
     parser.add_argument("--bin_size", type=int, default=2048, help="Bin size for model input")
@@ -26,7 +26,8 @@ def parse_args():
     parser.add_argument("--max_iter", type=int, default=4000, help="Maximum number of optimization steps")
     parser.add_argument("--early_stopping_iter", type=int, default=100, help="Early stopping threshold")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
-    
+    parser.add_argument("--l", type=float, default=0.1, help="Lambda to balance input/output losses")
+        
     return parser.parse_args()
 
 
