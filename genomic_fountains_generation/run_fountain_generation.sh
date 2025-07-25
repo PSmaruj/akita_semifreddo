@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=cone_2
+#SBATCH --job-name=f_l1_f2
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -21,7 +21,6 @@ python run_fountain_generation.py \
   --input_tsv_dir /scratch1/smaruj/genomic_flat_regions/flat_regions_chrom_states_tsv \
   --pt_files_dir /scratch1/smaruj/generate_genomic_fountain \
   --fountain_mask_path /scratch1/smaruj/generate_genomic_fountain/fountain_indices.pt \
-  --max_iter 3000 \
-  --early_stopping_iter 300  \
-  --seed 5  \
-  --l 100.0
+  --max_iter 2000 \
+  --early_stopping_iter 2000  \
+  --l 1.0

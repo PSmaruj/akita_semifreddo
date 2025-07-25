@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=d_l100_f2
+#SBATCH --job-name=d_100_f2
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
