@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=d_100_f2
+#SBATCH --job-name=d_70_f2
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -23,5 +23,5 @@ python run_dots_generation.py \
   --dots_mask_path /scratch1/smaruj/generate_genomic_dot/dots_indices.pt \
   --max_iter 2000 \
   --early_stopping_iter 2000  \
-  --l 100.0
+  --l 70.0
   

@@ -103,7 +103,7 @@ def main():
     flame_df = pd.read_csv(flame_df_path, sep="\t")
     
     # adding flames dimentions
-    RES = 8192
+    RES = 2048 # since that's Akita's pred resolution
 
     flame_df["y_bins"] = flame_df["y_length"] // RES
     flame_df["x_bins"] = flame_df["x_length"] // RES

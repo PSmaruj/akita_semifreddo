@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=f_l1_f2
+#SBATCH --job-name=f_l100_f2
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -23,4 +23,4 @@ python run_fountain_generation.py \
   --fountain_mask_path /scratch1/smaruj/generate_genomic_fountain/fountain_indices.pt \
   --max_iter 2000 \
   --early_stopping_iter 2000  \
-  --l 1.0
+  --l 100.0
