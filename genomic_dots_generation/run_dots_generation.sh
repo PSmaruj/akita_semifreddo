@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=d_01_f0
+#SBATCH --job-name=d_100_f0
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=50
 #SBATCH --gpus-per-node=1
 #SBATCH --mem=450000MB
-#SBATCH --time=7:00:00
+#SBATCH --time=10:00:00
 
 # Conda env activation
 eval "$(conda shell.bash hook)"
@@ -23,5 +23,5 @@ python run_dots_generation.py \
   --dots_mask_path /scratch1/smaruj/generate_genomic_dot/dots_indices.pt \
   --max_iter 2000 \
   --early_stopping_iter 2000  \
-  --l 0.1
+  --l 100.0
   
