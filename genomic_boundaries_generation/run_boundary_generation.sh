@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=0.5fol7
+#SBATCH --job-name=1fol2
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -15,7 +15,7 @@ eval "$(conda shell.bash hook)"
 conda activate pytorch_cuda11.8
 
 python run_boundary_generation.py \
-  --fold 7 \
+  --fold 2 \
   --target "-0.5" \
   --model_path /home1/smaruj/pytorch_akita/model_0_v2_finetuned_correctly.pt \
   --input_tsv_dir /scratch1/smaruj/genomic_flat_regions/flat_regions_chrom_states_tsv \
@@ -23,4 +23,4 @@ python run_boundary_generation.py \
   --boundary_mask_path /scratch1/smaruj/generate_genomic_boundary/boundary_indices.pt \
   --max_iter 2000 \
   --early_stopping_iter 2000  \
-  
+  --l 1.0  

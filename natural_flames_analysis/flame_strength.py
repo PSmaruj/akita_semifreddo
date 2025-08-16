@@ -53,7 +53,8 @@ class GenomicSequenceDataset(Dataset):
         TARGET_LEN = 1310720
         
         row = self.coords.iloc[idx]
-        chrom, start, end = row["chrom1"], row["window_start"], row["window_end"]
+        # chrom, start, end = row["chrom1"], row["window_start"], row["window_end"]
+        chrom, start, end = row["chr"], row["window_start"], row["window_end"]
         seq = self.genome[chrom][start:end].seq.upper()
         
         # Fix sequence length if needed
@@ -99,14 +100,14 @@ def from_upper_triu_batch(batch_vectors, matrix_len=512, num_diags=2):
 
 
 def main():
-    flame_df_path = "/scratch1/smaruj/stripepy_stripes/selected_stripes.tsv"
+    flame_df_path = "/scratch1/smaruj/stripenn_out/selected_stripes.tsv"
     flame_df = pd.read_csv(flame_df_path, sep="\t")
     
     # adding flames dimentions
     RES = 2048 # since that's Akita's pred resolution
 
-    flame_df["y_bins"] = flame_df["y_length"] // RES
-    flame_df["x_bins"] = flame_df["x_length"] // RES
+    flame_df["y_bins"] = flame_df["length"] // RES
+    flame_df["x_bins"] = flame_df["width"] // RES
     
     fasta_file = "/project/fudenber_735/genomes/mm10/mm10.fa"
     genome = Fasta(fasta_file)
@@ -121,8 +122,10 @@ def main():
     model.load_state_dict(torch.load("/home1/smaruj/pytorch_akita/model_0_v2_finetuned_correctly.pt", map_location=device))
     model.eval()
     
-    results = []
+    results_median = []
+    results_q3 = []  # 75th percentile
 
+    map_size = 512
     map_midbin = 256 # midpoint of a 512x512 map
     start_idx = 0
 
@@ -135,18 +138,35 @@ def main():
             
             for i in range(this_batch_size):
                 abs_i = start_idx + i
+            
+                x_end = min(max(map_midbin + flame_df["x_bins"].iat[abs_i], 0), map_size-1)
+
+                if flame_df["triangular_half"].iat[abs_i] == "upper":
+                    y_start = min(max(map_midbin - flame_df["y_bins"].iat[abs_i], 0), map_size-1)
+                    if x_end > map_midbin and map_midbin > y_start:
+                        region = og_maps[i, y_start:map_midbin, map_midbin:x_end]
+                    else:
+                        region = np.array([])
+                else:
+                    y_start = min(max(map_midbin + flame_df["y_bins"].iat[abs_i], 0), map_size-1)
+                    if x_end > map_midbin and y_start < map_size:
+                        region = og_maps[i, map_midbin:x_end, map_midbin:y_start]
+                    else:
+                        region = np.array([])
                 
-                x_end = map_midbin + flame_df["x_bins"][abs_i]
-                y_start = map_midbin - flame_df["y_bins"][abs_i]
-                
-                flame_mean = np.nanmean(og_maps[i, map_midbin:x_end, y_start:map_midbin])
-                results.append(flame_mean)
+                if region.size > 0:
+                    results_median.append(np.nanmedian(region))
+                    results_q3.append(np.nanpercentile(region, 75))
+                else:
+                    results_median.append(np.nan)
+                    results_q3.append(np.nan)
                 
             start_idx += this_batch_size
             
-    flame_df["flame_strength"] = results
+    flame_df["flame_strength_median"] = results_median
+    flame_df["flame_strength_q3"] = results_q3
     
-    flame_df.to_csv("/scratch1/smaruj/stripepy_stripes/filtered_flames_results.tsv", sep="\t", index=False)
+    flame_df.to_csv("/scratch1/smaruj/stripenn_out/selected_stripes_strength_results.tsv", sep="\t", index=False)
 
 
 if __name__ == "__main__":
