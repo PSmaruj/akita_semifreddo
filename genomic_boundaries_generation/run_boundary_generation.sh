@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=1fol2
+#SBATCH --job-name=01fol2
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -23,4 +23,4 @@ python run_boundary_generation.py \
   --boundary_mask_path /scratch1/smaruj/generate_genomic_boundary/boundary_indices.pt \
   --max_iter 2000 \
   --early_stopping_iter 2000  \
-  --l 1.0  
+  --l 0.1  
