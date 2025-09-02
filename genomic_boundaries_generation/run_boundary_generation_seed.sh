@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=f0_l240
+#SBATCH --job-name=seed4
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -14,13 +14,14 @@
 eval "$(conda shell.bash hook)"
 conda activate pytorch_cuda11.8
 
-python run_flame_generation.py \
+python run_boundary_generation_seed.py \
   --fold 0 \
-  --target "1.0" \
+  --target "-0.5" \
   --model_path /home1/smaruj/pytorch_akita/model_0_v2_finetuned_correctly.pt \
   --input_tsv_dir /scratch1/smaruj/genomic_flat_regions/flat_regions_chrom_states_tsv \
-  --pt_files_dir /scratch1/smaruj/generate_genomic_flame \
-  --mask_path /scratch1/smaruj/generate_genomic_flame/flame_indices.pt \
+  --pt_files_dir /scratch1/smaruj/generate_genomic_boundary \
+  --boundary_mask_path /scratch1/smaruj/generate_genomic_boundary/boundary_indices.pt \
   --max_iter 2000 \
   --early_stopping_iter 2000  \
-  --l 240.0  
+  --l 50.0  \
+  --seed 4

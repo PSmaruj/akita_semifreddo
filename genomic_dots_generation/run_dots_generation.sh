@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=d_130_f2
+#SBATCH --job-name=d70_f2
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -20,7 +20,8 @@ python run_dots_generation.py \
   --model_path /home1/smaruj/pytorch_akita/model_0_v2_finetuned_correctly.pt \
   --input_tsv_dir /scratch1/smaruj/genomic_flat_regions/flat_regions_chrom_states_tsv \
   --pt_files_dir /scratch1/smaruj/generate_genomic_dot \
-  --dots_mask_path /scratch1/smaruj/generate_genomic_dot/dots_indices.pt \
+  --dots_mask_path /scratch1/smaruj/generate_genomic_dot/dots_indices_70bins.pt \
+  --inter_anchor_dist 70 \
   --max_iter 2000 \
   --early_stopping_iter 2000  \
   --l 130.0

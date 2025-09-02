@@ -19,6 +19,7 @@ def parse_args():
     parser.add_argument("--input_tsv_dir", type=str, required=True, help="Base path to input .tsv files")
     parser.add_argument("--pt_files_dir", type=str, required=True, help="Base path to input and output .pt files")
     parser.add_argument("--dots_mask_path", type=str, required=True, help="Path to dots mask .pt file")
+    parser.add_argument("--inter_anchor_dist", type=int, default=10, help="Inter-anchor distance")
     
     parser.add_argument("--bin_size", type=int, default=2048, help="Bin size for model input")
     parser.add_argument("--cropping_applied", type=int, default=64, help="Cropping applied in the model")
@@ -52,17 +53,22 @@ def main():
     df = pd.read_csv(f"{args.input_tsv_dir}/fold{FOLD}_selected_genomic_windows_centered_chrom_states.tsv", sep="\t")
     
     dots_mask_path = args.dots_mask_path 
+    inter_anchor_dist = args.inter_anchor_dist
     
     bin_size = args.bin_size
     cropping_applied = args.cropping_applied
     padding_bins = args.padding_bins
     padding = padding_bins * bin_size
-
-    slice_0_bins = [256-25]
+    
+    inter_anchor_dist_mid = inter_anchor_dist // 2
+    size = 512
+    half = size // 2
+    
+    slice_0_bins = [half - inter_anchor_dist_mid]
     slice_0_start = (min(slice_0_bins) + cropping_applied - padding_bins) * bin_size
     slice_0_end = (max(slice_0_bins) + 1 + cropping_applied + padding_bins) * bin_size
     
-    slice_1_bins =[256+25]
+    slice_1_bins =[half + inter_anchor_dist_mid]
     slice_1_start = (min(slice_1_bins) + cropping_applied - padding_bins) * bin_size
     slice_1_end = (max(slice_1_bins) + 1 + cropping_applied + padding_bins) * bin_size
     
@@ -74,7 +80,7 @@ def main():
         print(f"Dots generation for genome location: {chrom}:{pred_start}-{pred_end}")
         
         X = torch.load(f"/scratch1/smaruj/generate_genomic_boundary/ohe_X/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_X.pt", weights_only=True, map_location=device)
-        target = torch.load(f"{args.pt_files_dir}/targets/target_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        target = torch.load(f"{args.pt_files_dir}/targets/target_{target_c}_{inter_anchor_dist}bins/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
         
         tower_output_path = f"/scratch1/smaruj/generate_genomic_boundary/tower_outputs/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_tower_out.pt"
         
@@ -88,8 +94,8 @@ def main():
                     return_history=False,
                     verbose=True,
                     bin_size=args.bin_size,
-                    input_mask_slices_0=[256-25],
-                    input_mask_slices_1=[256+25],
+                    input_mask_slices_0=[half - inter_anchor_dist_mid],
+                    input_mask_slices_1=[half + inter_anchor_dist_mid],
                     cropping_applied=args.cropping_applied,
                     output_mask_path=dots_mask_path,
                     use_semifreddo=True,
@@ -106,11 +112,14 @@ def main():
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update
         
-        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/lambda/lambda_{args.l}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice0.pt")
-        torch.save(x_bar_slice_1[:,:,padding:-padding], f"{args.pt_files_dir}/lambda/lambda_{args.l}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice1.pt")
+        # torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/lambda/lambda_{args.l}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice0.pt")
+        # torch.save(x_bar_slice_1[:,:,padding:-padding], f"{args.pt_files_dir}/lambda/lambda_{args.l}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice1.pt")
         
-    # df.to_csv(f"{args.pt_files_dir}/results/target_{target_c}/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
-    df.to_csv(f"{args.pt_files_dir}/lambda/lambda_{args.l}/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
+        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/results/dist_{inter_anchor_dist}bins/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice0.pt")
+        torch.save(x_bar_slice_1[:,:,padding:-padding], f"{args.pt_files_dir}/results/dist_{inter_anchor_dist}bins/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice1.pt")
+        
+    df.to_csv(f"{args.pt_files_dir}/results/dist_{inter_anchor_dist}bins/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
+    # df.to_csv(f"{args.pt_files_dir}/lambda/lambda_{args.l}/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
     
     
 if __name__ == "__main__":

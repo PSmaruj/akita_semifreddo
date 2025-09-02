@@ -16,8 +16,8 @@ def parse_args():
     parser.add_argument("--fold", type=int, required=True, help="Fold number to process")
     parser.add_argument("--target", type=str, required=True, help="Desired target constant value")
     parser.add_argument("--model_path", type=str, required=True, help="Path to model .pt file")
-    parser.add_argument("--input_dir", type=str, required=True, help="Base path to input .pt and .tsv files")
-    parser.add_argument("--output_dir", type=str, required=True, help="Base path to write output")
+    parser.add_argument("--input_tsv_dir", type=str, required=True, help="Base path to input .tsv files")
+    parser.add_argument("--pt_files_dir", type=str, required=True, help="Base path to input and output .pt files")
     parser.add_argument("--mask_path", type=str, required=True, help="Path to mask .pt file")
     
     parser.add_argument("--bin_size", type=int, default=2048, help="Bin size for model input")
@@ -26,6 +26,7 @@ def parse_args():
     parser.add_argument("--max_iter", type=int, default=4000, help="Maximum number of optimization steps")
     parser.add_argument("--early_stopping_iter", type=int, default=100, help="Early stopping threshold")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
+    parser.add_argument("--l", type=float, default=0.1, help="Lambda to balance input/output losses")
     
     return parser.parse_args()
 
@@ -48,7 +49,7 @@ def main():
 
     FOLD = args.fold
     
-    df = pd.read_csv(f"{args.input_dir}/fold{FOLD}_selected_genomic_windows_centered.tsv", sep="\t")
+    df = pd.read_csv(f"{args.input_tsv_dir}/fold{FOLD}_selected_genomic_windows_centered_chrom_states.tsv", sep="\t")
     
     mask_path = args.mask_path
     
@@ -68,15 +69,16 @@ def main():
         
         print(f"Flame generation for genome location: {chrom}:{pred_start}-{pred_end}")
         
-        X = torch.load(f"{args.input_dir}/ohe_X/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_X.pt", weights_only=True, map_location=device)
-        target = torch.load(f"/scratch1/smaruj/generate_genomic_flame/OW_targets_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        X = torch.load(f"/scratch1/smaruj/generate_genomic_boundary/ohe_X/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_X.pt", weights_only=True, map_location=device)
+        target = torch.load(f"{args.pt_files_dir}/targets/target_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
 
-        tower_output_path = f"{args.input_dir}/tower_outputs/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_tower_out.pt"
+        tower_output_path = f"/scratch1/smaruj/generate_genomic_boundary/tower_outputs/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_tower_out.pt"
         
         wrapper = Ledidi(model, 
                     input_loss=torch.nn.L1Loss(reduction='sum'), 
                     output_loss=torch.nn.L1Loss(reduction='sum'),
                     batch_size=1,
+                    l=args.l,
                     max_iter=args.max_iter,
                     early_stopping_iter=args.early_stopping_iter,
                     return_history=False,
@@ -98,9 +100,9 @@ def main():
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update
         
-        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.output_dir}/OW_results_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
+        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/lambda/lambda_{args.l}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
         
-    df.to_csv(f"{args.output_dir}/OW_fold{FOLD}_{target_c}_selected_genomic_windows_centered_with_steps.tsv", sep="\t", index=False)
+    df.to_csv(f"{args.pt_files_dir}/lambda/lambda_{args.l}/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
     
     
 if __name__ == "__main__":

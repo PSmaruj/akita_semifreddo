@@ -124,7 +124,8 @@ def main():
     
     results_median = []
     results_q3 = []  # 75th percentile
-
+    results_mean = []  # mean
+    
     map_size = 512
     map_midbin = 256 # midpoint of a 512x512 map
     start_idx = 0
@@ -157,16 +158,19 @@ def main():
                 if region.size > 0:
                     results_median.append(np.nanmedian(region))
                     results_q3.append(np.nanpercentile(region, 75))
+                    results_mean.append(np.nanmean(region))
                 else:
                     results_median.append(np.nan)
                     results_q3.append(np.nan)
+                    results_mean.append(np.nan)
                 
             start_idx += this_batch_size
             
     flame_df["flame_strength_median"] = results_median
     flame_df["flame_strength_q3"] = results_q3
+    flame_df["flame_strength_mean"] = results_mean
     
-    flame_df.to_csv("/scratch1/smaruj/stripenn_out/selected_stripes_strength_results.tsv", sep="\t", index=False)
+    flame_df.to_csv("/scratch1/smaruj/stripenn_out/selected_stripes_strength_results_median_q3_mean.tsv", sep="\t", index=False)
 
 
 if __name__ == "__main__":

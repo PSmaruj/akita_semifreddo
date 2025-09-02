@@ -100,13 +100,11 @@ def main():
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update
         
-        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/results/target_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
+        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/seeds/seed{args.seed}/{chrom}_{pred_start}_{pred_end}_slice.pt")
+        # torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/results/target_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
         # torch.save(x_bar_slice_0[:,:,padding:-padding], f"/scratch1/smaruj/generate_genomic_boundary/lambda/lambda_{args.l}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
         
-        # saving for a particular seed
-        # torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.output_dir}/reproducibility_fold0_-0.5/seed{args.seed}/{chrom}_{pred_start}_{pred_end}_slice.pt")
-        
-    df.to_csv(f"{args.pt_files_dir}/results/target_{target_c}/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
+    df.to_csv(f"{args.pt_files_dir}/seeds/seed{args.seed}_fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
     # df.to_csv(f"/scratch1/smaruj/generate_genomic_boundary/lambda/lambda_{args.l}/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
     
 if __name__ == "__main__":
