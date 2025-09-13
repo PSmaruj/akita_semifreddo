@@ -23,10 +23,10 @@ def parse_args():
     parser.add_argument("--bin_size", type=int, default=2048, help="Bin size for model input")
     parser.add_argument("--cropping_applied", type=int, default=64, help="Cropping applied in the model")
     parser.add_argument("--padding_bins", type=int, default=2, help="Number of bins to pad input slices")
-    parser.add_argument("--max_iter", type=int, default=4000, help="Maximum number of optimization steps")
-    parser.add_argument("--early_stopping_iter", type=int, default=100, help="Early stopping threshold")
+    parser.add_argument("--max_iter", type=int, default=2000, help="Maximum number of optimization steps")
+    parser.add_argument("--early_stopping_iter", type=int, default=2000, help="Early stopping threshold")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
-    parser.add_argument("--l", type=float, default=0.1, help="Lambda to balance input/output losses")
+    parser.add_argument("--l", type=float, default=240.0, help="Lambda to balance input/output losses")
     
     return parser.parse_args()
 
@@ -100,10 +100,11 @@ def main():
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update
         
-        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/lambda/lambda_{args.l}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
+        # torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/lambda/lambda_{args.l}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
+        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/results/target_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
         
-    df.to_csv(f"{args.pt_files_dir}/lambda/lambda_{args.l}/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
-    
+    # df.to_csv(f"{args.pt_files_dir}/lambda/lambda_{args.l}/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
+    df.to_csv(f"{args.pt_files_dir}/results/target_{target_c}/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
     
 if __name__ == "__main__":
     main()

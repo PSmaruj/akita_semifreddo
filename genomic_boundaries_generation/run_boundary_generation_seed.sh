@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=seed4
+#SBATCH --job-name=seed9
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -24,4 +24,4 @@ python run_boundary_generation_seed.py \
   --max_iter 2000 \
   --early_stopping_iter 2000  \
   --l 50.0  \
-  --seed 4
+  --seed 9
