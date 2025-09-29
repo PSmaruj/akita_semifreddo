@@ -26,7 +26,7 @@ def parse_args():
     parser.add_argument("--max_iter", type=int, default=2000, help="Maximum number of optimization steps")
     parser.add_argument("--early_stopping_iter", type=int, default=2000, help="Early stopping threshold")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
-    parser.add_argument("--l", type=float, default=50.0, help="Lambda to balance input/output losses")
+    parser.add_argument("--l", type=float, default=60.0, help="Lambda to balance input/output losses")
     parser.add_argument("--tau", type=float, default=1.0, help="Tau for Gumbel softmax")
     parser.add_argument("--eps", type=float, default=1e-4, help="Epsilon for convergence criterion")    
     return parser.parse_args()
@@ -71,7 +71,7 @@ def main():
         print(f"Boundary generation for genome location: {chrom}:{pred_start}-{pred_end}")
         
         X = torch.load(f"{args.pt_files_dir}/ohe_X/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_X.pt", weights_only=True, map_location=device)
-        target = torch.load(f"{args.pt_files_dir}/targets/target_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        target = torch.load(f"{args.pt_files_dir}/overwritten_targets/target_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
         tower_output_path = f"{args.pt_files_dir}/tower_outputs/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_tower_out.pt"
         
         wrapper = Ledidi(model, 
@@ -97,20 +97,14 @@ def main():
         
         slice_0_torch = X[:, :, slice_0_start:slice_0_end]
         
-        # x_bar_slice_0, last_update = wrapper.fit_transform(X=slice_0_torch, y_bar=target)
         x_bar_slice_0, last_update, _, _, _ = wrapper.fit_transform(X=slice_0_torch, y_bar=target)
         
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update
         
-        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/results/target_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
-        # torch.save(x_bar_slice_0[:,:,padding:-padding], f"/scratch1/smaruj/generate_genomic_boundary/lambda/lambda_{args.l}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
+        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/overwritten_results/target_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
         
-        # saving for a particular seed
-        # torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.output_dir}/reproducibility_fold0_-0.5/seed{args.seed}/{chrom}_{pred_start}_{pred_end}_slice.pt")
-        
-    df.to_csv(f"{args.pt_files_dir}/results/target_{target_c}/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
-    # df.to_csv(f"/scratch1/smaruj/generate_genomic_boundary/lambda/lambda_{args.l}/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
+    df.to_csv(f"{args.pt_files_dir}/overwritten_results/target_{target_c}/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
     
 if __name__ == "__main__":
     main()

@@ -71,7 +71,7 @@ def main():
         print(f"Boundary generation for genome location: {chrom}:{pred_start}-{pred_end}")
         
         X = torch.load(f"{args.pt_files_dir}/ohe_X/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_X.pt", weights_only=True, map_location=device)
-        target = torch.load(f"{args.pt_files_dir}/targets/target_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        target = torch.load(f"{args.pt_files_dir}/overwritten_targets/target_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
         tower_output_path = f"{args.pt_files_dir}/tower_outputs/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_tower_out.pt"
         
         wrapper = Ledidi(model, 
@@ -97,20 +97,14 @@ def main():
         
         slice_0_torch = X[:, :, slice_0_start:slice_0_end]
         
-        # x_bar_slice_0, last_update = wrapper.fit_transform(X=slice_0_torch, y_bar=target)
         x_bar_slice_0, last_update, _, _, _ = wrapper.fit_transform(X=slice_0_torch, y_bar=target)
         
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update
         
-        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/results/target_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
-        # torch.save(x_bar_slice_0[:,:,padding:-padding], f"/scratch1/smaruj/generate_genomic_boundary/lambda/lambda_{args.l}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
+        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/overwritten_tau/tau_{args.tau}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
         
-        # saving for a particular seed
-        # torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.output_dir}/reproducibility_fold0_-0.5/seed{args.seed}/{chrom}_{pred_start}_{pred_end}_slice.pt")
-        
-    df.to_csv(f"{args.pt_files_dir}/results/target_{target_c}/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
-    # df.to_csv(f"/scratch1/smaruj/generate_genomic_boundary/lambda/lambda_{args.l}/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
+    df.to_csv(f"{args.pt_files_dir}/overwritten_tau/tau_{args.tau}/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
     
 if __name__ == "__main__":
     main()
