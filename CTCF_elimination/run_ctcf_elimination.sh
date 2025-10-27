@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=el_f4
+#SBATCH --job-name=el_f7
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -15,7 +15,7 @@ eval "$(conda shell.bash hook)"
 conda activate pytorch_cuda11.8
 
 python run_ctcf_elimination.py \
-  --fold 4 \
+  --fold 7 \
   --target "-0.2" \
   --gamma "300.0" \
   --model_path /home1/smaruj/pytorch_akita/model_0_v2_finetuned_correctly.pt \

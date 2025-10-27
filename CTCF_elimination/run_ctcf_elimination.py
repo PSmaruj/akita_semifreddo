@@ -71,7 +71,7 @@ def main():
         print(f"Boundary generation for genome location: {chrom}:{pred_start}-{pred_end}")
         
         X = torch.load(f"{args.pt_files_dir}/ohe_X/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_X.pt", weights_only=True, map_location=device)
-        target = torch.load(f"{args.pt_files_dir}/targets/target_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        target = torch.load(f"{args.pt_files_dir}/overwritten_targets/target_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
         tower_output_path = f"{args.pt_files_dir}/tower_outputs/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_tower_out.pt"
         
         CTCF_PWM = "/home1/smaruj/IterativeMutagenesis/MA0139.1.meme"
