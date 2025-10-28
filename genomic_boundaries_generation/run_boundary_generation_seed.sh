@@ -23,5 +23,5 @@ python run_boundary_generation_seed.py \
   --boundary_mask_path /scratch1/smaruj/generate_genomic_boundary/boundary_indices.pt \
   --max_iter 2000 \
   --early_stopping_iter 2000  \
-  --l 50.0  \
+  --l 60.0  \
   --seed 9

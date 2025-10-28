@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=e_2_8
+#SBATCH --job-name=e_2_9
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -24,4 +24,4 @@ python run_boundary_generation_overwritten_eps.py \
   --max_iter 2000 \
   --early_stopping_iter 2000  \
   --l 0.1 \
-  --eps 1e-08
+  --eps 1e-09
