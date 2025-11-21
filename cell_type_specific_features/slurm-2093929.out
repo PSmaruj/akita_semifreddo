@@ -1,0 +1,67 @@
+==========================================
+SLURM_JOB_ID = 2093929
+SLURM_JOB_NODELIST = b23-17
+TMPDIR = /tmp/SLURM_2093929
+==========================================
+Boundary generation for genome location: chr1:37799936-39110656
+Model 0 in train mode: False
+Model 1 in train mode: False
+Model 2 in train mode: False
+Model 3 in train mode: False
+Gradients enabled for weights - slice 0: True
+Weights shape - slice 0: torch.Size([1, 4, 2048])
+Local loss applied.
+iter=I	input_loss=0.0	output_loss=7.552e+04	total_loss=7.552e+04	time=0.0
+iter=100	input_loss=603.0	output_loss=5.778e+04	total_loss=5.784e+04	time=295.6
+iter=200	input_loss=858.0	output_loss=4.96e+04	total_loss=4.969e+04	time=295.4
+iter=300	input_loss=929.0	output_loss=4.842e+04	total_loss=4.851e+04	time=295.6
+iter=400	input_loss=927.0	output_loss=4.751e+04	total_loss=4.76e+04	time=302.6
+iter=500	input_loss=934.0	output_loss=4.72e+04	total_loss=4.729e+04	time=298.2
+iter=600	input_loss=938.0	output_loss=4.689e+04	total_loss=4.699e+04	time=298.9
+iter=700	input_loss=958.0	output_loss=4.672e+04	total_loss=4.682e+04	time=297.6
+iter=800	input_loss=952.0	output_loss=4.662e+04	total_loss=4.672e+04	time=304.2
+iter=900	input_loss=976.0	output_loss=4.661e+04	total_loss=4.671e+04	time=305.4
+iter=1000	input_loss=958.0	output_loss=4.667e+04	total_loss=4.677e+04	time=302.8
+iter=1100	input_loss=943.0	output_loss=4.656e+04	total_loss=4.666e+04	time=301.2
+iter=1200	input_loss=946.0	output_loss=4.662e+04	total_loss=4.672e+04	time=297.7
+iter=1300	input_loss=956.0	output_loss=4.659e+04	total_loss=4.669e+04	time=295.1
+iter=1400	input_loss=948.0	output_loss=4.654e+04	total_loss=4.663e+04	time=297.8
+iter=1500	input_loss=946.0	output_loss=4.648e+04	total_loss=4.657e+04	time=300.4
+iter=1600	input_loss=964.0	output_loss=4.654e+04	total_loss=4.663e+04	time=301.5
+iter=1700	input_loss=944.0	output_loss=4.64e+04	total_loss=4.649e+04	time=301.2
+iter=1800	input_loss=935.0	output_loss=4.633e+04	total_loss=4.642e+04	time=298.7
+iter=1900	input_loss=963.0	output_loss=4.63e+04	total_loss=4.639e+04	time=300.2
+iter=2000	input_loss=960.0	output_loss=4.62e+04	total_loss=4.63e+04	time=299.8
+iter=F	input_loss=963.0	output_loss=4.62e+04	total_loss=4.629e+04	time=5.99e+03
+Last iteration with update:  1965
+Boundary generation for genome location: chr11:65677312-66988032
+Model 0 in train mode: False
+Model 1 in train mode: False
+Model 2 in train mode: False
+Model 3 in train mode: False
+Gradients enabled for weights - slice 0: True
+Weights shape - slice 0: torch.Size([1, 4, 2048])
+Local loss applied.
+iter=I	input_loss=0.0	output_loss=5.126e+04	total_loss=5.126e+04	time=0.0
+iter=100	input_loss=766.0	output_loss=2.813e+04	total_loss=2.82e+04	time=298.7
+iter=200	input_loss=855.0	output_loss=2.625e+04	total_loss=2.634e+04	time=295.8
+iter=300	input_loss=870.0	output_loss=2.548e+04	total_loss=2.557e+04	time=296.8
+iter=400	input_loss=881.0	output_loss=2.492e+04	total_loss=2.501e+04	time=296.9
+iter=500	input_loss=884.0	output_loss=2.46e+04	total_loss=2.469e+04	time=301.1
+iter=600	input_loss=871.0	output_loss=2.455e+04	total_loss=2.463e+04	time=301.4
+iter=700	input_loss=870.0	output_loss=2.469e+04	total_loss=2.478e+04	time=300.1
+iter=800	input_loss=855.0	output_loss=2.467e+04	total_loss=2.476e+04	time=299.1
+iter=900	input_loss=861.0	output_loss=2.451e+04	total_loss=2.46e+04	time=298.8
+iter=1000	input_loss=879.0	output_loss=2.452e+04	total_loss=2.461e+04	time=298.9
+iter=1100	input_loss=870.0	output_loss=2.443e+04	total_loss=2.452e+04	time=296.9
+iter=1200	input_loss=888.0	output_loss=2.44e+04	total_loss=2.449e+04	time=297.6
+iter=1300	input_loss=871.0	output_loss=2.427e+04	total_loss=2.435e+04	time=296.3
+iter=1400	input_loss=900.0	output_loss=2.424e+04	total_loss=2.433e+04	time=298.3
+iter=1500	input_loss=895.0	output_loss=2.417e+04	total_loss=2.426e+04	time=296.2
+iter=1600	input_loss=887.0	output_loss=2.395e+04	total_loss=2.404e+04	time=296.8
+iter=1700	input_loss=881.0	output_loss=2.398e+04	total_loss=2.407e+04	time=297.3
+iter=1800	input_loss=885.0	output_loss=2.382e+04	total_loss=2.391e+04	time=299.0
+iter=1900	input_loss=889.0	output_loss=2.38e+04	total_loss=2.389e+04	time=299.4
+iter=2000	input_loss=877.0	output_loss=2.373e+04	total_loss=2.382e+04	time=299.1
+iter=F	input_loss=880.0	output_loss=2.37e+04	total_loss=2.379e+04	time=5.964e+03
+Last iteration with update:  1978

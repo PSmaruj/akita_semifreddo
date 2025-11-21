@@ -8,7 +8,7 @@ sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
 from model_v2_compatible import SeqNN
 
 sys.path.insert(0, "/home1/smaruj/ledidi/ledidi")
-from ledidi_multiple_models import Ledidi
+from ledidi_multiple_models_sum import Ledidi
 
 
 def parse_args():
@@ -77,7 +77,7 @@ def main():
     
     df["last_accepted_step"] = -1  # initialize with placeholder
     
-    for i, row in enumerate(df.itertuples(index=False)):
+    for i, row in enumerate(df[0:3].itertuples(index=False)):
         chrom, pred_start, pred_end = row.chrom, row.centered_start, row.centered_end
         
         print(f"Fountain generation for genome location: {chrom}:{pred_start}-{pred_end}")
@@ -89,7 +89,7 @@ def main():
         target_m2 = torch.load(f"/scratch1/smaruj/generate_genomic_fountain/Bcell_targets_fold0/model2/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
         target_m3 = torch.load(f"/scratch1/smaruj/generate_genomic_fountain/Bcell_targets_fold0/model3/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
     
-        target = torch.stack([target_m0, target_m1, target_m2, target_m3], dim=0).mean(dim=0)
+        target = [target_m0, target_m1, target_m2, target_m3]
         
         tower_output_path_list = [f"/scratch1/smaruj/generate_genomic_fountain/Bcell_tower_out_fold0/model0/{chrom}_{pred_start}_{pred_end}_tower_out.pt",
                                 f"/scratch1/smaruj/generate_genomic_fountain/Bcell_tower_out_fold0/model1/{chrom}_{pred_start}_{pred_end}_tower_out.pt",
@@ -116,14 +116,14 @@ def main():
         
         slice_0_torch = X[:, :, slice_0_start:slice_0_end]
         
-        x_bar_slice_0, last_update, _, _, _ = wrapper.fit_transform(X=slice_0_torch, y_bar=target)
+        x_bar_slice_0, last_update, _, _, _ = wrapper.fit_transform(X=slice_0_torch, y_bar_list=target)
         
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update
         
-        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/Bcell_results/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
+        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/Bcell_results_sum/{chrom}_{pred_start}_{pred_end}_slice.pt")
         
-    df.to_csv(f"{args.pt_files_dir}/Bcell_results/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
+    # df.to_csv(f"{args.pt_files_dir}/Bcell_results/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
     
     
 if __name__ == "__main__":

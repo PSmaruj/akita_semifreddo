@@ -70,7 +70,7 @@ def main():
         print(f"Boundary generation for genome location: {chrom}:{pred_start}-{pred_end}")
         
         X = torch.load(f"{args.pt_files_dir}/ohe_X/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_X.pt", weights_only=True, map_location=device)
-        target = torch.load(f"{args.pt_files_dir}/overwritten_targets/target_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        target = torch.load(f"{args.pt_files_dir}/targets/target_{target_c}/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
         tower_output_path = f"{args.pt_files_dir}/tower_outputs/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_tower_out.pt"
         
         wrapper = Ledidi(model, 
@@ -100,9 +100,9 @@ def main():
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update
         
-        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/seeds/seed{args.seed}/{chrom}_{pred_start}_{pred_end}_slice.pt")
+        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/seeds_default_l/seed{args.seed}/{chrom}_{pred_start}_{pred_end}_slice.pt")
         
-    df.to_csv(f"{args.pt_files_dir}/seeds/seed{args.seed}_fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
+    df.to_csv(f"{args.pt_files_dir}/seeds_default_l/seed{args.seed}_fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
     
 if __name__ == "__main__":
     main()
