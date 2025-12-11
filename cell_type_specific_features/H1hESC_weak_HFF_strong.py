@@ -5,7 +5,7 @@ import sys
 import os
 
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
-from model_v2_compatible import SeqNN
+from akita_model.model import SeqNN
 
 sys.path.insert(0, "/home1/smaruj/ledidi/ledidi")
 from ledidi_multiple_models_sum import Ledidi
@@ -43,26 +43,26 @@ def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
     model0 = SeqNN()
-    model0.load_state_dict(torch.load("/scratch1/smaruj/Akita_pytorch_models/finetuned/mouse_models/Hsieh2019_mESC/models/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth", map_location=device))
+    model0.load_state_dict(torch.load("/scratch1/smaruj/Akita_pytorch_models/finetuned/human_models/Krietenstein2019_H1hESC/models/Akita_v2_human_Krietenstein2019_H1hESC_model0_finetuned.pth", map_location=device))
     model0.eval()
     
     model1 = SeqNN()
-    model1.load_state_dict(torch.load("/scratch1/smaruj/Akita_pytorch_models/finetuned/mouse_models/Hsieh2019_mESC/models/Akita_v2_mouse_Hsieh2019_mESC_model1_finetuned.pth", map_location=device))
+    model1.load_state_dict(torch.load("/scratch1/smaruj/Akita_pytorch_models/finetuned/human_models/Krietenstein2019_H1hESC/models/Akita_v2_human_Krietenstein2019_H1hESC_model1_finetuned.pth", map_location=device))
     model1.eval()
     
     model2 = SeqNN()
-    model2.load_state_dict(torch.load("/scratch1/smaruj/Akita_pytorch_models/finetuned/mouse_models/Bonev2017_ncx_NPC/models/Akita_v2_mouse_Bonev2017_ncx_NPC_model0_finetuned.pth", map_location=device))
+    model2.load_state_dict(torch.load("/scratch1/smaruj/Akita_pytorch_models/finetuned/human_models/Krietenstein2019_HFF/models/Akita_v2_human_Krietenstein2019_HFF_model0_finetuned.pth", map_location=device))
     model2.eval()
 
     model3 = SeqNN()
-    model3.load_state_dict(torch.load("/scratch1/smaruj/Akita_pytorch_models/finetuned/mouse_models/Bonev2017_ncx_NPC/models/Akita_v2_mouse_Bonev2017_ncx_NPC_model1_finetuned.pth", map_location=device))
+    model3.load_state_dict(torch.load("/scratch1/smaruj/Akita_pytorch_models/finetuned/human_models/Krietenstein2019_HFF/models/Akita_v2_human_Krietenstein2019_HFF_model1_finetuned.pth", map_location=device))
     model3.eval()
 
     models = [model0, model1, model2, model3]
     
     FOLD = args.fold
     
-    df = pd.read_csv(f"{args.input_tsv_dir}/fold{FOLD}_selected_genomic_windows_centered_chrom_states.tsv", sep="\t")
+    df = pd.read_csv(f"{args.input_tsv_dir}/fold{FOLD}_HUMAN_selected_genomic_windows_centered.tsv", sep="\t")
     
     boundary_mask_path = args.boundary_mask_path
     
@@ -82,19 +82,19 @@ def main():
         
         print(f"Boundary generation for genome location: {chrom}:{pred_start}-{pred_end}")
         
-        X = torch.load(f"/scratch1/smaruj/generate_genomic_boundary/ohe_X/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_X.pt", weights_only=True, map_location=device)
+        X = torch.load(f"/scratch1/smaruj/generate_cell_type_specific_features/ohe_X_HUMAN/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_X.pt", weights_only=True, map_location=device)
 
-        target_m0 = torch.load(f"/scratch1/smaruj/generate_cell_type_specific_features/target_mESC_weak_boundary/model0/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
-        target_m1 = torch.load(f"/scratch1/smaruj/generate_cell_type_specific_features/target_mESC_weak_boundary/model1/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
-        target_m2 = torch.load(f"/scratch1/smaruj/generate_cell_type_specific_features/target_ncx_NPC_strong_boundary/model0/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
-        target_m3 = torch.load(f"/scratch1/smaruj/generate_cell_type_specific_features/target_ncx_NPC_strong_boundary/model1/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        target_m0 = torch.load(f"/scratch1/smaruj/generate_cell_type_specific_features/target_H1hESC_weak_boundary/model0/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        target_m1 = torch.load(f"/scratch1/smaruj/generate_cell_type_specific_features/target_H1hESC_weak_boundary/model1/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        target_m2 = torch.load(f"/scratch1/smaruj/generate_cell_type_specific_features/target_HFF_strong_boundary/model0/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
+        target_m3 = torch.load(f"/scratch1/smaruj/generate_cell_type_specific_features/target_HFF_strong_boundary/model1/{chrom}_{pred_start}_{pred_end}_target.pt", weights_only=True, map_location=device)
     
         y_bar_list = [target_m0, target_m1, target_m2, target_m3]
         
-        tower_output_path_list = [f"/scratch1/smaruj/generate_cell_type_specific_features/tower_output_mESC/model0/{chrom}_{pred_start}_{pred_end}_tower_out.pt",
-                                f"/scratch1/smaruj/generate_cell_type_specific_features/tower_output_mESC/model1/{chrom}_{pred_start}_{pred_end}_tower_out.pt",
-                                f"/scratch1/smaruj/generate_cell_type_specific_features/tower_output_ncx_NPC/model0/{chrom}_{pred_start}_{pred_end}_tower_out.pt",
-                                f"/scratch1/smaruj/generate_cell_type_specific_features/tower_output_ncx_NPC/model1/{chrom}_{pred_start}_{pred_end}_tower_out.pt"]
+        tower_output_path_list = [f"/scratch1/smaruj/generate_cell_type_specific_features/tower_output_H1hESC/model0/{chrom}_{pred_start}_{pred_end}_tower_out.pt",
+                                f"/scratch1/smaruj/generate_cell_type_specific_features/tower_output_H1hESC/model1/{chrom}_{pred_start}_{pred_end}_tower_out.pt",
+                                f"/scratch1/smaruj/generate_cell_type_specific_features/tower_output_HFF/model0/{chrom}_{pred_start}_{pred_end}_tower_out.pt",
+                                f"/scratch1/smaruj/generate_cell_type_specific_features/tower_output_HFF/model1/{chrom}_{pred_start}_{pred_end}_tower_out.pt"]
         
         wrapper = Ledidi(models, 
             input_loss=torch.nn.L1Loss(reduction='sum'), 
@@ -121,9 +121,9 @@ def main():
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update
         
-        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/mESC_weak_ncx_NPC_strong_results_sum/{chrom}_{pred_start}_{pred_end}_slice.pt")
+        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/H1hESC_weak_HFF_strong_results/{chrom}_{pred_start}_{pred_end}_slice.pt")
         
-    # df.to_csv(f"{args.pt_files_dir}/fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
+    df.to_csv(f"{args.pt_files_dir}/fold{FOLD}_{target_c}_H1hESC_weak_HFF_strong_results.tsv", sep="\t", index=False)
     
     
 if __name__ == "__main__":
