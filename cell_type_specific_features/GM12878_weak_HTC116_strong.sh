@@ -8,7 +8,8 @@
 #SBATCH --cpus-per-task=50
 #SBATCH --gpus-per-node=1
 #SBATCH --mem=450000MB
-#SBATCH --time=5-00:00:00
+#SBATCH --time=3-00:00:00
+#SBATCH --exclude=b23-18       # ← Avoid broken GPU node
 
 # Conda env activation
 eval "$(conda shell.bash hook)"

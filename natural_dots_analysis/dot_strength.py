@@ -10,8 +10,7 @@ import sys
 import os
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
 
-# from model import SeqNN
-from model_v2_compatible import SeqNN
+from akita_model.model import SeqNN
 
 # functions
 
@@ -102,7 +101,7 @@ def main():
     dot_df_path = "/scratch1/smaruj/natural_dots/filtered_dots.tsv"
     dot_df = pd.read_csv(dot_df_path, sep="\t")
     
-    fasta_file = "/project/fudenber_735/genomes/mm10/mm10.fa"
+    fasta_file = "/project2/fudenber_735/genomes/mm10/mm10.fa"
     genome = Fasta(fasta_file)
     
     orig_dataset = GenomicSequenceDataset(dot_df, genome)
@@ -112,10 +111,10 @@ def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     model = SeqNN()
-    model.load_state_dict(torch.load("/home1/smaruj/pytorch_akita/model_0_v2_finetuned_correctly.pt", map_location=device))
+    model.load_state_dict(torch.load("/home1/smaruj/pytorch_akita/models/finetuned/mouse/Hsieh2019_mESC/checkpoints/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth", map_location=device))
     model.eval()
     
-    dot_width_half = 3
+    dot_width_half = 7
     
     results = []
 
@@ -139,7 +138,7 @@ def main():
             start_idx += this_batch_size
             
     dot_df["dot_strength"] = results
-    dot_df.to_csv("/scratch1/smaruj/natural_dots/filtered_dots_results.tsv", sep="\t", index=False)
+    dot_df.to_csv("/scratch1/smaruj/natural_dots/filtered_dots_results_15x15.tsv", sep="\t", index=False)
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ import os
 import ast
 
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
-from model_v2_compatible import SeqNN
+from akita_model.model import SeqNN
 
 sys.path.insert(0, "/home1/smaruj/ledidi")
 from ledidi import Ledidi
@@ -90,7 +90,7 @@ def main():
     
     for i, row in enumerate(df.itertuples(index=False)):
         chrom, pred_start, pred_end = row.chrom, row.centered_start, row.centered_end
-        ctcf_locations = ast.literal_eval(row.ctcf_motif_locs)
+        # ctcf_locations = ast.literal_eval(row.ctcf_motif_locs)
         
         print(f"CTCT suppression for genome location: {chrom}:{pred_start}-{pred_end}")
         
@@ -128,9 +128,9 @@ def main():
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update
         
-        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/results_control/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
+        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/results_control_repeated/fold{FOLD}/{chrom}_{pred_start}_{pred_end}_slice.pt")
         
-    df.to_csv(f"{args.pt_files_dir}/results_control/fold{FOLD}_with_positions_steps.tsv", sep="\t", index=False)
+    df.to_csv(f"{args.pt_files_dir}/results_control_repeated/fold{FOLD}_with_positions_steps.tsv", sep="\t", index=False)
     
 if __name__ == "__main__":
     main()

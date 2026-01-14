@@ -4,11 +4,24 @@ import argparse
 import sys
 import os
 
+# Print GPU allocation info
+print(f"CUDA_VISIBLE_DEVICES: {os.environ.get('CUDA_VISIBLE_DEVICES', 'Not set')}")
+
+# Check CUDA availability
+print(f"CUDA available: {torch.cuda.is_available()}")
+if torch.cuda.is_available():
+    print(f"Number of GPUs: {torch.cuda.device_count()}")
+    print(f"Current device: {torch.cuda.current_device()}")
+    print(f"Device name: {torch.cuda.get_device_name(0)}")
+else:
+    print("WARNING: No CUDA devices available! Job may have no GPU allocated.")
+    sys.exit(1)  # Exit if no GPU
+
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
 from akita_model.model import SeqNN
 
 sys.path.insert(0, "/home1/smaruj/ledidi/ledidi")
-from ledidi_multiple_models_sum import Ledidi
+from ledidi_multiple_models_sum_mod import Ledidi
 
 
 def parse_args():
@@ -77,7 +90,7 @@ def main():
     
     df["last_accepted_step"] = -1  # initialize with placeholder
     
-    for i, row in enumerate(df[0:3].itertuples(index=False)):
+    for i, row in enumerate(df.itertuples(index=False)):
         chrom, pred_start, pred_end = row.chrom, row.centered_start, row.centered_end
         
         print(f"Boundary generation for genome location: {chrom}:{pred_start}-{pred_end}")

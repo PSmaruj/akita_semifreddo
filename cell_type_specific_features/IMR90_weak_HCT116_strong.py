@@ -8,7 +8,7 @@ sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
 from akita_model.model import SeqNN
 
 sys.path.insert(0, "/home1/smaruj/ledidi/ledidi")
-from ledidi_multiple_models_sum import Ledidi
+from ledidi_multiple_models_sum_mod import Ledidi
 
 
 def parse_args():
@@ -77,7 +77,7 @@ def main():
     
     df["last_accepted_step"] = -1  # initialize with placeholder
     
-    for i, row in enumerate(df[0:3].itertuples(index=False)):
+    for i, row in enumerate(df.itertuples(index=False)):
         chrom, pred_start, pred_end = row.chrom, row.centered_start, row.centered_end
         
         print(f"Boundary generation for genome location: {chrom}:{pred_start}-{pred_end}")

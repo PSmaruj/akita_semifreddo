@@ -12,6 +12,6 @@
 
 # Conda env activation
 eval "$(conda shell.bash hook)"
-conda activate pytorch_cuda11.8
+conda activate pytorch_hic
 
 python dot_strength.py
