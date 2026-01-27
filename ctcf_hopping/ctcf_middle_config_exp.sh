@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=left
+#SBATCH --job-name=flanks
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu 
 #SBATCH --nodes=1
@@ -15,4 +15,4 @@
 eval "$(conda shell.bash hook)"
 conda activate pytorch_hic
 
-python ctcf_middle_config_exp.py --outer_orient "<<" 
+python ctcf_middle_config_exp.py --outer_orient "<>" 

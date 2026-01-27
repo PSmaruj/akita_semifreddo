@@ -9,13 +9,14 @@
 #SBATCH --gpus-per-node=1
 #SBATCH --mem=450000MB
 #SBATCH --time=8:00:00
+#SBATCH --exclude=b23-18
 
 # Conda env activation
 eval "$(conda shell.bash hook)"
-conda activate pytorch_cuda11.8
+conda activate pytorch_hic
 
 python run_boundary_generation_overwritten_seed.py \
-  --fold 0 \
+  --fold 2 \
   --target "-0.5" \
   --model_path /scratch1/smaruj/Akita_pytorch_models/finetuned/mouse_models/Hsieh2019_mESC/models/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth \
   --input_tsv_dir /scratch1/smaruj/genomic_flat_regions/flat_regions_chrom_states_tsv \
@@ -23,5 +24,5 @@ python run_boundary_generation_overwritten_seed.py \
   --boundary_mask_path /scratch1/smaruj/generate_genomic_boundary/boundary_indices.pt \
   --max_iter 2000 \
   --early_stopping_iter 2000  \
-  --l 1.0  \
+  --l 60.0  \
   --seed 9

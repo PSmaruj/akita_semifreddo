@@ -83,7 +83,8 @@ def one_hot_encode(sequence, return_type='numpy', channels_first=False):
 
 def get_ctcf_forward_seq(chrom, start, end, strand, genome_path):
     genome = Fasta(genome_path)
-    seq = genome[chrom][start:end].seq
+    flank = 15
+    seq = genome[chrom][start-flank:end+flank].seq
     if strand == "-":
         # reverse complement
         complement = str.maketrans("ACGTacgt", "TGCAtgca")
@@ -565,7 +566,7 @@ def main():
     results = run_predictions_new_design(exp_df, background_seqs, model, from_upper_triu)
     
     # Save as TSV
-    output_file = f"/scratch1/smaruj/ctcf_hopping/ctcf_{OUTER_ORIENT}_hopping.tsv"
+    output_file = f"/scratch1/smaruj/ctcf_hopping/ctcf_{OUTER_ORIENT}_hopping_with_flanks.tsv"
     results.to_csv(output_file, sep="\t", index=False)
     
     print("\n" + "="*80)

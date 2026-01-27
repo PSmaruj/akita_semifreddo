@@ -10,7 +10,7 @@ import sys
 
 # Add path to your model code
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
-from model_v2_compatible import SeqNN
+from akita_model.model import SeqNN
 
 # -------------------------
 # Helper functions

@@ -5,7 +5,7 @@ import sys
 import os
 
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
-from model_v2_compatible import SeqNN
+from akita_model.model import SeqNN
 
 sys.path.insert(0, "/home1/smaruj/ledidi")
 from ledidi import Ledidi
@@ -100,9 +100,9 @@ def main():
         # Update df with last_accepted_step
         df.at[i, "last_accepted_step"] = last_update
         
-        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/seeds_default_l/seed{args.seed}/{chrom}_{pred_start}_{pred_end}_slice.pt")
+        torch.save(x_bar_slice_0[:,:,padding:-padding], f"{args.pt_files_dir}/seeds_fold{FOLD}/seed{args.seed}/{chrom}_{pred_start}_{pred_end}_slice.pt")
         
-    df.to_csv(f"{args.pt_files_dir}/seeds_default_l/seed{args.seed}_fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
+    df.to_csv(f"{args.pt_files_dir}/seeds_fold{FOLD}/seed{args.seed}_fold{FOLD}_{target_c}_genomic_windows_table_steps.tsv", sep="\t", index=False)
     
 if __name__ == "__main__":
     main()

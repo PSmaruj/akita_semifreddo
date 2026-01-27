@@ -7,10 +7,10 @@ import pandas as pd
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, Dataset
-from tangermeme.tools import fimo
+from memelite import fimo
 
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
-from model_v2_compatible import SeqNN
+from akita_model.model import SeqNN
 
 
 # ----------------------------------------------------------------------
@@ -165,7 +165,7 @@ def read_meme_pwm_as_numpy(filename):
 def run_pipeline(seed, fold, target_c):
     # Load coordinate table
     df = pd.read_csv(
-        f"/scratch1/smaruj/generate_genomic_boundary/seeds_default_l/"
+        f"/scratch1/smaruj/generate_genomic_boundary/seeds_fold{fold}/"
         f"seed{seed}_fold{fold}_{target_c}_genomic_windows_table_steps.tsv",
         sep="\t"
     )
@@ -185,7 +185,7 @@ def run_pipeline(seed, fold, target_c):
 
     # Paths
     init_seq_path = f"/scratch1/smaruj/generate_genomic_boundary/ohe_X/fold{fold}/"
-    slice_path = f"/scratch1/smaruj/generate_genomic_boundary/seeds_default_l/seed{seed}/"
+    slice_path = f"/scratch1/smaruj/generate_genomic_boundary/seeds_fold{fold}/seed{seed}/"
     target_path = f"/scratch1/smaruj/generate_genomic_boundary/targets/target_{target_c}/fold{fold}/"
 
     # Datasets
@@ -277,7 +277,7 @@ def run_pipeline(seed, fold, target_c):
             edit_slice = edited_batch[:, :, edit_start-extra_flank : edit_end+extra_flank]
 
             # Original hits
-            orig_hits = fimo.fimo(motifs, orig_slice, threshold=1e-4, reverse_complement=True)[0]
+            orig_hits = fimo(motifs, orig_slice.cpu(), threshold=1e-4, reverse_complement=True)[0]
             orig_hits["start"] -= extra_flank
             orig_hits["end"] -= extra_flank
 
@@ -286,7 +286,7 @@ def run_pipeline(seed, fold, target_c):
                 orig_num.append(len(seq_hits) if not seq_hits.empty else 0)
 
             # Edited hits
-            hits = fimo.fimo(motifs, edit_slice, threshold=1e-4, reverse_complement=True)[0]
+            hits = fimo(motifs, edit_slice.cpu(), threshold=1e-4, reverse_complement=True)[0]
             hits["start"] -= extra_flank
             hits["end"] -= extra_flank
 
@@ -327,7 +327,7 @@ def run_pipeline(seed, fold, target_c):
     df["positions"] = positions[:len(df)]
 
     out_path = (
-        f"/scratch1/smaruj/generate_genomic_boundary/seeds_default_l/"
+        f"/scratch1/smaruj/generate_genomic_boundary/seeds_fold{fold}/"
         f"seed{seed}_fold{fold}_{target_c}_genomic_windows_table_results.tsv"
     )
     df.to_csv(out_path, sep="\t", index=False)
