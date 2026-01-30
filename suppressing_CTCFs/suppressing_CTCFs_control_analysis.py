@@ -6,11 +6,11 @@ import torch
 import numpy as np
 import pandas as pd
 from torch.utils.data import DataLoader, Dataset
-from tangermeme.tools import fimo
+from memelite import fimo
 
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
 
-from model_v2_compatible import SeqNN
+from akita_model.model import SeqNN
 
 
 # ==========================
@@ -31,7 +31,9 @@ class OriginalDataset(Dataset):
         start = row["centered_start"]
         end = row["centered_end"]
 
-        X = torch.load(f"{self.init_seq_path}{chrom}_{start}_{end}_X.pt", weights_only=True)
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        
+        X = torch.load(f"{self.init_seq_path}{chrom}_{start}_{end}_X.pt", weights_only=True, map_location=device)
         X = X.squeeze(0)
         return X
     
@@ -52,9 +54,11 @@ class BoundaryGenerationDataset(Dataset):
         chrom = row["chrom"]
         start = row["centered_start"]
         end = row["centered_end"]
-
-        X = torch.load(f"{self.init_seq_path}{chrom}_{start}_{end}_X.pt", weights_only=True)
-        slice = torch.load(f"{self.slice_path}{chrom}_{start}_{end}_slice.pt", weights_only=True)
+        
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        
+        X = torch.load(f"{self.init_seq_path}{chrom}_{start}_{end}_X.pt", weights_only=True, map_location=device)
+        slice = torch.load(f"{self.slice_path}{chrom}_{start}_{end}_slice.pt", weights_only=True, map_location=device)
         
         edit_start = (self.slice + self.cropping) * self.bin_size
         edit_end = edit_start + self.bin_size
@@ -87,8 +91,10 @@ class TriuMatrixDataset(Dataset):
         file_name = f"{chrom}_{start}_{end}_target.pt"
         file_path = os.path.join(self.map_path, file_name)
 
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        
         # Load the flat upper-triangular vector
-        triu_tensor = torch.load(file_path, map_location='cpu')
+        triu_tensor = torch.load(file_path, map_location=device)
 
         # triu_tensor = triu_tensor.squeeze()
 
@@ -164,12 +170,16 @@ def main(args):
     
     print(f"\n=== Running analysis for fold {FOLD}, target C = {TARGET_C} ===") 
 
-    df = pd.read_csv(f"/scratch1/smaruj/suppressing_CTCFs/results_control/fold{FOLD}_with_positions_steps.tsv", sep="\t")
+    df = pd.read_csv(f"/scratch1/smaruj/suppressing_CTCFs/results_control_repeated/fold{FOLD}_with_positions_steps.tsv", sep="\t")
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     model = SeqNN()
-    model.load_state_dict(torch.load("/home1/smaruj/pytorch_akita/model_0_v2_finetuned_correctly.pt", map_location=device))
+    model_path = (
+        "/scratch1/smaruj/Akita_pytorch_models/finetuned/mouse_models/"
+        "Hsieh2019_mESC/models/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
+    )
+    model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 
     # Datasets
@@ -178,7 +188,7 @@ def main(args):
 
     edited_dataset = BoundaryGenerationDataset(df, 
                                     f"/scratch1/smaruj/suppressing_CTCFs/ohe_X/fold{FOLD}/", 
-                                    f"/scratch1/smaruj/suppressing_CTCFs/results_control/fold{FOLD}/")
+                                    f"/scratch1/smaruj/suppressing_CTCFs/results_control_repeated/fold{FOLD}/")
 
     edited_loader = DataLoader(edited_dataset, batch_size=4, shuffle=False)
 
@@ -305,7 +315,7 @@ def main(args):
             edited_slice = edited_batch[:, :, edit_start-extra_flank:edit_end+extra_flank]
             
             # original sequences
-            ctcf_orig_hits, left_orig_hits, right_orig_hits = fimo.fimo(
+            ctcf_orig_hits, left_orig_hits, right_orig_hits = fimo(
                 motifs=motifs_dict,
                 sequences=orig_slice,
                 threshold=1e-4,
@@ -321,7 +331,7 @@ def main(args):
             right_orig_hits["end"]   -= extra_flank
         
             # edited sequences
-            ctcf_edit_hits, left_edit_hits, right_edit_hits = fimo.fimo(
+            ctcf_edit_hits, left_edit_hits, right_edit_hits = fimo(
                 motifs=motifs_dict,
                 sequences=edited_slice,
                 threshold=1e-4,
@@ -440,7 +450,7 @@ def main(args):
     df["orig_CTCFs_coord"] = orig_CTCFs_coord[:len(df)]
     df["new_CTCFs_coord"] = new_CTCFs_coord[:len(df)]
 
-    df.to_csv(f"/scratch1/smaruj/suppressing_CTCFs/results_control/fold{FOLD}_with_positions_steps_results.tsv", sep="\t", index=False)
+    df.to_csv(f"/scratch1/smaruj/suppressing_CTCFs/results_control_repeated/fold{FOLD}_with_positions_steps_results.tsv", sep="\t", index=False)
     
 # ==========================
 # Entry Point
