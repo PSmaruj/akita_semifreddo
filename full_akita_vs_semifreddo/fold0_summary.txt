@@ -1,8 +1,0 @@
-AVERAGE METRICS
-================================================================================
-pred_time_seqnn         0.005673
-pred_mem_seqnn_MB    1714.995098
-pred_time_sf            0.004244
-pred_mem_sf_MB        540.497295
-pearsonR                0.999521
-dtype: float64
