@@ -1,0 +1,8 @@
+layer,shared_all_3,shared_ctcf_1_2,ctcf_specific,b2noctcf_specific
+conv_block_1,8,3,7,4
+conv_tower_block0,2,7,11,10
+conv_tower_block1,2,2,16,4
+conv_tower_block2,0,6,14,9
+conv_tower_block3,3,8,9,10
+conv_tower_block4,2,6,12,10
+conv_tower_block5,1,8,11,12
