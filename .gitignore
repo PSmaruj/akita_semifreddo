@@ -1,0 +1,15 @@
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# OS-specific files (optional but recommended)
+.DS_Store
+Thumbs.db
+
+# Environments (if you use venv or conda)
+venv/
+env/
+.env
