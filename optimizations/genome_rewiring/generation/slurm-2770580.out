@@ -1,7 +1,0 @@
-==========================================
-SLURM_JOB_ID = 2770580
-SLURM_JOB_NODELIST = b23-20
-TMPDIR = /tmp/SLURM_2770580
-==========================================
-/home1/smaruj/miniconda3/envs/pytorch_hic/lib/python3.10/site-packages/torch/nn/modules/conv.py:306: UserWarning: Applied workaround for CuDNN issue, install nvrtc.so (Triggered internally at ../aten/src/ATen/native/cudnn/Conv_v8.cpp:84.)
-  return F.conv1d(input, weight, bias, self.stride,

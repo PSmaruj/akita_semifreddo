@@ -35,21 +35,11 @@ sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 
 from ledidi import ledidi
 from utils.model_utils import load_model
-
+from utils.data_utils import build_optimization_table
 
 # ==========================================================================
 # Helpers
 # ==========================================================================
-
-def build_optimization_table(df: pd.DataFrame) -> pd.DataFrame:
-    """Pair each window with the next one as its target (circular shift)."""
-    df = df.copy()
-    df["target_chrom"] = df["chrom"].shift(-1).fillna(df["chrom"].iloc[0])
-    df["target_start"] = df["start"].shift(-1).fillna(df["start"].iloc[0]).astype(int)
-    df["target_end"]   = df["end"].shift(-1).fillna(df["end"].iloc[0]).astype(int)
-    df["last_accepted_step"] = -1
-    return df
-
 
 def load_tensor(path: str, device: torch.device) -> torch.Tensor:
     return torch.load(path, weights_only=True, map_location=device)

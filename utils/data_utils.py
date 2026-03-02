@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import torch
+import pandas as pd
 
 def one_hot_encode_sequence(sequence_obj: object) -> np.ndarray:
     """One-hot encode a pyfaidx Sequence object.
@@ -34,6 +35,10 @@ def one_hot_encode_sequence(sequence_obj: object) -> np.ndarray:
     ohe[encoded, np.arange(len(encoded))] = 1.0
 
     return ohe[np.newaxis, ...]  # (1, 4, seq_len)
+
+
+def get_sequence(genome, chrom, start, end):
+    return str(genome[chrom][start:end].seq.upper())
 
 
 def upper_triangular_to_vector(matrix: np.ndarray, diagonal_offset: int = 2) -> np.ndarray:
@@ -123,3 +128,13 @@ def from_upper_triu(vector_repr, matrix_len, num_diags):
 
     # Ensure the matrix is symmetric
     return z + z.T
+
+
+def build_optimization_table(df: pd.DataFrame) -> pd.DataFrame:
+    """Pair each window with the next one as its target (circular shift)."""
+    df = df.copy()
+    df["target_chrom"] = df["chrom"].shift(-1).fillna(df["chrom"].iloc[0])
+    df["target_start"] = df["start"].shift(-1).fillna(df["start"].iloc[0]).astype(int)
+    df["target_end"]   = df["end"].shift(-1).fillna(df["end"].iloc[0]).astype(int)
+    df["last_accepted_step"] = -1
+    return df

@@ -41,3 +41,20 @@ def ctcf_hits_from_fimo(fimo_df, seq_len=1310720, bin_size=2048):
         else:
             hits_minus[bin_idx] += 1
     return hits_plus, hits_minus
+
+
+def hits_to_site_set(hits_df, bin_size=10):
+    site_set = set()
+    for _, row in hits_df.iterrows():
+        start, end, strand = row['start'], row['end'], row['strand']
+        center = (start + end) // 2
+        binned_pos = round(center / bin_size) * bin_size
+        site_set.add((binned_pos, strand))
+    return site_set
+
+
+def jaccard_index(set1, set2):
+    if not set1 and not set2:
+        return 1.0
+    union = set1 | set2
+    return len(set1 & set2) / len(union) if union else 0.0
