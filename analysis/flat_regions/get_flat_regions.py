@@ -249,7 +249,7 @@ def main():
 
     # Add akita repo to path and import model
     sys.path.append(os.path.abspath(args.akita_repo))
-    from akita_model.model import SeqNN
+    from akita.model import SeqNN
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")

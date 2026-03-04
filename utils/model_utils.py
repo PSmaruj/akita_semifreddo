@@ -17,7 +17,7 @@ def load_model(model_weights_path: str, device: torch.device) -> torch.nn.Module
     torch.nn.Module
         Model in eval mode with all parameters frozen.
     """
-    from akita_model.model import SeqNN
+    from akita.model import SeqNN
 
     model = SeqNN()
     model.load_state_dict(
