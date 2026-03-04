@@ -80,3 +80,23 @@ class TriuMatrixDataset(Dataset):
             f"{row['target_chrom']}_{row['target_start']}_{row['target_end']}_target.pt",
         )
         return torch.load(path, map_location="cpu")  # (1, N_triu) or (N_triu,)
+
+
+class HiCDataset(Dataset):
+    def __init__(self, data_files):
+        self.data = []
+        for file in data_files:
+            print(f"  Loading: {file}")
+            file_data = torch.load(file, weights_only=True)
+            for ohe_sequence, hic_vector in file_data:
+                ohe_sequence = ohe_sequence.squeeze(0)
+                assert ohe_sequence.shape[0] == 4
+                assert ohe_sequence.ndim == 2
+                self.data.append((ohe_sequence, hic_vector))
+        print(f"  Total sequences loaded: {len(self.data)}")
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        return self.data[idx]
