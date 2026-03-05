@@ -130,6 +130,28 @@ def from_upper_triu(vector_repr, matrix_len, num_diags):
     return z + z.T
 
 
+def from_upper_triu_batch(batch_vectors, matrix_len=512, num_diags=2):
+    """Convert a batch of upper-triangular vectors into symmetric matrices with np.nan on diagonals."""
+    if isinstance(batch_vectors, torch.Tensor):
+        batch_vectors = batch_vectors.detach().cpu().numpy()
+
+    batch_size = batch_vectors.shape[0]
+    matrices = np.zeros((batch_size, matrix_len, matrix_len), dtype=np.float32)
+
+    triu_indices = np.triu_indices(matrix_len, num_diags)
+
+    for i in range(batch_size):
+        matrices[i][triu_indices] = batch_vectors[i]
+        # Mirror to lower triangle
+        matrices[i] = matrices[i] + matrices[i].T
+
+        # Set diagonals to np.nan
+        for k in range(-num_diags + 1, num_diags):
+            set_diag(matrices[i], np.nan, k)
+
+    return matrices  # shape: [B, 512, 512]
+
+
 def build_optimization_table(df: pd.DataFrame) -> pd.DataFrame:
     """Pair each window with the next one as its target (circular shift)."""
     df = df.copy()
