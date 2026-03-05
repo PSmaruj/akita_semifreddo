@@ -5,9 +5,13 @@ PyTorch Dataset classes for loading genomic sequences and contact maps.
 """
 
 import os
+import pandas as pd
+import numpy as np
 import torch
 from torch.utils.data import Dataset
+from pyfaidx import Fasta
 
+from .data_utils import one_hot_encode_sequence
 
 class OriginalDataset(Dataset):
     """Load one-hot encoded initial (genomic) sequences from pre-saved .pt files.
@@ -100,3 +104,35 @@ class HiCDataset(Dataset):
 
     def __getitem__(self, idx):
         return self.data[idx]
+
+
+class DotsDataset(Dataset):
+    """
+    Returns one-hot encoded sequences centred on each dot's prediction window.
+
+    Args:
+        coord_df:     DataFrame with columns [chrom, window_start, window_end].
+        genome_fasta: pyfaidx.Fasta object for the reference genome.
+    """
+
+    def __init__(self, coord_df: pd.DataFrame, genome_fasta: Fasta,
+                 target_len) -> None:
+        self.coords       = coord_df
+        self.genome       = genome_fasta
+        self.target_len = target_len
+        
+    def __len__(self) -> int:
+        return len(self.coords)
+
+    def __getitem__(self, idx: int) -> torch.Tensor:
+        row   = self.coords.iloc[idx]
+        chrom = row["chrom"]
+        seq   = self.genome[chrom][row["window_start"]:row["window_end"]].seq.upper()
+
+        # Guard against off-chromosome windows: truncate or N-pad
+        if len(seq) != self.target_len:
+            seq = seq[:self.target_len].ljust(self.target_len, "N")
+
+        one_hot = one_hot_encode_sequence(seq)   # (1, 4, target_len) or (4, target_len)
+        one_hot = np.squeeze(one_hot)            # → (4, target_len)
+        return torch.from_numpy(one_hot.copy())
