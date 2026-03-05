@@ -72,6 +72,7 @@ def _splice_activations(
     x = x.clone()
     # Replace ±2 bins around the edit (5 bins total) with uncontaminated values.
     x[:, :, edited_bin_start - 2 : edited_bin_end + 3] = sub_x[:, :, _CENTER_SLICE]
+
     return x
 
 
