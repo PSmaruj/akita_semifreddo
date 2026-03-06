@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 
 from akita.model import SeqNN
 from utils.data_utils import from_upper_triu_batch
-from utils.dataset_utils import DotsDataset
+from utils.dataset_utils import FeatureDataset
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -107,7 +107,7 @@ def main() -> None:
     dot_df = pd.read_csv(DOT_TSV, sep="\t")
     genome = Fasta(FASTA_FILE)
 
-    dataset = DotsDataset(dot_df, genome, TARGET_LEN)
+    dataset = FeatureDataset(dot_df, genome, TARGET_LEN)
     loader  = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False)
 
     # -- Model ---------------------------------------------------------------

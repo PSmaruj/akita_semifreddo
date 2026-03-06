@@ -106,7 +106,7 @@ class HiCDataset(Dataset):
         return self.data[idx]
 
 
-class DotsDataset(Dataset):
+class FeatureDataset(Dataset):
     """
     Returns one-hot encoded sequences centred on each dot's prediction window.
 
