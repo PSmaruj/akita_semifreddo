@@ -232,3 +232,63 @@ class SemifreddoLedidiWrapper(nn.Module):
             cropping_applied        = self.cropping_applied,
         )
         return sf.forward()
+
+
+class TwoAnchorSemifreddoLedidiWrapper(nn.Module):
+    """Semifreddo wrapper for optimising two sequence bins simultaneously.
+
+    Expects X_anchors of shape (1, 4, 2*BIN_SIZE) — the two anchor bins
+    concatenated — and internally routes each half to Semifreddo's
+    slice_0 / slice_1 mechanism.
+    """
+    
+    def __init__(self, model, precomputed_full_output, full_X,
+                 bin_lo, bin_hi, context_bins=5, cropping_applied=64):
+        super().__init__()
+        self.model                   = model
+        self.precomputed_full_output = precomputed_full_output
+        self.context_bins            = context_bins
+        self.cropping_applied        = cropping_applied
+        self.bin_lo                  = bin_lo
+        self.bin_hi                  = bin_hi
+
+        # bp coordinates of the 11-bin padded windows in the full sequence
+        self.seq_lo_start = (bin_lo - context_bins + cropping_applied) * _BIN_SIZE
+        self.seq_lo_end   = (bin_lo + context_bins + cropping_applied + 1) * _BIN_SIZE
+        self.seq_hi_start = (bin_hi - context_bins + cropping_applied) * _BIN_SIZE
+        self.seq_hi_end   = (bin_hi + context_bins + cropping_applied + 1) * _BIN_SIZE
+
+        # bp coordinates of just the central (editable) bin for each anchor
+        self.bp_lo_start  = (bin_lo + cropping_applied) * _BIN_SIZE
+        self.bp_lo_end    = (bin_lo + cropping_applied + 1) * _BIN_SIZE
+        self.bp_hi_start  = (bin_hi + cropping_applied) * _BIN_SIZE
+        self.bp_hi_end    = (bin_hi + cropping_applied + 1) * _BIN_SIZE
+
+        self.register_buffer('full_X', full_X.clone())
+    
+    def forward(self, X_anchors: torch.Tensor) -> torch.Tensor:
+        # Split concatenated input back into per-anchor bins
+        X_lo_edit = X_anchors[:, :, :_BIN_SIZE]          # (1, 4, BIN_SIZE)
+        X_hi_edit = X_anchors[:, :, _BIN_SIZE:]           # (1, 4, BIN_SIZE)
+
+        full_X = self.full_X.detach()
+        ctx    = self.context_bins * _BIN_SIZE             # = 10240 bp
+
+        # Build 11-bin padded windows, splicing in the current edited bins
+        win_lo = full_X[:, :, self.seq_lo_start:self.seq_lo_end].clone()
+        win_lo[:, :, ctx : ctx + _BIN_SIZE] = X_lo_edit
+
+        win_hi = full_X[:, :, self.seq_hi_start:self.seq_hi_end].clone()
+        win_hi[:, :, ctx : ctx + _BIN_SIZE] = X_hi_edit
+
+        sf = Semifreddo(
+            model                   = self.model,
+            slice_0_padded_seq      = win_lo,
+            edited_indices_slice_0  = [self.bin_lo],
+            precomputed_full_output = self.precomputed_full_output,
+            slice_1_padded_seq      = win_hi,
+            edited_indices_slice_1  = [self.bin_hi],
+            batch_size              = 1,
+            cropping_applied        = self.cropping_applied,
+        )
+        return sf.forward()
