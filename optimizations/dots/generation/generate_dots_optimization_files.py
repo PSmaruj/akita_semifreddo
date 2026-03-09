@@ -124,25 +124,25 @@ def dot_center_from_distance(distance: int, half: int = HALF):
 
 def make_dot_mask(pileup: np.ndarray, distance: int):
     """
-    Build the full-map dot mask and return the upper-tri indices and values
-    that represent it (same convention as make_boundary_mask).
+    Build the full-map dot mask and return the flat upper-tri indices and the
+    full upper-tri value vector (same convention as make_boundary_mask /
+    make_flame_mask_indices).
 
     Returns
     -------
-    indices : torch.Tensor  — upper-tri (row, col) pairs where mask != 0
-    vector  : torch.Tensor  — flat upper-tri vector (zeros everywhere except
-                              the dot region)
+    indices : LongTensor of shape (K,)         — flat positions within the
+              upper-tri vector where the dot mask is nonzero.
+    vector  : FloatTensor of shape (N_triu,)   — full upper-tri vector with
+              dot values at masked positions and 0 elsewhere.
     """
     center = dot_center_from_distance(distance)
     full_mask = place_pileup_at_center(pileup, shape=(MAP_SIZE, MAP_SIZE), center=center)
 
-    # Extract upper triangle (excluding NUM_DIAGS diagonals, matching Akita convention)
     triu_rows, triu_cols = np.triu_indices(MAP_SIZE, k=NUM_DIAGS)
-    vector = full_mask[triu_rows, triu_cols]
+    upper_tri_values = full_mask[triu_rows, triu_cols]                    # (N_triu,)
 
-    indices = torch.tensor(np.stack([triu_rows, triu_cols], axis=0), dtype=torch.long)
-    vector  = torch.tensor(vector, dtype=torch.float32)
-
+    indices = torch.tensor(np.nonzero(upper_tri_values)[0], dtype=torch.long)
+    vector  = torch.tensor(upper_tri_values, dtype=torch.float32)         # full length
     return indices, vector
 
 
