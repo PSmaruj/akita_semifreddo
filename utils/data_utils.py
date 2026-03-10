@@ -160,3 +160,9 @@ def build_optimization_table(df: pd.DataFrame) -> pd.DataFrame:
     df["target_end"]   = df["end"].shift(-1).fillna(df["end"].iloc[0]).astype(int)
     df["last_accepted_step"] = -1
     return df
+
+
+def gc_content(X: torch.Tensor, bp_start: int = 0, bp_end: int = -1) -> np.ndarray:
+    """Mean GC fraction per sequence over the specified bp range."""
+    region = X[:, :, bp_start:bp_end] if bp_end != -1 else X
+    return (region[:, 1:3, :].sum(dim=(1, 2)) / region.sum(dim=(1, 2))).cpu().numpy()

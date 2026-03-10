@@ -8,35 +8,16 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
+sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 
-from model_v2_compatible import SeqNN
-from memelite import fimo
+from akita.model import SeqNN
 
+from utils.dataset_utils import OriginalDataset, TriuMatrixDataset
+from utils.data_utils import from_upper_triu_batch
+from utils.fimo_utils import read_meme_pwm_as_numpy
 
-# -----------------------------
-# Dataset classes
-# -----------------------------
-
-class OriginalDataset(Dataset):
-    def __init__(self, coord_df, init_seq_path):
-        self.coords = coord_df
-        self.init_seq_path = init_seq_path
-    
-    def __len__(self):
-        return len(self.coords)
-
-    def __getitem__(self, idx):
-        row = self.coords.iloc[idx]
-        chrom = row["chrom"]
-        start = row["centered_start"]
-        end = row["centered_end"]
-
-        X = torch.load(f"{self.init_seq_path}{chrom}_{start}_{end}_X.pt", weights_only=True)
-        X = X.squeeze(0)
-        return X
- 
-    
-class BoundaryGenerationDataset(Dataset):
+# this class should be moved to dataset_utils as well
+class CentralInsertionDataset(Dataset):
     def __init__(self, coord_df, init_seq_path, slice_path, slice=256, cropping=64, bin_size=2048):
         self.coords = coord_df
         self.init_seq_path = init_seq_path
@@ -68,96 +49,45 @@ class BoundaryGenerationDataset(Dataset):
         return editedX
     
 
-class TriuMatrixDataset(Dataset):
-    def __init__(self, coord_df, map_path):
-        """
-        coord_df: DataFrame with ["chrom", "centered_start", "centered_end"]
-        map_path: Directory containing upper-triangle map tensors (e.g. chr1_1000000_1051200_target.pt)
-        """
-        self.coords = coord_df
-        self.map_path = map_path
+# ---------------------------------------------------------------------------
+# This function could be used for insulation estimation
+# ---------------------------------------------------------------------------
 
-    def __len__(self):
-        return len(self.coords)
+# insulation -> Upper-right quarter slice of the 512-bin contact map.
+# Rows 0–249  → upstream half  (excluding diagonal buffer)
+# Cols 260–511 → downstream half (excluding diagonal buffer)
+URQ_ROW_SLICE = slice(0, 250)
+URQ_COL_SLICE = slice(260, 512)
 
-    def __getitem__(self, idx):
-        row = self.coords.iloc[idx]
-        chrom = row["chrom"]
-        start = row["centered_start"]
-        end = row["centered_end"]
+def predict_insulation(
+    loader: DataLoader,
+    model: torch.nn.Module,
+    device: torch.device,
+) -> list[float]:
+    """
+    Run inference over all batches and return per-sequence URQ mean values.
 
-        file_name = f"{chrom}_{start}_{end}_target.pt"
-        file_path = os.path.join(self.map_path, file_name)
+    The URQ (upper-right quarter) of the contact map captures the insulation
+    signal across the boundary: high values indicate a strong boundary.
+    """
+    urq_means: list[float] = []
 
-        # Load the flat upper-triangular vector
-        triu_tensor = torch.load(file_path, map_location='cpu')
+    with torch.no_grad():
+        for batch in loader:
+            preds = model(batch.to(device)).cpu()
+            maps  = from_upper_triu_batch(preds)                          # (B, 512, 512)
+            urq   = maps[:, URQ_ROW_SLICE, URQ_COL_SLICE]                 # (B, 250, 252)
+            urq_means.extend(np.nanmean(urq, axis=(1, 2)).tolist())
 
-        # triu_tensor = triu_tensor.squeeze()
+    return urq_means
 
-        return triu_tensor
+from memelite import fimo
 
-
-# -----------------------------
-# Helper functions
-# -----------------------------
-
-def set_diag(matrix, value, k):
-    """Set diagonal `k` of a matrix to `value`."""
-    rows, cols = matrix.shape
-    for i in range(rows):
-        if 0 <= i + k < cols:
-            matrix[i, i + k] = value
-
-def from_upper_triu_batch(batch_vectors, matrix_len=512, num_diags=2):
-    """Convert a batch of upper-triangular vectors into symmetric matrices with np.nan on diagonals."""
-    if isinstance(batch_vectors, torch.Tensor):
-        batch_vectors = batch_vectors.detach().cpu().numpy()
-
-    batch_size = len(batch_vectors)
-    matrices = np.zeros((batch_size, matrix_len, matrix_len), dtype=np.float32)
-
-    triu_indices = np.triu_indices(matrix_len, num_diags)
-
-    for i in range(batch_size):
-        matrices[i][triu_indices] = batch_vectors[i][0,:]
-        # Mirror to lower triangle
-        matrices[i] = matrices[i] + matrices[i].T
-
-        # Set diagonals to np.nan
-        for k in range(-num_diags + 1, num_diags):
-            set_diag(matrices[i], np.nan, k)
-
-    return matrices  # shape: [B, 512, 512]
-
-
-def read_meme_pwm_as_numpy(filename):
-    pwm_list = []  # List to store PWM rows
-    
-    with open(filename, 'r') as file:
-        in_matrix_section = False
-        
-        for line in file:
-            line = line.strip()
-            
-            # Check if we are reading the PWM matrix
-            if line.startswith("letter-probability matrix"):
-                in_matrix_section = True  # Start reading matrix data
-                continue  # Skip this header line
-            
-            # If we are in the matrix section, process the rows
-            if in_matrix_section and line:
-                pwm_row = [float(value) for value in line.split()]  # Parse values
-                pwm_list.append(pwm_row)  # Append to the PWM list
-            
-            # If we encounter a new MOTIF or the end of file, stop matrix reading
-            if line.startswith("MOTIF") and in_matrix_section:
-                break
-    
-    # Convert the list to a numpy array
-    pwm_array = np.array(pwm_list)
-    
-    return pwm_array
-
+def run_fimo(seq_tensor, motifs_dict, threshold=1e-4):
+    """Run FIMO on a (1, 4, L) tensor; returns the hits DataFrame."""
+    arr = seq_tensor.cpu().detach().numpy()
+    return fimo(motifs=motifs_dict, sequences=arr,
+                threshold=threshold, reverse_complement=True)[0]
 
 # -----------------------------
 # Main pipeline
@@ -166,44 +96,57 @@ def read_meme_pwm_as_numpy(filename):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--fold", type=int, required=True)
-    parser.add_argument("--target_c", type=float, required=True)
+    parser.add_argument("--boundary_strength", type=float, required=True)
+    parser.add_argument("--l", type=float, required=True)
+    parser.add_argument("--e", type=float, required=True)
+    parser.add_argument("--t", type=float, required=True)
     args = parser.parse_args()
 
     FOLD = args.fold
-    TARGET_C = args.target_c
-
+    TARGET_C = args.boundary_strength
+    L = args.l # default 0.01
+    epsilon = args.e # default 1e-4
+    tau = args.t # default 1.0
+    
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
     # -----------------------------
-    # Load dataframe
+    # Table with number of edits and the last step with edits
     # -----------------------------
-    df_path = f"/scratch1/smaruj/generate_genomic_boundary/results/target_{TARGET_C}/fold{FOLD}_{TARGET_C}_genomic_windows_table_steps.tsv"
+    df_path = f"/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/boundaries/lambda/lambda_{L}/fold{FOLD}_selected_genomic_windows_centered_chrom_states_opt.tsv"
     df = pd.read_csv(df_path, sep="\t")
 
     # -----------------------------
     # Load model
     # -----------------------------
     model = SeqNN()
-    model_path = (
-        "/scratch1/smaruj/Akita_pytorch_models/finetuned/mouse_models/"
-        "Hsieh2019_mESC/models/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
+    MODEL_CKPT = (
+    "/home1/smaruj/pytorch_akita/models/finetuned/mouse/Hsieh2019_mESC"
+    "/checkpoints/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
     )
-    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.load_state_dict(torch.load(MODEL_CKPT, map_location=device))
     model.eval()
 
     # -----------------------------
     # Datasets + Loaders
     # -----------------------------
-    orig_dataset = OriginalDataset(df, f"/scratch1/smaruj/generate_genomic_boundary/ohe_X/fold{FOLD}/")
-    edited_dataset = BoundaryGenerationDataset(
+    
+    _PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
+    DEFAULT_SEQ_BASE_DIR      = f"{_PROJ}/analysis/flat_regions"
+    
+    DEFAULT_TARGET_BASE_DIR   = f"{_PROJ}/optimizations/boundaries/targets"
+    
+    orig_dataset = OriginalDataset(df, f"{DEFAULT_SEQ_BASE_DIR}/mouse_sequences/fold{FOLD}/")
+    edited_dataset = CentralInsertionDataset(
         df,
-        f"/scratch1/smaruj/generate_genomic_boundary/ohe_X/fold{FOLD}/",
-        f"/scratch1/smaruj/generate_genomic_boundary/results/target_{TARGET_C}/fold{FOLD}/"
+        f"{DEFAULT_SEQ_BASE_DIR}/mouse_sequences/fold{FOLD}/",
+        f"/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/boundaries/lambda/lambda_{L}/fold{FOLD}/"
     )
     target_dataset = TriuMatrixDataset(
         df,
-        f"/scratch1/smaruj/generate_genomic_boundary/targets/target_{TARGET_C}/fold{FOLD}/"
+        f"{DEFAULT_TARGET_BASE_DIR}/boundary_neg0p5/fold{FOLD}/"
     )
+    # where boundary_neg0p5 is the tagged boundary_strength
     
     batch_size = 4
     orig_loader = DataLoader(orig_dataset, batch_size=batch_size, shuffle=False)
@@ -225,12 +168,10 @@ def main():
     preds_all_edited = []
     targets_all = []
 
-    scd_values = []
     urq_mean_values = []
     og_urq_mean_values = []
     target_urq_mean_values = []
 
-    edit_counts = []
     seq_GC_content = []
     slice_GC_content = []
     edited_GC_content = []
@@ -253,23 +194,14 @@ def main():
             slice_GC_content.extend(gc_slice.mean(dim=1).cpu().numpy())
             edited_GC_content.extend(gc_slice_edit.mean(dim=1).cpu().numpy())
 
-            # Edit count
-            diffs = torch.abs(orig_batch[:, :, edit_start:edit_end] - edited_batch[:, :, edit_start:edit_end])
-            num_flips = diffs.sum(dim=(1, 2))
-            edit_counts.extend((num_flips / 2).cpu().numpy())
-
             preds_orig = model(orig_batch).cpu()
             preds_edited = model(edited_batch).cpu()
 
             preds_all_orig.extend(preds_orig)
             preds_all_edited.extend(preds_edited)
             targets_all.extend(target_batch.cpu())
-
-            # SCD
-            scd_batch = torch.sqrt(((preds_edited - preds_orig) ** 2).sum(dim=(1, 2)))
-            scd_values.extend(scd_batch.numpy())
-
-            # URQ means
+            
+            # insulation score
             orig_maps = from_upper_triu_batch(preds_orig)
             edited_maps = from_upper_triu_batch(preds_edited)
             target_maps = from_upper_triu_batch(target_batch.cpu())
@@ -278,10 +210,11 @@ def main():
             og_urq_mean_values.extend(np.nanmean(orig_maps[:, 0:250, 260:512], axis=(1, 2)))
             target_urq_mean_values.extend(np.nanmean(target_maps[:, 0:250, 260:512], axis=(1, 2)))
 
+    
     # -----------------------------
     # CTCF scoring
     # -----------------------------
-    pwm_path = "/home1/smaruj/IterativeMutagenesis/MA0139.1.meme"
+    pwm_path = "/home1/smaruj/ledidi_akita/data/pwm/MA0139.1.meme"
     pwm = read_meme_pwm_as_numpy(pwm_path)
     pwm_tensor = torch.from_numpy(pwm.T).float()
     motifs = {"CTCF": pwm_tensor}
@@ -336,11 +269,9 @@ def main():
     # -----------------------------
     # Final merge + Save
     # -----------------------------
-    df["SCD"] = scd_values
     df["URQ_result"] = urq_mean_values
     df["URQ_target"] = target_urq_mean_values
     df["URQ_init"] = og_urq_mean_values
-    df["num_edits"] = edit_counts
     df["GC_seq"] = seq_GC_content
     df["GC_slice"] = slice_GC_content
     df["GC_slice_edited"] = edited_GC_content
@@ -351,7 +282,7 @@ def main():
     df["orientation"] = strand_strings[:len(df)]
     df["positions"] = positions[:len(df)]
 
-    out_path = f"/scratch1/smaruj/generate_genomic_boundary/results/target_{TARGET_C}/fold{FOLD}_{TARGET_C}_genomic_windows_table_results.tsv"
+    out_path = f"/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/boundaries/lambda/lambda_{L}/fold{FOLD}_selected_genomic_windows_centered_chrom_states_results.tsv"
     df.to_csv(out_path, sep="\t", index=False)
     print(f"Saved results → {out_path}")
 

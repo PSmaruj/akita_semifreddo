@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from memelite import fimo
+import pandas as pd
 
 def read_meme_pwm(filename):
     """Parse a MEME-format file and return the PWM as a (4, L) float32 tensor."""
@@ -25,6 +26,26 @@ def run_fimo(seq_tensor, motifs_dict, threshold=1e-4):
     arr = seq_tensor.cpu().detach().numpy()
     return fimo(motifs=motifs_dict, sequences=arr,
                 threshold=threshold, reverse_complement=True)[0]
+
+
+def ctcf_hits_per_seq(hits: pd.DataFrame, batch_size: int) -> list[dict]:
+    """Summarise FIMO hits per sequence index within a batch."""
+    records = []
+    for seq_idx in range(batch_size):
+        eh = hits[hits["sequence_name"] == seq_idx]
+        if eh.empty:
+            records.append(dict(n=0, score_sum=0.0, score_max=0.0,
+                                positions=[], strands="no"))
+        else:
+            eh = eh.sort_values("start")
+            records.append(dict(
+                n         = len(eh),
+                score_sum = float(eh["score"].sum()),
+                score_max = float(eh["score"].max()),
+                positions = [(int(s), int(e)) for s, e in zip(eh["start"], eh["end"])],
+                strands   = "".join(eh["strand"].tolist()),
+            ))
+    return records
 
 
 def ctcf_hits_from_fimo(fimo_df, seq_len=1310720, bin_size=2048):
