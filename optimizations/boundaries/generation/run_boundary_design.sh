@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=f3_0.1
+#SBATCH --job-name=f0_e-3
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu
 #SBATCH --nodes=1
@@ -14,8 +14,22 @@
 eval "$(conda shell.bash hook)"
 conda activate pytorch_hic
 
+# python run_boundary_design.py \
+#         --fold 3 \
+#         --run_name lambda/lambda_100.0 \
+#         --boundary_strength -0.5 \
+#         --L 100.0 \
+
+
 python run_boundary_design.py \
-        --fold 3 \
-        --run_name lambda/lambda_0.1 \
+        --fold 0 \
+        --run_name epsilon/epsilon_1e-3 \
         --boundary_strength -0.5 \
-        --L 0.1 \
+        --eps 1e-3 \
+
+
+# python run_boundary_design.py \
+#         --fold 0 \
+#         --run_name tau/tau_10.0 \
+#         --boundary_strength -0.5 \
+#         --tau 10.0 \

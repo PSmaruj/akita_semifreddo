@@ -6,14 +6,15 @@ GC content, and CTCF motif hits for original, edited, and target sequences.
 
 Usage:
 python boundary_design_analysis.py \
-    --fold 1 \
-    --run_name lambda/lambda_0.01 \
+    --fold 3 \
+    --run_name lambda/lambda_10.0 \
     --boundary_strength -0.5
 """
 
 import argparse
 import os
 import sys
+
 
 import numpy as np
 import pandas as pd
