@@ -1,6 +1,5 @@
 import torch
 import numpy as np
-from utils.data_utils import upper_triangular_to_vector, fragment_indices_in_upper_triangular
 
 
 def strength_tag(strength: float) -> str:
@@ -18,37 +17,8 @@ def strength_tag(strength: float) -> str:
     return f"{prefix}{val_str}"
 
 
-def make_boundary_mask(
-    strength: float,
-    map_size: int = 512,
-    num_diags: int = 2,
-):
-    """Build the boundary mask that suppresses inter-compartment contacts.
-
-    The top-right and bottom-left quadrants of the contact map are set to
-    `strength` (typically negative); all other entries are 0.
-
-    Returns
-    -------
-    indices : (N,) LongTensor   — positions in the flattened upper-tri vector
-    vector  : (M,) FloatTensor  — full upper-tri vector with mask values filled in
-    """
-    half = map_size // 2
-
-    matrix = np.zeros((map_size, map_size))
-    matrix[:half, half:] = strength
-    matrix[half:, :half] = strength
-
-    fragment_bool = np.zeros((map_size, map_size), dtype=bool)
-    fragment_bool[:half, half:] = True
-    fragment_bool[half:, :half] = True
-
-    vector  = upper_triangular_to_vector(matrix, num_diags)
-    indices = fragment_indices_in_upper_triangular(
-        matrix_size=map_size, fragment_mask=fragment_bool
-    )
-
-    return torch.tensor(indices), torch.tensor(vector).float()
+def build_stem(chrom: str, start: int, end: int) -> str:
+    return f"{chrom}_{start}_{end}"
 
 
 def store_tower_output(X_tensor: torch.Tensor, model, path: str) -> None:
@@ -74,3 +44,33 @@ def make_target(
     y_bar = y.clone()
     y_bar[0, 0, feature_mask] = feature_vector[feature_mask].to(device)
     return y_bar.cpu()
+
+
+def last_accepted_step(history: dict) -> int:
+    """Return the index of the last iteration that introduced a new edited position.
+
+    Each entry in history["edits"] is a tuple of three tensors:
+        (batch_indices, nucleotide_indices, position_indices)
+    We track the cumulative set of positions seen across steps 0..i-1 and
+    return the last i where history["edits"][i][2] contains a position not
+    previously seen.
+    """
+    edits = history["edits"]
+    seen  = set()
+    last  = 0
+    for i, edit in enumerate(edits):
+        positions = set(edit[2].cpu().tolist())
+        if positions - seen:
+            last = i
+            seen |= positions
+    return last
+
+
+def count_edits(original_X: torch.Tensor, generated_full: torch.Tensor) -> int:
+    """Number of nucleotide positions that differ between original and generated."""
+    return int(
+        (torch.argmax(generated_full, dim=1) != torch.argmax(original_X, dim=1))
+        .sum()
+        .item()
+    )
+

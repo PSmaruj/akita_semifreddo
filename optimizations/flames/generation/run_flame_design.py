@@ -1,14 +1,14 @@
 """
-run_boundary_design.py
+run_flame_design.py
 
-Batch boundary optimisation over all genomic windows in a fold's flat-regions table.
+Batch flame optimisation over all genomic windows in a fold's flat-regions table.
 Saves per-window generated sequences and an enriched TSV with optimisation metadata.
 
 Usage:
-    python run_boundary_design.py \\
+    python run_flame_design.py \\
         --folds 0 1 2 3 \\
         --run_name lambda/lambda_0.01 \\
-        --boundary_strength -0.5 \\
+        --flame_strength 1.0 \\
         --L 0.01 \\
 """
 
@@ -37,9 +37,9 @@ DEFAULT_MODEL_PATH = (
     "Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
 )
 DEFAULT_SEQ_BASE_DIR      = f"{_PROJ}/analysis/flat_regions"
-DEFAULT_TARGET_BASE_DIR   = f"{_PROJ}/optimizations/boundaries/targets"
-DEFAULT_MASK_PATH         = f"{_PROJ}/optimizations/feature_masks/boundary_mask.pt"
-DEFAULT_RESULTS_BASE_DIR  = f"{_PROJ}/optimizations/boundaries"
+DEFAULT_TARGET_BASE_DIR   = f"{_PROJ}/optimizations/flames/targets"
+DEFAULT_MASK_PATH         = f"{_PROJ}/optimizations/feature_masks/flame_mask.pt"
+DEFAULT_RESULTS_BASE_DIR  = f"{_PROJ}/optimizations/flames"
 DEFAULT_FLAT_REGIONS_BASE = f"{_PROJ}/analysis/flat_regions/mouse_flat_regions_chrom_states_tsv"
 
 # ── Semifreddo / architecture constants ───────────────────────────────────────
@@ -62,16 +62,16 @@ log = logging.getLogger(__name__)
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="Batch boundary optimisation over one or more folds",
+        description="Batch flame optimisation over one or more folds",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     p.add_argument("--folds",    type=int, nargs="+", required=True,
                    help="One or more fold indices, e.g. --folds 0 1 2 3")
     p.add_argument("--run_name", type=str, required=True,
                    help="Results subdirectory name (e.g. 'lambda/lambda_0.01')")
-    p.add_argument("--boundary_strength", type=float, required=True,
-                   help="Value applied to the off-diagonal quadrants of the boundary mask "
-                        "(e.g. -0.5). Negative values suppress contacts.")
+    p.add_argument("--flame_strength", type=float, required=True,
+                   help="Value applied to the flame mask "
+                        "(e.g. 1.0). Positive values encourage contacts.")
     p.add_argument("--L",   type=float, default=0.01,  help="Input-loss regularisation weight")
     p.add_argument("--tau", type=float, default=1.0,   help="Ledidi tau parameter")
     p.add_argument("--eps", type=float, default=1e-4,  help="Ledidi eps parameter")
@@ -88,11 +88,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args   = parse_args()
-    tag    = strength_tag(args.boundary_strength)
+    tag    = strength_tag(args.flame_strength)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     log.info(f"Device: {device}  |  Folds: {args.folds}  |  Run: {args.run_name}")
-    log.info(f"Boundary strength: {args.boundary_strength} (tag: {tag})")
+    log.info(f"Flame strength: {args.flame_strength} (tag: {tag})")
     log.info(f"Ledidi params — L={args.L}  tau={args.tau}  eps={args.eps}")
 
     # ── Shared resources (loaded once across all folds) ───────────────────────
@@ -100,13 +100,13 @@ def main() -> None:
     mask        = torch.load(args.mask_path, weights_only=True).to(device)
     output_loss = LocalL1Loss(mask, n_triu=N_TRIU, reduction="sum").to(device)
 
-    # ── Boundary-specific run_one closure ─────────────────────────────────────
+    # ── Flame-specific run_one closure ────────────────────────────────────────
     def run_one_fn(row, fold, args, out_dir):
         stem = build_stem(row["chrom"], int(row["centered_start"]), int(row["centered_end"]))
         log.info(f"  Window: {stem}")
         X      = torch.load(f"{args.seq_base_dir}/mouse_sequences/fold{fold}/{stem}_X.pt", weights_only=True).to(device)
         tower  = torch.load(f"{args.seq_base_dir}/mouse_tower_outputs/fold{fold}/{stem}_tower_out.pt", weights_only=True).to(device)
-        target = torch.load(f"{args.target_base_dir}/boundary_{tag}/fold{fold}/{stem}_target.pt", weights_only=True).to(device)
+        target = torch.load(f"{args.target_base_dir}/flame_{tag}/fold{fold}/{stem}_target.pt", weights_only=True).to(device)
         sf_wrapper = SemifreddoLedidiWrapper(
             model=model, precomputed_full_output=tower, full_X=X,
             edited_bin=CENTER_BIN_MAP, context_bins=CONTEXT_BINS,

@@ -1,25 +1,24 @@
 """
-boundary_design_analysis.py
+flame_design_analysis.py
 
-Analyse boundary optimisation results: predicted insulation scores (URQ),
+Analyse flame optimisation results: predicted flame scores at multiple widths,
 GC content, and CTCF motif hits for original, edited, and target sequences.
 
 Usage:
-python boundary_design_analysis.py \
-    --fold 3 \
-    --run_name epsilon/epsilon_1e-6 \
-    --boundary_strength -0.5
+    python flame_design_analysis.py \\
+        --fold 0 \\
+        --run_name lambda/lambda_0.01 \\
+        --flame_strength 1.0
 """
 
 import argparse
 import os
 import sys
 
-
 import numpy as np
 import pandas as pd
 import torch
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 from memelite import fimo
 
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
@@ -30,7 +29,7 @@ from utils.data_utils import from_upper_triu_batch, gc_content
 from utils.fimo_utils import read_meme_pwm, ctcf_hits_per_seq
 from utils.optimization_utils import strength_tag
 from utils.model_utils import load_model
-from utils.scores_utils import insulation_score
+from utils.scores_utils import compute_flame_scores
 
 # ── Fixed paths ───────────────────────────────────────────────────────────────
 _PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
@@ -40,8 +39,8 @@ MODEL_CKPT        = (
     "/checkpoints/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
 )
 SEQ_BASE_DIR      = f"{_PROJ}/analysis/flat_regions"
-TARGET_BASE_DIR   = f"{_PROJ}/optimizations/boundaries/targets"
-RESULTS_BASE_DIR  = f"{_PROJ}/optimizations/boundaries"
+TARGET_BASE_DIR   = f"{_PROJ}/optimizations/flames/targets"
+RESULTS_BASE_DIR  = f"{_PROJ}/optimizations/flames"
 FLAT_REGIONS_BASE = f"{_PROJ}/analysis/flat_regions/mouse_flat_regions_chrom_states_tsv"
 PWM_PATH          = "/home1/smaruj/ledidi_akita/data/pwm/MA0139.1.meme"
 
@@ -49,28 +48,28 @@ PWM_PATH          = "/home1/smaruj/ledidi_akita/data/pwm/MA0139.1.meme"
 CENTER_BIN_MAP = 256
 CROPPING       = 64
 BIN_SIZE       = 2048
-EDIT_START     = (CENTER_BIN_MAP + CROPPING) * BIN_SIZE   # bp start of central bin
-EDIT_END       = EDIT_START + BIN_SIZE                    # bp end   of central bin
-EXTRA_FLANK    = 60                                       # extra bp around bin for FIMO
+EDIT_START     = (CENTER_BIN_MAP + CROPPING) * BIN_SIZE
+EDIT_END       = EDIT_START + BIN_SIZE
+EXTRA_FLANK    = 60
 
-# ── URQ slice ─────────────────────────────────────────────────────────────────
-URQ_ROW_SLICE = slice(0, 250)
-URQ_COL_SLICE = slice(260, 512)
+# ── Flame score half-widths to measure (in bins) ──────────────────────────────
+# flame-3: half=1, flame-5: half=2, flame-7: half=3
+FLAME_HALF_WIDTHS = [1, 2, 3]
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="Boundary optimisation analysis",
+        description="Flame optimisation analysis",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    p.add_argument("--fold",              type=int,   required=True)
-    p.add_argument("--run_name",          type=str,   required=True,
-                   help="Results subdirectory, e.g. 'lambda/lambda_0.01' or 'tau/tau_1.0'")
-    p.add_argument("--boundary_strength", type=float, required=True,
-                   help="Boundary strength value used during optimisation (e.g. -0.5)")
-    p.add_argument("--batch_size", type=int, default=4)
+    p.add_argument("--fold",           type=int, required=True)
+    p.add_argument("--run_name",       type=str, required=True,
+                   help="Results subdirectory, e.g. 'lambda/lambda_0.01'")
+    p.add_argument("--flame_strength", type=float, required=True,
+                   help="Flame strength value used during optimisation (e.g. 1.0)")
+    p.add_argument("--batch_size",     type=int, default=4)
     p.add_argument("--results_base_dir",  default=RESULTS_BASE_DIR)
     p.add_argument("--flat_regions_base", default=FLAT_REGIONS_BASE)
     return p.parse_args()
@@ -81,7 +80,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args   = parse_args()
     fold   = args.fold
-    tag    = strength_tag(args.boundary_strength)
+    tag    = strength_tag(args.flame_strength)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     run_dir  = os.path.join(args.results_base_dir, args.run_name)
@@ -104,7 +103,7 @@ def main() -> None:
 
     # ── Datasets ──────────────────────────────────────────────────────────────
     seq_path    = f"{SEQ_BASE_DIR}/mouse_sequences/fold{fold}/"
-    target_path = f"{TARGET_BASE_DIR}/boundary_{tag}/fold{fold}/"
+    target_path = f"{TARGET_BASE_DIR}/flame_{tag}/fold{fold}/"
 
     orig_dataset   = SequenceDataset(df, seq_path, "chrom", "centered_start", "centered_end", "X")
     edited_dataset = CentralInsertionDataset(df, seq_path, fold_dir + "/", EDIT_START, EDIT_END)
@@ -115,7 +114,11 @@ def main() -> None:
     target_loader = DataLoader(target_dataset, batch_size=args.batch_size, shuffle=False)
 
     # ── Storage ───────────────────────────────────────────────────────────────
-    urq_orig, urq_edited, urq_target = [], [], []
+    flame_scores = {
+        f"flame{2*hw+1}_{cond}": []
+        for hw in FLAME_HALF_WIDTHS
+        for cond in ("orig", "edited", "target")
+    }
     gc_seq, gc_slice_orig, gc_slice_edited = [], [], []
 
     # ── Prediction loop ───────────────────────────────────────────────────────
@@ -127,32 +130,31 @@ def main() -> None:
 
             # GC content
             gc_seq.extend(gc_content(orig_b).tolist())
-            gc_slice_orig.extend(
-                gc_content(orig_b, EDIT_START, EDIT_END).tolist()
-            )
-            gc_slice_edited.extend(
-                gc_content(edited_b, EDIT_START, EDIT_END).tolist()
-            )
+            gc_slice_orig.extend(gc_content(orig_b,   EDIT_START, EDIT_END).tolist())
+            gc_slice_edited.extend(gc_content(edited_b, EDIT_START, EDIT_END).tolist())
 
-            # Predictions
+            # Predictions → contact maps
             maps_orig   = from_upper_triu_batch(model(orig_b).cpu())
             maps_edited = from_upper_triu_batch(model(edited_b).cpu())
             maps_target = from_upper_triu_batch(target_b.cpu())
 
-            urq_orig.extend(insulation_score(maps_orig, URQ_ROW_SLICE, URQ_COL_SLICE))
-            urq_edited.extend(insulation_score(maps_edited, URQ_ROW_SLICE, URQ_COL_SLICE))
-            urq_target.extend(insulation_score(maps_target, URQ_ROW_SLICE, URQ_COL_SLICE))
+            # Flame scores at all widths
+            for hw in FLAME_HALF_WIDTHS:
+                size = 2 * hw + 1
+                for maps, cond in ((maps_orig, "orig"), (maps_edited, "edited"), (maps_target, "target")):
+                    scores = compute_flame_scores(maps, [hw])
+                    flame_scores[f"flame{size}_{cond}"].extend(scores[f"flame{size}"])
 
     # ── CTCF loop ─────────────────────────────────────────────────────────────
-    pwm     = read_meme_pwm(PWM_PATH)
-    motifs  = {"CTCF": pwm}
+    pwm    = read_meme_pwm(PWM_PATH)
+    motifs = {"CTCF": pwm}
 
     orig_n_ctcf  = []
-    ctcf_records = []   # edited: n, score_sum, score_max, positions, strands
+    ctcf_records = []
 
     with torch.no_grad():
         for orig_b, edited_b in zip(orig_loader, edited_loader):
-            bs = orig_b.shape[0]   # true batch size (last batch may be smaller)
+            bs = orig_b.shape[0]
 
             orig_slice   = orig_b[:,   :, EDIT_START - EXTRA_FLANK : EDIT_END + EXTRA_FLANK].cpu().numpy()
             edited_slice = edited_b[:, :, EDIT_START - EXTRA_FLANK : EDIT_END + EXTRA_FLANK].cpu().numpy()
@@ -162,10 +164,10 @@ def main() -> None:
             edited_hits = fimo(motifs=motifs, sequences=edited_slice,
                                threshold=1e-4, reverse_complement=True)[0]
 
-            # Adjust positions back to central-bin coordinates
             for hits in (orig_hits, edited_hits):
                 hits["start"] -= EXTRA_FLANK
                 hits["end"]   -= EXTRA_FLANK
+                hits["sequence_name"] = hits["sequence_name"].astype(int)
 
             for seq_idx in range(bs):
                 oh = orig_hits[orig_hits["sequence_name"] == seq_idx]
@@ -174,18 +176,18 @@ def main() -> None:
             ctcf_records.extend(ctcf_hits_per_seq(edited_hits, bs))
 
     # ── Assemble results ──────────────────────────────────────────────────────
-    df["insul_score_orig"]       = urq_orig
-    df["insul_score_edited"]     = urq_edited
-    df["insul_score_target"]     = urq_target
-    df["GC_seq"]         = gc_seq
-    df["GC_slice_orig"]  = gc_slice_orig
-    df["GC_slice_edited"]= gc_slice_edited
-    df["init_CTCFs_num"] = orig_n_ctcf
-    df["CTCFs_num"]      = [r["n"]         for r in ctcf_records]
-    df["FIMO_sum"]       = [r["score_sum"] for r in ctcf_records]
-    df["FIMO_max"]       = [r["score_max"] for r in ctcf_records]
-    df["orientation"]    = [r["strands"]   for r in ctcf_records]
-    df["positions"]      = [r["positions"] for r in ctcf_records]
+    for col, vals in flame_scores.items():
+        df[col] = vals
+
+    df["GC_seq"]          = gc_seq
+    df["GC_slice_orig"]   = gc_slice_orig
+    df["GC_slice_edited"] = gc_slice_edited
+    df["init_CTCFs_num"]  = orig_n_ctcf
+    df["CTCFs_num"]       = [r["n"]         for r in ctcf_records]
+    df["FIMO_sum"]        = [r["score_sum"] for r in ctcf_records]
+    df["FIMO_max"]        = [r["score_max"] for r in ctcf_records]
+    df["orientation"]     = [r["strands"]   for r in ctcf_records]
+    df["positions"]       = [r["positions"] for r in ctcf_records]
 
     # ── Save ──────────────────────────────────────────────────────────────────
     out_path = os.path.join(

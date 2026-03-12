@@ -195,3 +195,49 @@ class CentralInsertionDataset(Dataset):
         edited = X.clone()
         edited[:, :, self.edit_start:self.edit_end] = slice_
         return edited.squeeze(0)
+
+
+class DoubleInsertionDataset(Dataset):
+    """Reconstruct full sequences by inserting two optimised anchor bins.
+
+    The saved _gen_seq.pt contains a (1, 4, 2*BIN_SIZE) tensor with the
+    lo anchor in [:, :, :BIN_SIZE] and the hi anchor in [:, :, BIN_SIZE:].
+    """
+
+    def __init__(
+        self,
+        coord_df: pd.DataFrame,
+        seq_path: str,
+        slice_path: str,
+        bp_lo_start: int,
+        bp_lo_end: int,
+        bp_hi_start: int,
+        bp_hi_end: int,
+        bin_size: int = 2048,
+    ):
+        self.coords      = coord_df
+        self.seq_path    = seq_path
+        self.slice_path  = slice_path
+        self.bp_lo_start = bp_lo_start
+        self.bp_lo_end   = bp_lo_end
+        self.bp_hi_start = bp_hi_start
+        self.bp_hi_end   = bp_hi_end
+        self.bin_size    = bin_size
+
+    def __len__(self) -> int:
+        return len(self.coords)
+
+    def __getitem__(self, idx: int) -> torch.Tensor:
+        row   = self.coords.iloc[idx]
+        chrom = row["chrom"]
+        start = int(row["centered_start"])
+        end   = int(row["centered_end"])
+        stem  = f"{chrom}_{start}_{end}"
+
+        X      = torch.load(f"{self.seq_path}{stem}_X.pt",        weights_only=True)
+        slice_ = torch.load(f"{self.slice_path}{stem}_gen_seq.pt", weights_only=True)
+
+        edited = X.clone()
+        edited[:, :, self.bp_lo_start:self.bp_lo_end] = slice_[:, :, :self.bin_size]
+        edited[:, :, self.bp_hi_start:self.bp_hi_end] = slice_[:, :, self.bin_size:]
+        return edited.squeeze(0)   # (4, L)

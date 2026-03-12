@@ -18,7 +18,7 @@ every fold of the flat-regions dataset:
 Usage
 -----
 python generate_boundaries_optimization_files.py \
-    --boundary_strength -0.2 \
+    --boundary_strength -5.0 \
     --mask_output_dir /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/feature_masks \
     --seq_output_dir /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/analysis/flat_regions \
     --target_output_dir /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/boundaries
@@ -42,7 +42,8 @@ sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 
 from akita.model import SeqNN
 from utils.data_utils import one_hot_encode_sequence
-from utils.optimization_utils import strength_tag, make_boundary_mask, store_tower_output, make_target
+from utils.optimization_utils import strength_tag, store_tower_output, make_target
+from utils.data_utils import upper_triangular_to_vector, fragment_indices_in_upper_triangular
 
 # =============================================================================
 # Constants
@@ -63,6 +64,43 @@ MODEL_PATH_PATTERN = (
     "/home1/smaruj/pytorch_akita/models/finetuned/mouse/Hsieh2019_mESC/checkpoints/"
     "Akita_v2_mouse_Hsieh2019_mESC_model{model_idx}_finetuned.pth"
 )
+
+# =============================================================================
+# Boundary mask utilities
+# =============================================================================
+
+
+def make_boundary_mask(
+    strength: float,
+    map_size: int = 512,
+    num_diags: int = 2,
+):
+    """Build the boundary mask that suppresses inter-compartment contacts.
+
+    The top-right and bottom-left quadrants of the contact map are set to
+    `strength` (typically negative); all other entries are 0.
+
+    Returns
+    -------
+    indices : (N,) LongTensor   — positions in the flattened upper-tri vector
+    vector  : (M,) FloatTensor  — full upper-tri vector with mask values filled in
+    """
+    half = map_size // 2
+
+    matrix = np.zeros((map_size, map_size))
+    matrix[:half, half:] = strength
+    matrix[half:, :half] = strength
+
+    fragment_bool = np.zeros((map_size, map_size), dtype=bool)
+    fragment_bool[:half, half:] = True
+    fragment_bool[half:, :half] = True
+
+    vector  = upper_triangular_to_vector(matrix, num_diags)
+    indices = fragment_indices_in_upper_triangular(
+        matrix_size=map_size, fragment_mask=fragment_bool
+    )
+
+    return torch.tensor(indices), torch.tensor(vector).float()
 
 
 # =============================================================================
