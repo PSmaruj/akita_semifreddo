@@ -17,6 +17,8 @@ def load_model(model_weights_path: str, device: torch.device) -> torch.nn.Module
     torch.nn.Module
         Model in eval mode with all parameters frozen.
     """
+    import sys
+    sys.path.insert(0, "/home1/smaruj/pytorch_akita/")
     from akita.model import SeqNN
 
     model = SeqNN()

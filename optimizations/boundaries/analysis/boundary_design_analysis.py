@@ -7,7 +7,7 @@ GC content, and CTCF motif hits for original, edited, and target sequences.
 Usage:
 python boundary_design_analysis.py \
     --fold 3 \
-    --run_name epsilon/epsilon_1e-6 \
+    --run_name tau/tau_10.0 \
     --boundary_strength -0.5
 """
 

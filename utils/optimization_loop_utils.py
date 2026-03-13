@@ -137,11 +137,18 @@ def run_one_design_dot(
     end   = int(row["centered_end"])
     stem  = build_stem(chrom, start, end)
 
-    X_center = X[:, :, sf_wrapper.center_bp_start:sf_wrapper.center_bp_end]
+    bp_lo_start = sf_wrapper.bp_lo_start
+    bp_lo_end   = sf_wrapper.bp_lo_end
+    bp_hi_start = sf_wrapper.bp_hi_start
+    bp_hi_end   = sf_wrapper.bp_hi_end
+
+    X_lo = X[:, :, bp_lo_start:bp_lo_end]
+    X_hi = X[:, :, bp_hi_start:bp_hi_end]
+    X_anchors = torch.cat([X_lo, X_hi], dim=2)   # (1, 4, 2*BIN_SIZE)
 
     ledidi_optimizer = Ledidi(
         sf_wrapper,
-        shape               = X_center.shape[1:],
+        shape               = X_anchors.shape[1:],
         input_loss          = torch.nn.L1Loss(reduction="sum"),
         output_loss         = output_loss,
         batch_size          = 1,
@@ -154,7 +161,7 @@ def run_one_design_dot(
         verbose             = False,
     ).cuda()
 
-    generated_anchors, history = ledidi_optimizer.fit_transform(X_center, target)
+    generated_anchors, history = ledidi_optimizer.fit_transform(X_anchors, target)
 
     # Reconstruct full sequence for edit counting
     full_generated_seq = X.clone()
@@ -162,6 +169,8 @@ def run_one_design_dot(
     full_generated_seq[:, :, sf_wrapper.bp_hi_start:sf_wrapper.bp_hi_end] = generated_anchors[:, :, bin_size:]
 
     n_edits   = count_edits(X, full_generated_seq)
+    last_step = last_accepted_step(history)
+    log.info(f"    Edits: {n_edits}  |  Last accepted step: {last_step}")
     last_step = last_accepted_step(history)
     log.info(f"    Edits: {n_edits}  |  Last accepted step: {last_step}")
 

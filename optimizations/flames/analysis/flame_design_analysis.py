@@ -5,10 +5,10 @@ Analyse flame optimisation results: predicted flame scores at multiple widths,
 GC content, and CTCF motif hits for original, edited, and target sequences.
 
 Usage:
-    python flame_design_analysis.py \\
-        --fold 0 \\
-        --run_name lambda/lambda_0.01 \\
-        --flame_strength 1.0
+python flame_design_analysis.py \
+    --fold 3 \
+    --run_name lambda/lambda_10.0 \
+    --flame_strength 1.0
 """
 
 import argparse
