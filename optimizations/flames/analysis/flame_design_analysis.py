@@ -7,7 +7,7 @@ GC content, and CTCF motif hits for original, edited, and target sequences.
 Usage:
 python flame_design_analysis.py \
     --fold 3 \
-    --run_name lambda/lambda_10.0 \
+    --run_name lambda/lambda_140.0 \
     --flame_strength 1.0
 """
 
