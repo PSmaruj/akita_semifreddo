@@ -110,8 +110,8 @@ def main() -> None:
         torch.manual_seed(seed)
         log.info(f"=== Seed {seed} ===")
 
-        # Nest seed outputs under <results_base_dir>/<run_name>/seed<seed>/
-        seed_results_dir = os.path.join(args.results_base_dir, args.run_name, f"seed{seed}")
+        # Nest seed outputs under <results_base_dir>/<run_name>/
+        # seed_results_dir = os.path.join(args.results_base_dir, args.run_name)
 
         # ── Boundary-specific run_one closure (captures current seed) ─────────
         def run_one_fn(row, fold, args, out_dir, _seed=seed):
@@ -129,7 +129,7 @@ def main() -> None:
 
         # ── Run all folds for this seed ───────────────────────────────────────
         for fold in args.folds:
-            run_fold(fold, args, run_one_fn, args.flat_regions_base, seed_results_dir)
+            run_fold(fold, args, run_one_fn, args.flat_regions_base, args.results_base_dir)
 
     log.info("All seeds and folds complete.")
 
