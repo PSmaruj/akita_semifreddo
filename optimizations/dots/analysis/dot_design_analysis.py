@@ -5,10 +5,10 @@ Analyse dot optimisation results: predicted dot scores at multiple window sizes,
 GC content, and CTCF motif hits for original, edited, and target sequences.
 
 Usage:
-    python dot_design_analysis.py \
-        --fold 3 \
-        --run_name lambda/lambda_150.0 \
-        --inter_anchor_dist 50
+python dot_design_analysis.py \
+    --fold 7 \
+    --run_name results/dot_d70 \
+    --inter_anchor_dist 70
 """
 
 import argparse

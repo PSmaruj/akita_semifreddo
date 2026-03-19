@@ -292,3 +292,23 @@ class TwoAnchorSemifreddoLedidiWrapper(nn.Module):
             cropping_applied        = self.cropping_applied,
         )
         return sf.forward()
+
+
+class CTCFAwareSemifreddoWrapper(nn.Module):
+    def __init__(self, sf_wrapper: nn.Module):
+        super().__init__()
+        self.sf_wrapper = sf_wrapper
+        self.last_x: torch.Tensor | None = None
+
+    # Pass-throughs so run_one_design can read bp coordinates
+    @property
+    def center_bp_start(self):
+        return self.sf_wrapper.center_bp_start
+
+    @property
+    def center_bp_end(self):
+        return self.sf_wrapper.center_bp_end
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        self.last_x = x
+        return self.sf_wrapper(x)

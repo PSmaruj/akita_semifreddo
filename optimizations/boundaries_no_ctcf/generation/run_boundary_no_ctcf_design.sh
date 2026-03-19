@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=g1.8e5
+#SBATCH --job-name=elim_2
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu
 #SBATCH --nodes=1
@@ -16,7 +16,7 @@ conda activate pytorch_hic
 
 python run_boundary_no_ctcf_design.py \
         --folds 0 1 2 3 4 5 6 7 \
-        --run_name gamma/gamma_1.8e5 \
+        --run_name results_g3k_2 \
         --boundary_strength -0.2 \
         --L 0.01 \
-        --gamma 1.8e5
+        --gamma 3000

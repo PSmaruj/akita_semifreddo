@@ -14,9 +14,9 @@
 eval "$(conda shell.bash hook)"
 conda activate pytorch_hic
 
-python retry_boundary_design.py \\
-        --folds 0 1 2 3 4 5 6 7 \\
-        --run_name rerun_unsuccessful \\
-        --boundary_strength -0.5 \\
-        --L 125.0 \\
+python retry_boundary_design.py \
+        --folds 0 1 2 3 4 5 6 7 \
+        --run_name rerun_unsuccessful \
+        --boundary_strength -0.5 \
+        --L 125.0 \
         --retry_tsv /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/boundaries/unsuccessful_all_folds_-0.5.tsv

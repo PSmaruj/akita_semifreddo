@@ -76,10 +76,25 @@ def parse_target_from_dirname(dirname: str) -> float:
     return sign * float(f"{integer_part}.{decimal_part}")
 
 
+def parse_dot_distance_from_dirname(dirname: str) -> float:
+    """
+    Extract target dot distance from a directory name.
+    Example:
+        dot_d30 -> 30.0
+        dot_d50 -> 50.0
+    """
+    match = re.search(r'd(\d+)', dirname)
+    if not match:
+        raise ValueError(f"Could not parse dot distance from directory name: '{dirname}'")
+    
+    return float(match.group(1))
+
+
 def load_optimization_results(
     result_dirs: list[str],
     base_dir: Path,
     folds: range,
+    parser_func=parse_target_from_dirname
 ) -> pd.DataFrame:
     """
     Load all optimization result TSVs from the given subdirectories,
@@ -94,27 +109,27 @@ def load_optimization_results(
         Concatenated DataFrame with added 'fold' and 'target' columns.
     """
     dfs = []
-
+    
     for dirname in result_dirs:
-        target = parse_target_from_dirname(dirname)
+        # Use the passed parser function
+        target = parser_func(dirname)
         dir_path = base_dir / dirname
-
+        
         for fold in folds:
             fname = f"fold{fold}_selected_genomic_windows_centered_chrom_states_results.tsv"
             fpath = dir_path / fname
-
+            
             if not fpath.exists():
                 print(f"Warning: file not found, skipping: {fpath}")
                 continue
-
+                
             df = pd.read_csv(fpath, sep="\t")
             df["fold"] = fold
             df["target"] = target
             dfs.append(df)
-
+            
     if not dfs:
-        raise RuntimeError("No TSV files were loaded. Check your paths and directory names.")
-
+        raise RuntimeError("No TSV files were loaded. Check your paths.")
     return pd.concat(dfs, ignore_index=True)
 
 

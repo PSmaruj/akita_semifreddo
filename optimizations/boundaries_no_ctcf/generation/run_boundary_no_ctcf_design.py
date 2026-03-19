@@ -7,10 +7,10 @@ Saves per-window generated sequences and an enriched TSV with optimisation metad
 Usage:
     python run_boundary_no_ctcf_design.py \\
         --folds 0 1 2 3 \\
-        --run_name results/gamma_300 \\
+        --run_name results/gamma_3000 \\
         --boundary_strength -0.2 \\
         --L 0.01 \\
-        --gamma 10000
+        --gamma 3000
 """
 
 import os
@@ -24,7 +24,7 @@ sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
 sys.path.insert(0, "/home1/smaruj/ledidi/ledidi/")
 sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 
-from semifreddo.semifreddo import SemifreddoLedidiWrapper
+from semifreddo.semifreddo import SemifreddoLedidiWrapper, CTCFAwareSemifreddoWrapper
 from utils.losses_utils import LocalL1Loss, LocalL1LossWithCTCFPenalty
 from utils.optimization_utils import strength_tag, build_stem
 from utils.model_utils import load_model
@@ -53,11 +53,9 @@ BIN_SIZE         = 2048
 CROPPING_APPLIED = 64
 N_TRIU           = 130305
 
-# Edited slice computed from architecture constants (no sf_wrapper needed at module level)
-EDITED_SLICE = slice(
-    (CENTER_BIN_MAP - CONTEXT_BINS) * BIN_SIZE,
-    (CENTER_BIN_MAP + CONTEXT_BINS) * BIN_SIZE,
-)
+# Edited slice is relative to X_center (shape (1, 4, 2048) — just the central bin),
+# so it always spans the full extent of what Ledidi is optimising.
+EDITED_SLICE = slice(0, BIN_SIZE)
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -78,11 +76,11 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--folds",    type=int, nargs="+", required=True,
                    help="One or more fold indices, e.g. --folds 0 1 2 3")
     p.add_argument("--run_name", type=str, required=True,
-                   help="Results subdirectory name (e.g. 'results/gamma_10000')")
+                   help="Results subdirectory name (e.g. 'results/gamma_3000')")
     p.add_argument("--boundary_strength", type=float, required=True,
                    help="Value applied to the off-diagonal quadrants of the boundary mask "
                         "(e.g. -0.2). Negative values suppress contacts.")
-    p.add_argument("--gamma", type=float, default=10000, help="CTCF penalty weight (gamma)")
+    p.add_argument("--gamma", type=float, default=3000, help="CTCF penalty weight (gamma)")
     p.add_argument("--L",     type=float, default=0.01,  help="Input-loss regularisation weight")
     p.add_argument("--tau",   type=float, default=1.0,   help="Ledidi tau parameter")
     p.add_argument("--eps",   type=float, default=1e-4,  help="Ledidi eps parameter")
@@ -111,20 +109,12 @@ def main() -> None:
     model = load_model(args.model_path, device)
     mask  = torch.load(args.mask_path, weights_only=True).to(device)
 
-    # CTCF PWM
+    # CTCF PWM — read_meme_pwm returns (4, 19) directly, no .T needed
     pwm_CTCF    = read_meme_pwm(CTCF_PWM_PATH)
     motifs_dict = {"CTCF": pwm_CTCF}
 
-    # Base structural loss
+    # Base structural loss — shared across all windows
     output_loss = LocalL1Loss(mask, n_triu=N_TRIU, reduction="sum").to(device)
-
-    # Combined loss with CTCF penalty — uses module-level EDITED_SLICE
-    ctcf_penalty_output_loss = LocalL1LossWithCTCFPenalty(
-        local_loss_fn = output_loss,
-        motifs_dict   = motifs_dict,
-        edited_slice  = EDITED_SLICE,
-        gamma         = args.gamma,
-    ).to(device)
 
     # ── Boundary-specific run_one closure ─────────────────────────────────────
     def run_one_fn(row, fold, args, out_dir):
@@ -136,13 +126,23 @@ def main() -> None:
                             weights_only=True).to(device)
         target = torch.load(f"{args.target_base_dir}/boundary_{tag}/fold{fold}/{stem}_target.pt",
                             weights_only=True).to(device)
+
         sf_wrapper = SemifreddoLedidiWrapper(
             model=model, precomputed_full_output=tower, full_X=X,
             edited_bin=CENTER_BIN_MAP, context_bins=CONTEXT_BINS,
             cropping_applied=CROPPING_APPLIED,
         )
-        # ✅ ctcf_penalty_output_loss passed (not the plain output_loss)
-        return run_one_design(row, fold, args, sf_wrapper, ctcf_penalty_output_loss,
+        sf_ctcf_wrapper = CTCFAwareSemifreddoWrapper(sf_wrapper)
+
+        ctcf_penalty_output_loss = LocalL1LossWithCTCFPenalty(
+            local_loss_fn = output_loss,
+            motifs_dict   = motifs_dict,
+            edited_slice  = slice(0, BIN_SIZE),
+            gamma         = args.gamma,
+            seq_wrapper   = sf_ctcf_wrapper,
+        ).to(device)
+
+        return run_one_design(row, fold, args, sf_ctcf_wrapper, ctcf_penalty_output_loss,
                               X, target, device, out_dir)
 
     # ── Run all folds ─────────────────────────────────────────────────────────
