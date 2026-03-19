@@ -164,3 +164,42 @@ def load_indep_runs_results(
         raise RuntimeError(f"No TSV files were loaded from {indep_runs_dir}")
 
     return pd.concat(dfs, ignore_index=True)
+
+
+def summarize_by_target(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    For each target strength, compute:
+      - n_total:              total number of optimization runs
+      - n_no_edits:           runs where no edits were accepted (n_edits == 0)
+      - n_no_depletion:       runs with edits but no contact depletion
+                              (n_edits > 0 and optimization_success == False)
+      - success_rate_pct:     percentage of successful optimizations
+    For successful runs only:
+      - mean_n_edits:         average number of accepted edits
+      - mean_last_step:       average last accepted optimization step
+    """
+    rows = []
+    for target, grp in df.groupby("target"):
+        n_total       = len(grp)
+        no_edits      = grp["n_edits"] == 0
+        successful    = grp["optimization_success"]
+
+        n_no_edits    = no_edits.sum()
+        n_no_depletion = (~successful & ~no_edits).sum()
+        success_rate  = 100 * successful.mean()
+
+        successful_grp = grp[successful]
+        mean_n_edits   = successful_grp["n_edits"].mean()
+        mean_last_step = successful_grp["last_accepted_step"].mean()
+
+        rows.append({
+            "target":            target,
+            "n_total":           n_total,
+            "n_no_edits":        n_no_edits,
+            "n_no_depletion":    n_no_depletion,
+            "success_rate_pct":  round(success_rate, 1),
+            "mean_n_edits":      round(mean_n_edits, 1),
+            "mean_last_step":    round(mean_last_step, 1),
+        })
+
+    return pd.DataFrame(rows).sort_values("target").reset_index(drop=True)

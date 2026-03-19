@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=seed0
+#SBATCH --job-name=l_s9
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu
 #SBATCH --nodes=1
@@ -16,7 +16,7 @@ conda activate pytorch_hic
 
 python run_boundary_design_seed.py \
         --folds 0 1 2 3 \
-        --seeds 0 \
-        --run_name indep_runs_lambda_125.0/seed0 \
+        --seeds 9 \
+        --run_name indep_runs_lambda_0.01/seed9 \
         --boundary_strength -0.5 \
-        --L 125.0 \
+        --L 0.01 \

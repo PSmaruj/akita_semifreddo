@@ -7,7 +7,7 @@ GC content, and CTCF motif hits for original, edited, and target sequences.
 Usage:
 python boundary_design_analysis.py \
     --fold 3 \
-    --run_name indep_runs_lambda_125.0/seed3 \
+    --run_name indep_runs_lambda_0.01/seed9 \
     --boundary_strength -0.5
 """
 
