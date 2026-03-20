@@ -1,14 +1,13 @@
 """
-boundary_design_analysis.py
+boundary_suppression_analysis.py
 
 Analyse boundary optimisation results: predicted insulation scores (URQ),
 GC content, and CTCF motif hits for original, edited, and target sequences.
 
 Usage:
-python boundary_design_analysis.py \
+python boundary_suppression_analysis.py \
     --fold 0 \
-    --run_name results_0 \
-    --boundary_strength -0.2
+    --run_name results_0
 """
 
 import argparse
@@ -27,7 +26,6 @@ sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 from utils.dataset_utils import CentralInsertionDataset, SequenceDataset, TriuMatrixDataset
 from utils.data_utils import from_upper_triu_batch, gc_content
 from utils.fimo_utils import read_meme_pwm, ctcf_hits_per_seq
-from utils.optimization_utils import strength_tag
 from utils.model_utils import load_model
 from utils.scores_utils import insulation_score
 
@@ -38,10 +36,10 @@ MODEL_CKPT        = (
     "/home1/smaruj/pytorch_akita/models/finetuned/mouse/Hsieh2019_mESC"
     "/checkpoints/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
 )
-SEQ_BASE_DIR      = f"{_PROJ}/analysis/flat_regions"
-TARGET_BASE_DIR   = f"{_PROJ}/optimizations/boundaries/targets"
-RESULTS_BASE_DIR  = f"{_PROJ}/optimizations/boundaries_no_ctcf"
-FLAT_REGIONS_BASE = f"{_PROJ}/analysis/flat_regions/mouse_flat_regions_chrom_states_tsv"
+SEQ_BASE_DIR      = f"{_PROJ}/optimizations/boundary_suppression/initial_sequences"
+TARGET_BASE_DIR   = f"{_PROJ}/optimizations/boundary_suppression/targets"
+RESULTS_BASE_DIR  = f"{_PROJ}/optimizations/boundary_suppression"
+FLAT_REGIONS_BASE = f"{_PROJ}/optimizations/boundaries/successful_optimizations_-0.5.tsv"
 PWM_PATH          = "/home1/smaruj/ledidi_akita/data/pwm/MA0139.1.meme"
 
 # ── Architecture constants ────────────────────────────────────────────────────
@@ -61,14 +59,12 @@ URQ_COL_SLICE = slice(260, 512)
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="Boundary optimisation analysis",
+        description="Boundary suppression analysis",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     p.add_argument("--fold",              type=int,   required=True)
     p.add_argument("--run_name",          type=str,   required=True,
-                   help="Results subdirectory, e.g. 'lambda/lambda_0.01' or 'tau/tau_1.0'")
-    p.add_argument("--boundary_strength", type=float, required=True,
-                   help="Boundary strength value used during optimisation (e.g. -0.5)")
+                   help="Results subdirectory, e.g. 'results'")
     p.add_argument("--batch_size", type=int, default=4)
     p.add_argument("--results_base_dir",  default=RESULTS_BASE_DIR)
     p.add_argument("--flat_regions_base", default=FLAT_REGIONS_BASE)
@@ -80,7 +76,6 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args   = parse_args()
     fold   = args.fold
-    tag    = strength_tag(args.boundary_strength)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     run_dir  = os.path.join(args.results_base_dir, args.run_name)
@@ -89,21 +84,23 @@ def main() -> None:
     print(f"Device    : {device}")
     print(f"Run dir   : {run_dir}")
     print(f"Fold dir  : {fold_dir}")
-    print(f"Tag       : {tag}")
 
     # ── Load opt metadata table ───────────────────────────────────────────────
     df = pd.read_csv(
-        os.path.join(run_dir, f"fold{fold}_selected_genomic_windows_centered_chrom_states_opt.tsv"),
+        os.path.join(run_dir, f"fold{fold}_suppression_opt.tsv"),
         sep="\t",
     )
     print(f"Loaded {len(df)} windows")
 
+    df = df.drop(columns=["insul_score_diff", "optimization_success", "n_edits", "last_accepted_step"])
+    df = df.rename(columns={"n_edits.1": "n_edits", "last_accepted_step.1": "last_accepted_step"})
+    
     # ── Model ─────────────────────────────────────────────────────────────────
     model = load_model(MODEL_CKPT, device)
 
     # ── Datasets ──────────────────────────────────────────────────────────────
-    seq_path    = f"{SEQ_BASE_DIR}/mouse_sequences/fold{fold}/"
-    target_path = f"{TARGET_BASE_DIR}/boundary_{tag}/fold{fold}/"
+    seq_path    = f"{SEQ_BASE_DIR}/fold{fold}/"
+    target_path = f"{TARGET_BASE_DIR}/fold{fold}/"
 
     orig_dataset   = SequenceDataset(df, seq_path, "chrom", "centered_start", "centered_end", "X")
     edited_dataset = CentralInsertionDataset(df, seq_path, fold_dir + "/", EDIT_START, EDIT_END)
@@ -189,7 +186,7 @@ def main() -> None:
     # ── Save ──────────────────────────────────────────────────────────────────
     out_path = os.path.join(
         run_dir,
-        f"fold{fold}_selected_genomic_windows_centered_chrom_states_results.tsv",
+        f"fold{fold}_suppression_results.tsv",
     )
     df.to_csv(out_path, sep="\t", index=False)
     print(f"Saved → {out_path}")

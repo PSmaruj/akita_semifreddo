@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=elim_2
+#SBATCH --job-name=supp_C
 #SBATCH --account=fudenber_735
 #SBATCH --partition=qcbgpu
 #SBATCH --nodes=1
@@ -14,9 +14,8 @@
 eval "$(conda shell.bash hook)"
 conda activate pytorch_hic
 
-python run_boundary_no_ctcf_design.py \
-        --folds 0 1 2 3 4 5 6 7 \
-        --run_name results_2 \
-        --boundary_strength -0.2 \
-        --L 0.01 \
-        --gamma 3000
+python run_boundary_suppression_control.py \
+    --folds 0 1 2 3 4 5 6 7 \
+    --run_name control \
+    --L 0.01 \
+    --no_ctcf_mask

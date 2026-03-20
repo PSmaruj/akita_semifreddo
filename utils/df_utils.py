@@ -218,3 +218,46 @@ def summarize_by_target(df: pd.DataFrame) -> pd.DataFrame:
         })
 
     return pd.DataFrame(rows).sort_values("target").reset_index(drop=True)
+
+
+def simple_load_results(
+    result_dirs: list[str],
+    base_dir: Path,
+    folds: range,
+    tsv_suffix: str,
+) -> pd.DataFrame:
+    """
+    Load all result TSVs from the given subdirectories and concatenate
+    into a single DataFrame.
+
+    Args:
+        result_dirs: List of subdirectory names under base_dir.
+        base_dir:    Root directory containing the subdirectories.
+        folds:       Iterable of fold indices.
+        tsv_suffix:  Suffix of the TSV files to load. The expected filename
+                     pattern is fold{N}_{tsv_suffix}. Default is
+                     'suppression_opt.tsv'.
+
+    Returns:
+        Concatenated DataFrame with an added 'run_name' column identifying
+        the source subdirectory.
+    """
+    dfs = []
+
+    for dirname in result_dirs:
+        dir_path = base_dir / dirname
+
+        for fold in folds:
+            fname = f"fold{fold}_{tsv_suffix}"
+            fpath = dir_path / fname
+
+            if not fpath.exists():
+                print(f"Warning: file not found, skipping: {fpath}")
+                continue
+
+            df = pd.read_csv(fpath, sep="\t")
+            dfs.append(df)
+
+    if not dfs:
+        raise RuntimeError("No TSV files were loaded. Check your paths.")
+    return pd.concat(dfs, ignore_index=True)

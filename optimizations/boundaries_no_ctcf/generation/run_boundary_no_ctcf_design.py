@@ -126,7 +126,7 @@ def main() -> None:
                             weights_only=True).to(device)
         target = torch.load(f"{args.target_base_dir}/boundary_{tag}/fold{fold}/{stem}_target.pt",
                             weights_only=True).to(device)
-
+        
         sf_wrapper = SemifreddoLedidiWrapper(
             model=model, precomputed_full_output=tower, full_X=X,
             edited_bin=CENTER_BIN_MAP, context_bins=CONTEXT_BINS,
@@ -142,6 +142,9 @@ def main() -> None:
             seq_wrapper   = sf_ctcf_wrapper,
         ).to(device)
 
+        print(type(sf_ctcf_wrapper))
+        print(type(ctcf_penalty_output_loss.seq_wrapper))
+        
         return run_one_design(row, fold, args, sf_ctcf_wrapper, ctcf_penalty_output_loss,
                               X, target, device, out_dir)
 

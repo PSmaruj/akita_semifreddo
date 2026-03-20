@@ -300,7 +300,6 @@ class CTCFAwareSemifreddoWrapper(nn.Module):
         self.sf_wrapper = sf_wrapper
         self.last_x: torch.Tensor | None = None
 
-    # Pass-throughs so run_one_design can read bp coordinates
     @property
     def center_bp_start(self):
         return self.sf_wrapper.center_bp_start
@@ -310,5 +309,7 @@ class CTCFAwareSemifreddoWrapper(nn.Module):
         return self.sf_wrapper.center_bp_end
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        print(f"[DEBUG] CTCFAwareSemifreddoWrapper.forward called, x.shape={x.shape}")
+        
         self.last_x = x
         return self.sf_wrapper(x)

@@ -97,7 +97,7 @@ def main() -> None:
         sep="\t",
     )
     print(f"Loaded {len(df)} windows")
-
+    
     # ── Model ─────────────────────────────────────────────────────────────────
     model = load_model(MODEL_CKPT, device)
 
@@ -191,6 +191,7 @@ def main() -> None:
         run_dir,
         f"fold{fold}_selected_genomic_windows_centered_chrom_states_results.tsv",
     )
+    
     df.to_csv(out_path, sep="\t", index=False)
     print(f"Saved → {out_path}")
 

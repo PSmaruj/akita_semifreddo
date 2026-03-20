@@ -16,8 +16,6 @@ import torch.nn as nn
 from ledidi import Ledidi
 from utils.optimization_utils import build_stem, last_accepted_step, count_edits
 
-from semifreddo.semifreddo import CTCFAwareSemifreddoWrapper
-
 
 log = logging.getLogger(__name__)
 
@@ -75,16 +73,10 @@ def run_one_design(
     end   = int(row["centered_end"])
     stem  = build_stem(chrom, start, end)
     
-    # ── If the loss needs sequence access, wrap sf_wrapper and wire it in ─────
-    if hasattr(output_loss, "seq_wrapper"):
-        model_for_ledidi = CTCFAwareSemifreddoWrapper(sf_wrapper)
-        output_loss.seq_wrapper = model_for_ledidi
-        log.info("    CTCFAwareSemifreddoWrapper active — CTCF penalty enabled")
-    else:
-        model_for_ledidi = sf_wrapper
-    
     X_center = X[:, :, sf_wrapper.center_bp_start:sf_wrapper.center_bp_end]
-
+    
+    print(f"model type passed to Ledidi: {type(sf_wrapper)}")
+    
     ledidi_optimizer = Ledidi(
         sf_wrapper,
         shape               = X_center.shape[1:],
