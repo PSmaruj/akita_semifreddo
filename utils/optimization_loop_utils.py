@@ -35,6 +35,7 @@ def run_one_design(
     target: torch.Tensor,
     device: torch.device,
     out_dir: str,
+    input_mask: torch.Tensor | None = None,
 ) -> dict:
     """Run Ledidi optimisation for a single genomic window.
 
@@ -60,7 +61,11 @@ def run_one_design(
     device : torch.device
     out_dir : str
         Directory where <stem>_gen_seq.pt is saved.
-
+    input_mask : torch.Tensor or None, shape (seq_len,)
+        Boolean mask passed to Ledidi — True positions are frozen (weight set
+        to -inf). Used e.g. to freeze CTCF motif positions during suppression.
+        If None, no positions are masked. Default is None.
+        
     Returns
     -------
     dict with keys 'n_edits' and 'last_accepted_step'.
@@ -85,6 +90,7 @@ def run_one_design(
         shape               = X_center.shape[1:],
         input_loss          = torch.nn.L1Loss(reduction="sum"),
         output_loss         = output_loss,
+        input_mask          = input_mask,
         batch_size          = 1,
         l                   = args.L,
         tau                 = args.tau,
