@@ -6,7 +6,7 @@ GC content, and CTCF motif hits for original, edited, and target sequences.
 
 Usage:
 python boundary_design_analysis.py \
-    --fold 0 \
+    --fold 6 \
     --run_name results_0 \
     --boundary_strength -0.2
 """

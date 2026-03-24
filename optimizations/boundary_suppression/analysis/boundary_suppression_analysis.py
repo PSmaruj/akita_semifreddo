@@ -6,8 +6,8 @@ GC content, and CTCF motif hits for original, edited, and target sequences.
 
 Usage:
 python boundary_suppression_analysis.py \
-    --fold 0 \
-    --run_name results_0
+    --fold 7 \
+    --run_name control
 """
 
 import argparse
