@@ -313,3 +313,162 @@ class CTCFAwareSemifreddoWrapper(nn.Module):
         
         self.last_x = x
         return self.sf_wrapper(x)
+
+
+class MultiBinSemifreddoLedidiWrapper(nn.Module):
+    """Semifreddo wrapper for optimising a contiguous block of bins simultaneously.
+
+    Designed for large features (e.g. fountains) where edits span many bins.
+    The editable region is a contiguous block of `n_edit_bins` bins centered on
+    `center_bin` in the 512-bin contact map space.
+
+    The conv tower is run once over a padded window of
+    (n_edit_bins + 2 * context_bins) bins. The recomputed activations are
+    spliced back into the cached full-sequence tower output, replacing
+    (n_edit_bins + 2 * splice_buffer) bins around the edited block to avoid
+    boundary contamination.
+
+    Parameters
+    ----------
+    model                   : Akita SeqNN in eval mode
+    precomputed_full_output : (1, C, 640) cached trunk activations from initial X
+    full_X                  : (1, 4, L) full one-hot encoded sequence
+    center_bin              : centre of the editable block in 512-bin map space
+                              (default 256, the middle of the map)
+    n_edit_bins             : number of contiguous bins to optimise (default 50)
+    context_bins            : conv tower context bins on each side (default 5)
+    splice_buffer           : extra bins spliced back on each side of the edited
+                              block to avoid boundary artefacts (default 2,
+                              matching the ±2 convention in _splice_activations)
+    cropping_applied        : bins cropped from each side by Akita (default 64)
+    """
+
+    def __init__(
+        self,
+        model,
+        precomputed_full_output: torch.Tensor,
+        full_X: torch.Tensor,
+        center_bin: int      = 256,
+        n_edit_bins: int     = 50,
+        context_bins: int    = 5,
+        splice_buffer: int   = 2,
+        cropping_applied: int = 64,
+    ):
+        super().__init__()
+        self.model                   = model
+        self.precomputed_full_output = precomputed_full_output
+        self.n_edit_bins             = n_edit_bins
+        self.context_bins            = context_bins
+        self.splice_buffer           = splice_buffer
+        self.cropping_applied        = cropping_applied
+
+        # ── Bin indices in 512-bin map space ──────────────────────────────────
+        half          = n_edit_bins // 2
+        self.bin_start = center_bin - half              # first edited bin (map space)
+        self.bin_end   = self.bin_start + n_edit_bins   # one-past-last (exclusive)
+
+        # ── Bin indices in 640-bin tower space (add cropping offset) ──────────
+        self.tower_bin_start = self.bin_start + cropping_applied
+        self.tower_bin_end   = self.bin_end   + cropping_applied  # exclusive
+
+        # ── bp coordinates of the padded conv-tower input window ──────────────
+        # window = context_bins left + n_edit_bins + context_bins right
+        self.seq_window_start = (self.tower_bin_start - context_bins) * _BIN_SIZE
+        self.seq_window_end   = (self.tower_bin_end   + context_bins) * _BIN_SIZE
+
+        # ── bp coordinates of just the editable block within full_X ──────────
+        self.edit_bp_start = self.tower_bin_start * _BIN_SIZE
+        self.edit_bp_end   = self.tower_bin_end   * _BIN_SIZE
+
+        # ── Splice range in 640-bin tower space ───────────────────────────────
+        # Replace (n_edit_bins + 2 * splice_buffer) bins in the cached tensor
+        self.splice_start = self.tower_bin_start - splice_buffer
+        self.splice_end   = self.tower_bin_end   + splice_buffer  # exclusive
+
+        # ── Slice of the recomputed sub_x to read splice values from ─────────
+        # sub_x has shape (1, C, n_edit_bins + 2*context_bins)
+        # The uncontaminated central region starts at context_bins - splice_buffer
+        sub_x_splice_start = context_bins - splice_buffer
+        sub_x_splice_end   = context_bins + n_edit_bins + splice_buffer
+        self.sub_x_splice  = slice(sub_x_splice_start, sub_x_splice_end)
+
+        self.register_buffer('full_X', full_X.clone())
+
+        # Expose for notebooks / sanity checks
+        print(
+            f"MultiBinSemifreddoLedidiWrapper:\n"
+            f"  editable bins (map space) : {self.bin_start}–{self.bin_end - 1}\n"
+            f"  editable bp               : {self.edit_bp_start:,}–{self.edit_bp_end:,}\n"
+            f"  conv-tower window bp      : {self.seq_window_start:,}–{self.seq_window_end:,}\n"
+            f"  splice range (tower space): {self.splice_start}–{self.splice_end - 1}"
+        )
+
+    def forward(self, X_edit: torch.Tensor) -> torch.Tensor:
+        """
+        Parameters
+        ----------
+        X_edit : (1, 4, n_edit_bins * BIN_SIZE)
+            One-hot encoded sequence for the editable block only.
+
+        Returns
+        -------
+        y_hat : (1, 1, N_triu)  model prediction
+        """
+        full_X = self.full_X.detach()
+
+        # Build padded window: frozen context left + edited block + frozen context right
+        X_window = full_X[:, :, self.seq_window_start:self.seq_window_end].clone()
+
+        # Splice the current edited block into the window
+        context_bp = self.context_bins * _BIN_SIZE
+        X_window[:, :, context_bp : context_bp + self.n_edit_bins * _BIN_SIZE] = X_edit
+
+        device = next(self.model.parameters()).device
+        X_window = X_window.to(device)
+
+        # Run conv tower on the padded window only
+        with torch.no_grad():
+            # conv_block_1 and conv_tower must not accumulate gradients for
+            # the frozen cached activations path; only X_edit needs grad flow
+            pass
+
+        sub_x = self.model.conv_block_1(X_window)
+        sub_x = self.model.conv_tower(sub_x)   # (1, C, n_edit_bins + 2*context_bins)
+
+        # Splice recomputed activations into cached full-sequence tensor
+        x = self.precomputed_full_output.clone().to(device)
+        x[:, :, self.splice_start:self.splice_end] = sub_x[:, :, self.sub_x_splice]
+
+        # Run the rest of the model (identical to Semifreddo.forward)
+        x, reverse_bool = self.model.stochastic_reverse_complement(x)
+
+        x = self.model.residual1d_block1(x)
+        x = self.model.residual1d_block2(x)
+        x = self.model.residual1d_block3(x)
+        x = self.model.residual1d_block4(x)
+        x = self.model.residual1d_block5(x)
+        x = self.model.residual1d_block6(x)
+        x = self.model.residual1d_block7(x)
+        x = self.model.residual1d_block8(x)
+        x = self.model.residual1d_block9(x)
+        x = self.model.residual1d_block10(x)
+        x = self.model.residual1d_block11(x)
+
+        x = self.model.conv_reduce(x)
+        x = self.model.one_to_two(x)
+        x = self.model.conv2d_block(x)
+        x = self.model.symmetrize_2d(x)
+
+        x = self.model.residual2d_block1(x)
+        x = self.model.residual2d_block2(x)
+        x = self.model.residual2d_block3(x)
+        x = self.model.residual2d_block4(x)
+        x = self.model.residual2d_block5(x)
+        x = self.model.residual2d_block6(x)
+
+        x = self.model.squeeze_excite(x)
+        x = self.model.cropping_2d(x)
+        x = self.model.upper_tri(x, reverse_complement_flags=reverse_bool)
+        x = self.model.final(x)
+
+        return x

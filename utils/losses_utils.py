@@ -111,3 +111,25 @@ class LocalL1LossWithCTCFPenalty(nn.Module):
         map_loss     = self.local_loss_fn(pred, target)
         ctcf_penalty = self._ctcf_penalty()
         return map_loss + ctcf_penalty
+
+
+class MultiHeadLocalL1Loss(nn.Module):
+    """Apply LocalL1Loss independently to each model head and sum the results.
+
+    Expects predictions of shape (batch, n_models, N_triu) and targets of
+    the same shape.
+    """
+    def __init__(self, mask: torch.Tensor, n_triu: int, n_models: int,
+                 reduction: str = 'sum'):
+        super().__init__()
+        self.n_models   = n_models
+        self.single_loss = LocalL1Loss(mask, n_triu=n_triu, reduction=reduction)
+
+    def forward(self, y_hat: torch.Tensor, y_bar: torch.Tensor) -> torch.Tensor:
+        # y_hat, y_bar: (batch, n_models, N_triu)
+        total = sum(
+            self.single_loss(y_hat[:, i, :].unsqueeze(1),
+                             y_bar[:, i, :].unsqueeze(1))
+            for i in range(self.n_models)
+        )
+        return total

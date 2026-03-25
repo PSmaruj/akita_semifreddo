@@ -1,0 +1,395 @@
+==========================================
+SLURM_JOB_ID = 3022889
+SLURM_JOB_NODELIST = b23-15
+TMPDIR = /tmp/SLURM_3022889
+==========================================
+18:22:12  INFO  Device: cuda:0  |  Folds: [4, 5, 6, 7]  |  Run: results
+18:22:12  INFO  Fountain strength: 0.5 (tag: pos0p5)
+18:22:12  INFO  Ledidi params — L=0.01  tau=1.0  eps=0.0001
+18:22:13  INFO  Model 0 loaded
+18:22:14  INFO  Model 1 loaded
+18:22:15  INFO  Model 2 loaded
+18:22:15  INFO  Model 3 loaded
+18:22:15  INFO  ============================================================
+18:22:15  INFO  Fold 4
+18:22:15  INFO  ============================================================
+18:22:16  INFO  Loaded 47 windows from /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/analysis/flat_regions/mouse_flat_regions_chrom_states_tsv/fold4_selected_genomic_windows_centered_chrom_states.tsv
+18:22:16  INFO    [1/47]
+/home1/smaruj/miniconda3/envs/pytorch_hic/lib/python3.10/site-packages/torch/nn/modules/conv.py:306: UserWarning: Applied workaround for CuDNN issue, install nvrtc.so (Triggered internally at ../aten/src/ATen/native/cudnn/Conv_v8.cpp:84.)
+  return F.conv1d(input, weight, bias, self.stride,
+18:32:00  INFO      chr10_96423936_97734656  |  Edits: 28731  |  Last accepted step: 1999
+18:32:00  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr10_96423936_97734656_gen_seq.pt
+18:32:00  INFO    [2/47]
+18:41:43  INFO      chr10_109588480_110899200  |  Edits: 29352  |  Last accepted step: 1999
+18:41:43  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr10_109588480_110899200_gen_seq.pt
+18:41:43  INFO    [3/47]
+18:51:27  INFO      chr10_111110144_112420864  |  Edits: 29208  |  Last accepted step: 1999
+18:51:27  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr10_111110144_112420864_gen_seq.pt
+18:51:27  INFO    [4/47]
+19:01:10  INFO      chr10_124880896_126191616  |  Edits: 29894  |  Last accepted step: 1999
+19:01:10  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr10_124880896_126191616_gen_seq.pt
+19:01:10  INFO    [5/47]
+19:10:54  INFO      chr10_88485888_89796608  |  Edits: 29844  |  Last accepted step: 1998
+19:10:54  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr10_88485888_89796608_gen_seq.pt
+19:10:54  INFO    [6/47]
+19:20:37  INFO      chr10_115324928_116635648  |  Edits: 30110  |  Last accepted step: 1999
+19:20:37  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr10_115324928_116635648_gen_seq.pt
+19:20:37  INFO    [7/47]
+19:30:20  INFO      chr10_111943680_113254400  |  Edits: 30701  |  Last accepted step: 1999
+19:30:20  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr10_111943680_113254400_gen_seq.pt
+19:30:20  INFO    [8/47]
+19:40:04  INFO      chr10_105379840_106690560  |  Edits: 30719  |  Last accepted step: 1999
+19:40:04  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr10_105379840_106690560_gen_seq.pt
+19:40:04  INFO    [9/47]
+19:49:47  INFO      chr10_86657024_87967744  |  Edits: 30227  |  Last accepted step: 1998
+19:49:47  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr10_86657024_87967744_gen_seq.pt
+19:49:47  INFO    [10/47]
+19:59:30  INFO      chr10_122945536_124256256  |  Edits: 28391  |  Last accepted step: 1999
+19:59:30  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr10_122945536_124256256_gen_seq.pt
+19:59:30  INFO    [11/47]
+20:09:13  INFO      chr10_89847808_91158528  |  Edits: 27833  |  Last accepted step: 1996
+20:09:13  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr10_89847808_91158528_gen_seq.pt
+20:09:13  INFO    [12/47]
+20:18:56  INFO      chr10_95733760_97044480  |  Edits: 27778  |  Last accepted step: 1999
+20:18:56  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr10_95733760_97044480_gen_seq.pt
+20:18:56  INFO    [13/47]
+20:28:39  INFO      chr10_98043904_99354624  |  Edits: 29881  |  Last accepted step: 1999
+20:28:39  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr10_98043904_99354624_gen_seq.pt
+20:28:39  INFO    [14/47]
+20:38:22  INFO      chr11_29796352_31107072  |  Edits: 30419  |  Last accepted step: 1999
+20:38:22  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr11_29796352_31107072_gen_seq.pt
+20:38:22  INFO    [15/47]
+20:48:05  INFO      chr11_28307456_29618176  |  Edits: 30051  |  Last accepted step: 1999
+20:48:05  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr11_28307456_29618176_gen_seq.pt
+20:48:05  INFO    [16/47]
+20:57:48  INFO      chr11_23840768_25151488  |  Edits: 29336  |  Last accepted step: 1999
+20:57:48  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr11_23840768_25151488_gen_seq.pt
+20:57:48  INFO    [17/47]
+21:07:32  INFO      chr11_6737920_8048640  |  Edits: 30647  |  Last accepted step: 1999
+21:07:32  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr11_6737920_8048640_gen_seq.pt
+21:07:32  INFO    [18/47]
+21:17:15  INFO      chr11_26122240_27432960  |  Edits: 29670  |  Last accepted step: 1997
+21:17:15  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr11_26122240_27432960_gen_seq.pt
+21:17:15  INFO    [19/47]
+21:26:58  INFO      chr11_18665472_19976192  |  Edits: 29283  |  Last accepted step: 1999
+21:26:58  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr11_18665472_19976192_gen_seq.pt
+21:26:58  INFO    [20/47]
+21:36:41  INFO      chr14_101570560_102881280  |  Edits: 28988  |  Last accepted step: 1999
+21:36:41  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr14_101570560_102881280_gen_seq.pt
+21:36:41  INFO    [21/47]
+21:46:24  INFO      chr14_61353984_62664704  |  Edits: 30635  |  Last accepted step: 1999
+21:46:24  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr14_61353984_62664704_gen_seq.pt
+21:46:24  INFO    [22/47]
+21:56:07  INFO      chr14_100524032_101834752  |  Edits: 30247  |  Last accepted step: 1998
+21:56:07  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr14_100524032_101834752_gen_seq.pt
+21:56:07  INFO    [23/47]
+22:05:51  INFO      chr14_102098944_103409664  |  Edits: 30378  |  Last accepted step: 1999
+22:05:51  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr14_102098944_103409664_gen_seq.pt
+22:05:51  INFO    [24/47]
+22:15:34  INFO      chr14_88764416_90075136  |  Edits: 30844  |  Last accepted step: 1999
+22:15:34  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr14_88764416_90075136_gen_seq.pt
+22:15:34  INFO    [25/47]
+22:25:17  INFO      chr14_79382528_80693248  |  Edits: 28360  |  Last accepted step: 1999
+22:25:17  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr14_79382528_80693248_gen_seq.pt
+22:25:17  INFO    [26/47]
+22:35:00  INFO      chr14_98957312_100268032  |  Edits: 29418  |  Last accepted step: 1999
+22:35:00  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr14_98957312_100268032_gen_seq.pt
+22:35:00  INFO    [27/47]
+22:44:44  INFO      chr14_70430720_71741440  |  Edits: 31392  |  Last accepted step: 1999
+22:44:44  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr14_70430720_71741440_gen_seq.pt
+22:44:44  INFO    [28/47]
+22:54:27  INFO      chr15_89812992_91123712  |  Edits: 29608  |  Last accepted step: 1999
+22:54:27  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr15_89812992_91123712_gen_seq.pt
+22:54:27  INFO    [29/47]
+23:04:10  INFO      chr15_93179904_94490624  |  Edits: 30318  |  Last accepted step: 1999
+23:04:10  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr15_93179904_94490624_gen_seq.pt
+23:04:10  INFO    [30/47]
+23:13:53  INFO      chr15_94713856_96024576  |  Edits: 29460  |  Last accepted step: 1999
+23:13:53  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr15_94713856_96024576_gen_seq.pt
+23:13:53  INFO    [31/47]
+23:23:36  INFO      chr19_27705344_29016064  |  Edits: 29464  |  Last accepted step: 1999
+23:23:36  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr19_27705344_29016064_gen_seq.pt
+23:23:36  INFO    [32/47]
+23:33:20  INFO      chr19_26310656_27621376  |  Edits: 30237  |  Last accepted step: 1999
+23:33:20  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr19_26310656_27621376_gen_seq.pt
+23:33:20  INFO    [33/47]
+23:43:03  INFO      chr19_25298944_26609664  |  Edits: 29873  |  Last accepted step: 1998
+23:43:03  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr19_25298944_26609664_gen_seq.pt
+23:43:03  INFO    [34/47]
+23:52:46  INFO      chr2_171116544_172427264  |  Edits: 29428  |  Last accepted step: 1999
+23:52:46  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr2_171116544_172427264_gen_seq.pt
+23:52:46  INFO    [35/47]
+00:02:29  INFO      chr2_168833024_170143744  |  Edits: 29685  |  Last accepted step: 1999
+00:02:29  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr2_168833024_170143744_gen_seq.pt
+00:02:29  INFO    [36/47]
+00:12:12  INFO      chr2_158654464_159965184  |  Edits: 29721  |  Last accepted step: 1999
+00:12:12  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr2_158654464_159965184_gen_seq.pt
+00:12:12  INFO    [37/47]
+00:21:55  INFO      chr4_86921216_88231936  |  Edits: 29727  |  Last accepted step: 1999
+00:21:55  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr4_86921216_88231936_gen_seq.pt
+00:21:55  INFO    [38/47]
+00:31:38  INFO      chr4_85633024_86943744  |  Edits: 30157  |  Last accepted step: 1999
+00:31:38  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr4_85633024_86943744_gen_seq.pt
+00:31:38  INFO    [39/47]
+00:41:21  INFO      chr5_111278080_112588800  |  Edits: 29406  |  Last accepted step: 1999
+00:41:21  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr5_111278080_112588800_gen_seq.pt
+00:41:21  INFO    [40/47]
+00:51:04  INFO      chr8_66428928_67739648  |  Edits: 30856  |  Last accepted step: 1999
+00:51:04  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr8_66428928_67739648_gen_seq.pt
+00:51:04  INFO    [41/47]
+01:00:47  INFO      chr8_65529856_66840576  |  Edits: 29568  |  Last accepted step: 1999
+01:00:48  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr8_65529856_66840576_gen_seq.pt
+01:00:48  INFO    [42/47]
+01:10:31  INFO      chr8_56436736_57747456  |  Edits: 30493  |  Last accepted step: 1999
+01:10:31  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr8_56436736_57747456_gen_seq.pt
+01:10:31  INFO    [43/47]
+01:20:14  INFO      chr8_57575424_58886144  |  Edits: 30673  |  Last accepted step: 1999
+01:20:14  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr8_57575424_58886144_gen_seq.pt
+01:20:14  INFO    [44/47]
+01:29:57  INFO      chr8_23111680_24422400  |  Edits: 28081  |  Last accepted step: 1999
+01:29:57  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr8_23111680_24422400_gen_seq.pt
+01:29:57  INFO    [45/47]
+01:39:41  INFO      chr8_44978176_46288896  |  Edits: 31135  |  Last accepted step: 1999
+01:39:41  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr8_44978176_46288896_gen_seq.pt
+01:39:41  INFO    [46/47]
+01:49:24  INFO      chr8_31100928_32411648  |  Edits: 29347  |  Last accepted step: 1999
+01:49:24  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr8_31100928_32411648_gen_seq.pt
+01:49:24  INFO    [47/47]
+01:59:07  INFO      chr8_79517696_80828416  |  Edits: 29035  |  Last accepted step: 1999
+01:59:07  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4/chr8_79517696_80828416_gen_seq.pt
+01:59:07  INFO  Saved enriched table → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold4_selected_genomic_windows_centered_chrom_states_opt.tsv
+01:59:07  INFO  ============================================================
+01:59:07  INFO  Fold 5
+01:59:07  INFO  ============================================================
+01:59:07  INFO  Loaded 41 windows from /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/analysis/flat_regions/mouse_flat_regions_chrom_states_tsv/fold5_selected_genomic_windows_centered_chrom_states.tsv
+01:59:07  INFO    [1/41]
+02:08:50  INFO      chr1_125507584_126818304  |  Edits: 29020  |  Last accepted step: 1997
+02:08:50  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr1_125507584_126818304_gen_seq.pt
+02:08:50  INFO    [2/41]
+02:18:33  INFO      chr1_9984000_11294720  |  Edits: 29240  |  Last accepted step: 1999
+02:18:33  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr1_9984000_11294720_gen_seq.pt
+02:18:33  INFO    [3/41]
+02:28:16  INFO      chr1_14743552_16054272  |  Edits: 29818  |  Last accepted step: 1999
+02:28:16  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr1_14743552_16054272_gen_seq.pt
+02:28:16  INFO    [4/41]
+02:37:59  INFO      chr1_120156160_121466880  |  Edits: 28696  |  Last accepted step: 1998
+02:37:59  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr1_120156160_121466880_gen_seq.pt
+02:37:59  INFO    [5/41]
+02:47:43  INFO      chr10_9451520_10762240  |  Edits: 31030  |  Last accepted step: 1997
+02:47:43  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr10_9451520_10762240_gen_seq.pt
+02:47:43  INFO    [6/41]
+02:57:26  INFO      chr10_32829440_34140160  |  Edits: 31015  |  Last accepted step: 1998
+02:57:26  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr10_32829440_34140160_gen_seq.pt
+02:57:27  INFO    [7/41]
+03:07:10  INFO      chr10_11536384_12847104  |  Edits: 29189  |  Last accepted step: 1999
+03:07:10  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr10_11536384_12847104_gen_seq.pt
+03:07:10  INFO    [8/41]
+03:16:53  INFO      chr10_52297728_53608448  |  Edits: 29275  |  Last accepted step: 1999
+03:16:53  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr10_52297728_53608448_gen_seq.pt
+03:16:53  INFO    [9/41]
+03:26:36  INFO      chr10_8736768_10047488  |  Edits: 29335  |  Last accepted step: 1999
+03:26:36  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr10_8736768_10047488_gen_seq.pt
+03:26:36  INFO    [10/41]
+03:36:20  INFO      chr10_83548160_84858880  |  Edits: 30305  |  Last accepted step: 1999
+03:36:20  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr10_83548160_84858880_gen_seq.pt
+03:36:20  INFO    [11/41]
+03:46:03  INFO      chr10_20088832_21399552  |  Edits: 30250  |  Last accepted step: 1999
+03:46:03  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr10_20088832_21399552_gen_seq.pt
+03:46:03  INFO    [12/41]
+03:55:46  INFO      chr10_4268032_5578752  |  Edits: 29753  |  Last accepted step: 1999
+03:55:46  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr10_4268032_5578752_gen_seq.pt
+03:55:46  INFO    [13/41]
+04:05:29  INFO      chr17_10055680_11366400  |  Edits: 28886  |  Last accepted step: 1999
+04:05:29  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr17_10055680_11366400_gen_seq.pt
+04:05:29  INFO    [14/41]
+04:15:13  INFO      chr17_11134976_12445696  |  Edits: 29615  |  Last accepted step: 1999
+04:15:13  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr17_11134976_12445696_gen_seq.pt
+04:15:13  INFO    [15/41]
+04:24:56  INFO      chr2_49848320_51159040  |  Edits: 30110  |  Last accepted step: 1999
+04:24:56  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr2_49848320_51159040_gen_seq.pt
+04:24:56  INFO    [16/41]
+04:34:39  INFO      chr2_62334976_63645696  |  Edits: 29835  |  Last accepted step: 1999
+04:34:39  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr2_62334976_63645696_gen_seq.pt
+04:34:39  INFO    [17/41]
+04:44:22  INFO      chr2_47990784_49301504  |  Edits: 29368  |  Last accepted step: 1999
+04:44:22  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr2_47990784_49301504_gen_seq.pt
+04:44:22  INFO    [18/41]
+04:54:05  INFO      chr2_79386624_80697344  |  Edits: 29683  |  Last accepted step: 1999
+04:54:05  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr2_79386624_80697344_gen_seq.pt
+04:54:05  INFO    [19/41]
+05:03:49  INFO      chr2_80572416_81883136  |  Edits: 30804  |  Last accepted step: 1999
+05:03:49  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr2_80572416_81883136_gen_seq.pt
+05:03:49  INFO    [20/41]
+05:13:32  INFO      chr2_37427200_38737920  |  Edits: 29660  |  Last accepted step: 1999
+05:13:32  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr2_37427200_38737920_gen_seq.pt
+05:13:32  INFO    [21/41]
+05:23:15  INFO      chr2_102184960_103495680  |  Edits: 29476  |  Last accepted step: 1999
+05:23:15  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr2_102184960_103495680_gen_seq.pt
+05:23:15  INFO    [22/41]
+05:32:58  INFO      chr2_51025920_52336640  |  Edits: 28227  |  Last accepted step: 1999
+05:32:58  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr2_51025920_52336640_gen_seq.pt
+05:32:58  INFO    [23/41]
+05:42:41  INFO      chr2_106692608_108003328  |  Edits: 29060  |  Last accepted step: 1999
+05:42:41  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr2_106692608_108003328_gen_seq.pt
+05:42:41  INFO    [24/41]
+05:52:24  INFO      chr2_60530688_61841408  |  Edits: 29736  |  Last accepted step: 1999
+05:52:24  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr2_60530688_61841408_gen_seq.pt
+05:52:24  INFO    [25/41]
+06:02:08  INFO      chr2_52854784_54165504  |  Edits: 30845  |  Last accepted step: 1998
+06:02:08  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr2_52854784_54165504_gen_seq.pt
+06:02:08  INFO    [26/41]
+06:11:51  INFO      chr2_94203904_95514624  |  Edits: 29146  |  Last accepted step: 1998
+06:11:51  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr2_94203904_95514624_gen_seq.pt
+06:11:51  INFO    [27/41]
+06:21:34  INFO      chr3_17752064_19062784  |  Edits: 30489  |  Last accepted step: 1999
+06:21:34  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr3_17752064_19062784_gen_seq.pt
+06:21:34  INFO    [28/41]
+06:31:17  INFO      chr3_18163712_19474432  |  Edits: 29560  |  Last accepted step: 1998
+06:31:17  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr3_18163712_19474432_gen_seq.pt
+06:31:17  INFO    [29/41]
+06:41:01  INFO      chr4_53458944_54769664  |  Edits: 29001  |  Last accepted step: 1998
+06:41:01  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr4_53458944_54769664_gen_seq.pt
+06:41:01  INFO    [30/41]
+06:50:44  INFO      chr4_65212416_66523136  |  Edits: 29178  |  Last accepted step: 1999
+06:50:44  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr4_65212416_66523136_gen_seq.pt
+06:50:44  INFO    [31/41]
+07:00:27  INFO      chr4_8652800_9963520  |  Edits: 29939  |  Last accepted step: 1999
+07:00:27  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr4_8652800_9963520_gen_seq.pt
+07:00:27  INFO    [32/41]
+07:10:11  INFO      chr4_47114240_48424960  |  Edits: 30000  |  Last accepted step: 1999
+07:10:11  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr4_47114240_48424960_gen_seq.pt
+07:10:11  INFO    [33/41]
+07:19:54  INFO      chr4_64653312_65964032  |  Edits: 29614  |  Last accepted step: 1999
+07:19:54  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr4_64653312_65964032_gen_seq.pt
+07:19:54  INFO    [34/41]
+07:29:37  INFO      chr4_55185408_56496128  |  Edits: 29613  |  Last accepted step: 1999
+07:29:38  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr4_55185408_56496128_gen_seq.pt
+07:29:38  INFO    [35/41]
+07:39:21  INFO      chr4_33372160_34682880  |  Edits: 30524  |  Last accepted step: 1999
+07:39:21  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr4_33372160_34682880_gen_seq.pt
+07:39:21  INFO    [36/41]
+07:49:04  INFO      chr5_141242368_142553088  |  Edits: 28399  |  Last accepted step: 1999
+07:49:04  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr5_141242368_142553088_gen_seq.pt
+07:49:04  INFO    [37/41]
+07:58:47  INFO      chr5_127584256_128894976  |  Edits: 29630  |  Last accepted step: 1999
+07:58:47  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr5_127584256_128894976_gen_seq.pt
+07:58:47  INFO    [38/41]
+08:08:30  INFO      chr5_118458368_119769088  |  Edits: 30303  |  Last accepted step: 1999
+08:08:30  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr5_118458368_119769088_gen_seq.pt
+08:08:30  INFO    [39/41]
+08:18:13  INFO      chr9_78751744_80062464  |  Edits: 29699  |  Last accepted step: 1999
+08:18:13  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr9_78751744_80062464_gen_seq.pt
+08:18:13  INFO    [40/41]
+08:27:56  INFO      chr9_84854784_86165504  |  Edits: 30335  |  Last accepted step: 1999
+08:27:57  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr9_84854784_86165504_gen_seq.pt
+08:27:57  INFO    [41/41]
+08:37:40  INFO      chr9_85612544_86923264  |  Edits: 30324  |  Last accepted step: 1999
+08:37:40  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5/chr9_85612544_86923264_gen_seq.pt
+08:37:40  INFO  Saved enriched table → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold5_selected_genomic_windows_centered_chrom_states_opt.tsv
+08:37:40  INFO  ============================================================
+08:37:40  INFO  Fold 6
+08:37:40  INFO  ============================================================
+08:37:40  INFO  Loaded 61 windows from /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/analysis/flat_regions/mouse_flat_regions_chrom_states_tsv/fold6_selected_genomic_windows_centered_chrom_states.tsv
+08:37:40  INFO    [1/61]
+08:47:23  INFO      chr1_21090304_22401024  |  Edits: 30893  |  Last accepted step: 1998
+08:47:23  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr1_21090304_22401024_gen_seq.pt
+08:47:23  INFO    [2/61]
+08:57:06  INFO      chr1_22865920_24176640  |  Edits: 30140  |  Last accepted step: 1999
+08:57:06  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr1_22865920_24176640_gen_seq.pt
+08:57:06  INFO    [3/61]
+09:06:49  INFO      chr1_175732736_177043456  |  Edits: 28956  |  Last accepted step: 1999
+09:06:49  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr1_175732736_177043456_gen_seq.pt
+09:06:49  INFO    [4/61]
+09:16:32  INFO      chr1_34435072_35745792  |  Edits: 31241  |  Last accepted step: 1999
+09:16:32  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr1_34435072_35745792_gen_seq.pt
+09:16:32  INFO    [5/61]
+09:26:16  INFO      chr1_178130944_179441664  |  Edits: 30670  |  Last accepted step: 1999
+09:26:16  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr1_178130944_179441664_gen_seq.pt
+09:26:16  INFO    [6/61]
+09:35:59  INFO      chr10_65492992_66803712  |  Edits: 28843  |  Last accepted step: 1999
+09:35:59  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr10_65492992_66803712_gen_seq.pt
+09:35:59  INFO    [7/61]
+09:45:42  INFO      chr12_118622208_119932928  |  Edits: 31205  |  Last accepted step: 1999
+09:45:42  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr12_118622208_119932928_gen_seq.pt
+09:45:42  INFO    [8/61]
+09:55:25  INFO      chr12_117985280_119296000  |  Edits: 29166  |  Last accepted step: 1998
+09:55:25  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr12_117985280_119296000_gen_seq.pt
+09:55:25  INFO    [9/61]
+10:05:08  INFO      chr12_39192576_40503296  |  Edits: 29641  |  Last accepted step: 1998
+10:05:08  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr12_39192576_40503296_gen_seq.pt
+10:05:08  INFO    [10/61]
+10:14:51  INFO      chr13_9461760_10772480  |  Edits: 28521  |  Last accepted step: 1998
+10:14:51  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr13_9461760_10772480_gen_seq.pt
+10:14:51  INFO    [11/61]
+10:24:34  INFO      chr13_14374912_15685632  |  Edits: 30078  |  Last accepted step: 1998
+10:24:34  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr13_14374912_15685632_gen_seq.pt
+10:24:34  INFO    [12/61]
+10:34:18  INFO      chr13_17672192_18982912  |  Edits: 29375  |  Last accepted step: 1998
+10:34:18  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr13_17672192_18982912_gen_seq.pt
+10:34:18  INFO    [13/61]
+10:44:01  INFO      chr13_7868416_9179136  |  Edits: 29807  |  Last accepted step: 1999
+10:44:01  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr13_7868416_9179136_gen_seq.pt
+10:44:01  INFO    [14/61]
+10:53:44  INFO      chr14_22583296_23894016  |  Edits: 29191  |  Last accepted step: 1999
+10:53:44  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr14_22583296_23894016_gen_seq.pt
+10:53:44  INFO    [15/61]
+11:03:26  INFO      chr14_23179264_24489984  |  Edits: 28221  |  Last accepted step: 1999
+11:03:27  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr14_23179264_24489984_gen_seq.pt
+11:03:27  INFO    [16/61]
+11:13:10  INFO      chr17_52535296_53846016  |  Edits: 30783  |  Last accepted step: 1997
+11:13:10  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr17_52535296_53846016_gen_seq.pt
+11:13:10  INFO    [17/61]
+11:22:53  INFO      chr17_43841536_45152256  |  Edits: 28532  |  Last accepted step: 1999
+11:22:53  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr17_43841536_45152256_gen_seq.pt
+11:22:53  INFO    [18/61]
+11:32:36  INFO      chr17_48111616_49422336  |  Edits: 29110  |  Last accepted step: 1999
+11:32:36  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr17_48111616_49422336_gen_seq.pt
+11:32:36  INFO    [19/61]
+11:42:19  INFO      chr17_52164608_53475328  |  Edits: 30218  |  Last accepted step: 1999
+11:42:19  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr17_52164608_53475328_gen_seq.pt
+11:42:19  INFO    [20/61]
+11:52:02  INFO      chr2_144242688_145553408  |  Edits: 29136  |  Last accepted step: 1999
+11:52:02  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr2_144242688_145553408_gen_seq.pt
+11:52:02  INFO    [21/61]
+12:01:45  INFO      chr2_3487744_4798464  |  Edits: 30086  |  Last accepted step: 1999
+12:01:45  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr2_3487744_4798464_gen_seq.pt
+12:01:45  INFO    [22/61]
+12:11:28  INFO      chr2_136908800_138219520  |  Edits: 28399  |  Last accepted step: 1999
+12:11:28  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr2_136908800_138219520_gen_seq.pt
+12:11:28  INFO    [23/61]
+12:21:12  INFO      chr2_122419200_123729920  |  Edits: 30195  |  Last accepted step: 1998
+12:21:12  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr2_122419200_123729920_gen_seq.pt
+12:21:12  INFO    [24/61]
+12:30:55  INFO      chr2_5947392_7258112  |  Edits: 29868  |  Last accepted step: 1999
+12:30:55  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr2_5947392_7258112_gen_seq.pt
+12:30:55  INFO    [25/61]
+12:40:38  INFO      chr2_112349184_113659904  |  Edits: 29624  |  Last accepted step: 1999
+12:40:38  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr2_112349184_113659904_gen_seq.pt
+12:40:38  INFO    [26/61]
+12:50:21  INFO      chr2_12199936_13510656  |  Edits: 29949  |  Last accepted step: 1999
+12:50:21  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr2_12199936_13510656_gen_seq.pt
+12:50:21  INFO    [27/61]
+13:00:04  INFO      chr2_146921472_148232192  |  Edits: 29652  |  Last accepted step: 1999
+13:00:04  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr2_146921472_148232192_gen_seq.pt
+13:00:04  INFO    [28/61]
+13:09:47  INFO      chr2_134395904_135706624  |  Edits: 30022  |  Last accepted step: 1999
+13:09:47  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr2_134395904_135706624_gen_seq.pt
+13:09:47  INFO    [29/61]
+13:19:30  INFO      chr2_117184512_118495232  |  Edits: 28525  |  Last accepted step: 1999
+13:19:30  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr2_117184512_118495232_gen_seq.pt
+13:19:30  INFO    [30/61]
+13:29:14  INFO      chr2_142704640_144015360  |  Edits: 29229  |  Last accepted step: 1999
+13:29:14  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr2_142704640_144015360_gen_seq.pt
+13:29:14  INFO    [31/61]
+13:38:57  INFO      chr5_15818752_17129472  |  Edits: 29284  |  Last accepted step: 1999
+13:38:57  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr5_15818752_17129472_gen_seq.pt
+13:38:57  INFO    [32/61]
+13:48:40  INFO      chr5_19099648_20410368  |  Edits: 30027  |  Last accepted step: 1999
+13:48:40  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr5_19099648_20410368_gen_seq.pt
+13:48:40  INFO    [33/61]
+13:58:23  INFO      chr5_19783680_21094400  |  Edits: 30358  |  Last accepted step: 1999
+13:58:23  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr5_19783680_21094400_gen_seq.pt
+13:58:23  INFO    [34/61]
+14:08:06  INFO      chr5_4515840_5826560  |  Edits: 30393  |  Last accepted step: 1998
+14:08:07  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/fountains/results/fold6/chr5_4515840_5826560_gen_seq.pt
+14:08:07  INFO    [35/61]

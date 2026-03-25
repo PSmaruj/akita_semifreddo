@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 
 DEFAULT_MODEL_SRC = "/home1/smaruj/pytorch_akita/"
 
@@ -54,3 +55,16 @@ def run_model(model: torch.nn.Module, X_tensor: torch.Tensor, device: torch.devi
     """
     y = model(X_tensor.to(device))
     return y.cpu()
+
+
+class StackingDesignWrapper(nn.Module):
+    """Combines multiple models by stacking outputs along dim=1.
+    Each model must return (batch, 1, N_triu); result is (batch, n_models, N_triu).
+    Use instead of tangermeme DesignWrapper which concatenates on dim=-1.
+    """
+    def __init__(self, models):
+        super().__init__()
+        self.models = nn.ModuleList(models)
+
+    def forward(self, X):
+        return torch.cat([m(X) for m in self.models], dim=1)
