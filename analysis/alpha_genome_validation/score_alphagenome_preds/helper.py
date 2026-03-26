@@ -117,6 +117,88 @@ def flame_score(
     ))
 
 
+# ── SCD ───────────────────────────────────────────────────────────────────────
+
+def scd(matrix_orig: np.ndarray, matrix_designed: np.ndarray) -> float:
+    """
+    Squared Contact Difference: mean squared pixelwise difference between
+    two contact maps, computed over the upper triangle only (excluding diagonal).
+
+    Parameters
+    ----------
+    matrix_orig : np.ndarray
+        Contact map for the original sequence, shape [N, N].
+    matrix_designed : np.ndarray
+        Contact map for the designed sequence, shape [N, N].
+
+    Returns
+    -------
+    float
+        Mean squared difference over upper-triangle pixels.
+    """
+    diff = matrix_designed - matrix_orig
+    upper_tri_idx = np.triu_indices(diff.shape[0], k=2)
+    return float(np.sqrt(np.nanmean(diff[upper_tri_idx] ** 2)))
+
+
+def scd_fasta_dirs(
+    dna_model,
+    df: pd.DataFrame,
+    og_fasta_dir: str,
+    mod_fasta_dir: str,
+    label: str = "",
+) -> list[float]:
+    """
+    Compute Alpha Genome SCD for each locus by predicting both original and
+    designed contact maps and computing their upper-triangle squared difference.
+
+    Parameters
+    ----------
+    dna_model :
+        Alpha Genome model instance.
+    df : pd.DataFrame
+        Table with columns chrom, centered_start, centered_end.
+    og_fasta_dir : str
+        Directory of original FASTA files.
+    mod_fasta_dir : str
+        Directory of designed FASTA files.
+    label : str
+        Short label for progress printing.
+
+    Returns
+    -------
+    list of float
+        SCD per locus; NaN for any locus that failed.
+    """
+    scores   = []
+    failures = []
+
+    for i, row in enumerate(df.itertuples(index=False)):
+        chrom, start, end = row.chrom, row.centered_start, row.centered_end
+        locus = f"{chrom}_{start}_{end}"
+        print(f"  [{i:>4}] {label} {locus}", end=" ... ", flush=True)
+
+        try:
+            og_seq  = read_fasta(f"{og_fasta_dir}/{locus}.fasta")
+            mod_seq = read_fasta(f"{mod_fasta_dir}/{locus}.fasta")
+            mat_og  = predict_contact_map(dna_model, og_seq)
+            mat_mod = predict_contact_map(dna_model, mod_seq)
+            score   = scd(mat_og, mat_mod)
+            scores.append(score)
+            print(f"{score:.6f}")
+        except Exception as e:
+            print(f"FAILED ({e})")
+            failures.append(locus)
+            scores.append(float("nan"))
+
+    if failures:
+        print(f"\n  WARNING: {len(failures)} loci failed for {label}:")
+        for loc in failures:
+            print(f"    {loc}")
+
+    return scores
+
+
 # ── Score loop ─────────────────────────────────────────────────────────────────
 
 def score_fasta_dir(

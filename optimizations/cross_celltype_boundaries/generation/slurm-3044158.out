@@ -1,0 +1,476 @@
+==========================================
+SLURM_JOB_ID = 3044158
+SLURM_JOB_NODELIST = b23-16
+TMPDIR = /tmp/SLURM_3044158
+==========================================
+18:51:39  INFO  Device: cuda:0  |  Folds: [4, 5, 6, 7]  |  Run: H1hESC_strong_neg0p5_HFF_weak_neg0p2
+18:51:39  INFO  Strong boundary (-0.5) → H1hESC
+18:51:39  INFO  Weak   boundary (-0.2)  → HFF
+18:51:39  INFO  Target tag: H1hESC_strong_neg0p5_HFF_weak_neg0p2
+18:51:39  INFO  Ledidi params — L=0.01  tau=1.0  eps=0.0001
+18:51:40  INFO  H1hESC model 0 loaded
+18:51:41  INFO  H1hESC model 1 loaded
+18:51:42  INFO  HFF model 0 loaded
+18:51:42  INFO  HFF model 1 loaded
+18:51:43  INFO  ============================================================
+18:51:43  INFO  Fold 4
+18:51:43  INFO  ============================================================
+18:51:43  INFO  Loaded 46 windows from /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/analysis/flat_regions/human_flat_regions_tsv/fold4_selected_genomic_windows_centered.tsv
+18:51:43  INFO    [1/46]
+18:51:43  INFO    Window: chr12_40986624_42297344
+/home1/smaruj/miniconda3/envs/pytorch_hic/lib/python3.10/site-packages/torch/nn/modules/conv.py:306: UserWarning: Applied workaround for CuDNN issue, install nvrtc.so (Triggered internally at ../aten/src/ATen/native/cudnn/Conv_v8.cpp:84.)
+  return F.conv1d(input, weight, bias, self.stride,
+19:01:09  INFO      Edits: 727  |  Last accepted step: 1966
+19:01:09  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr12_40986624_42297344_gen_seq.pt
+19:01:09  INFO    [2/46]
+19:01:09  INFO    Window: chr12_42436608_43747328
+19:10:34  INFO      Edits: 561  |  Last accepted step: 1996
+19:10:34  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr12_42436608_43747328_gen_seq.pt
+19:10:34  INFO    [3/46]
+19:10:34  INFO    Window: chr12_43886592_45197312
+19:19:59  INFO      Edits: 583  |  Last accepted step: 1998
+19:19:59  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr12_43886592_45197312_gen_seq.pt
+19:19:59  INFO    [4/46]
+19:19:59  INFO    Window: chr12_70371328_71682048
+19:29:24  INFO      Edits: 695  |  Last accepted step: 1963
+19:29:24  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr12_70371328_71682048_gen_seq.pt
+19:29:24  INFO    [5/46]
+19:29:24  INFO    Window: chr12_74225664_75536384
+19:38:49  INFO      Edits: 808  |  Last accepted step: 1986
+19:38:49  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr12_74225664_75536384_gen_seq.pt
+19:38:49  INFO    [6/46]
+19:38:49  INFO    Window: chr12_78012416_79323136
+19:48:14  INFO      Edits: 527  |  Last accepted step: 1995
+19:48:14  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr12_78012416_79323136_gen_seq.pt
+19:48:14  INFO    [7/46]
+19:48:14  INFO    Window: chr12_81184768_82495488
+19:57:39  INFO      Edits: 555  |  Last accepted step: 1980
+19:57:39  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr12_81184768_82495488_gen_seq.pt
+19:57:39  INFO    [8/46]
+19:57:39  INFO    Window: chr12_84987904_86298624
+20:07:04  INFO      Edits: 808  |  Last accepted step: 1982
+20:07:04  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr12_84987904_86298624_gen_seq.pt
+20:07:04  INFO    [9/46]
+20:07:04  INFO    Window: chr12_88170496_89481216
+20:16:29  INFO      Edits: 690  |  Last accepted step: 1992
+20:16:29  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr12_88170496_89481216_gen_seq.pt
+20:16:29  INFO    [10/46]
+20:16:29  INFO    Window: chr12_89856000_91166720
+20:25:53  INFO      Edits: 637  |  Last accepted step: 1999
+20:25:53  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr12_89856000_91166720_gen_seq.pt
+20:25:53  INFO    [11/46]
+20:25:53  INFO    Window: chr12_96739328_98050048
+20:35:18  INFO      Edits: 535  |  Last accepted step: 1998
+20:35:18  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr12_96739328_98050048_gen_seq.pt
+20:35:18  INFO    [12/46]
+20:35:18  INFO    Window: chr12_97495040_98805760
+20:44:43  INFO      Edits: 618  |  Last accepted step: 1990
+20:44:43  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr12_97495040_98805760_gen_seq.pt
+20:44:43  INFO    [13/46]
+20:44:43  INFO    Window: chr12_98572288_99883008
+20:54:08  INFO      Edits: 595  |  Last accepted step: 1888
+20:54:08  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr12_98572288_99883008_gen_seq.pt
+20:54:08  INFO    [14/46]
+20:54:08  INFO    Window: chr12_102510592_103821312
+21:03:33  INFO      Edits: 831  |  Last accepted step: 1990
+21:03:33  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr12_102510592_103821312_gen_seq.pt
+21:03:33  INFO    [15/46]
+21:03:33  INFO    Window: chr13_42768384_44079104
+21:12:58  INFO      Edits: 554  |  Last accepted step: 1999
+21:12:58  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr13_42768384_44079104_gen_seq.pt
+21:12:58  INFO    [16/46]
+21:12:58  INFO    Window: chr13_46555136_47865856
+21:22:22  INFO      Edits: 773  |  Last accepted step: 1996
+21:22:22  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr13_46555136_47865856_gen_seq.pt
+21:22:22  INFO    [17/46]
+21:22:22  INFO    Window: chr13_60262400_61573120
+21:31:47  INFO      Edits: 673  |  Last accepted step: 1988
+21:31:47  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr13_60262400_61573120_gen_seq.pt
+21:31:47  INFO    [18/46]
+21:31:47  INFO    Window: chr13_75620352_76931072
+21:41:12  INFO      Edits: 679  |  Last accepted step: 1965
+21:41:12  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr13_75620352_76931072_gen_seq.pt
+21:41:12  INFO    [19/46]
+21:41:12  INFO    Window: chr13_80064512_81375232
+21:50:37  INFO      Edits: 726  |  Last accepted step: 1995
+21:50:37  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr13_80064512_81375232_gen_seq.pt
+21:50:37  INFO    [20/46]
+21:50:37  INFO    Window: chr13_84740096_86050816
+22:00:02  INFO      Edits: 627  |  Last accepted step: 1993
+22:00:02  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr13_84740096_86050816_gen_seq.pt
+22:00:02  INFO    [21/46]
+22:00:02  INFO    Window: chr2_65556480_66867200
+22:09:26  INFO      Edits: 621  |  Last accepted step: 1998
+22:09:26  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr2_65556480_66867200_gen_seq.pt
+22:09:26  INFO    [22/46]
+22:09:26  INFO    Window: chr20_38924288_40235008
+22:18:51  INFO      Edits: 649  |  Last accepted step: 1995
+22:18:51  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr20_38924288_40235008_gen_seq.pt
+22:18:51  INFO    [23/46]
+22:18:51  INFO    Window: chr20_42311680_43622400
+22:28:16  INFO      Edits: 744  |  Last accepted step: 1999
+22:28:16  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr20_42311680_43622400_gen_seq.pt
+22:28:16  INFO    [24/46]
+22:28:16  INFO    Window: chr20_47439872_48750592
+22:37:41  INFO      Edits: 568  |  Last accepted step: 1989
+22:37:41  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr20_47439872_48750592_gen_seq.pt
+22:37:41  INFO    [25/46]
+22:37:41  INFO    Window: chr22_26456064_27766784
+22:47:06  INFO      Edits: 598  |  Last accepted step: 1995
+22:47:06  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr22_26456064_27766784_gen_seq.pt
+22:47:06  INFO    [26/46]
+22:47:06  INFO    Window: chr22_26923008_28233728
+22:56:30  INFO      Edits: 519  |  Last accepted step: 1999
+22:56:31  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr22_26923008_28233728_gen_seq.pt
+22:56:31  INFO    [27/46]
+22:56:31  INFO    Window: chr4_141877248_143187968
+23:05:55  INFO      Edits: 743  |  Last accepted step: 1999
+23:05:55  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr4_141877248_143187968_gen_seq.pt
+23:05:55  INFO    [28/46]
+23:05:55  INFO    Window: chr4_147574784_148885504
+23:15:20  INFO      Edits: 545  |  Last accepted step: 1985
+23:15:20  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr4_147574784_148885504_gen_seq.pt
+23:15:20  INFO    [29/46]
+23:15:20  INFO    Window: chr4_148979712_150290432
+23:24:45  INFO      Edits: 787  |  Last accepted step: 1999
+23:24:45  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr4_148979712_150290432_gen_seq.pt
+23:24:45  INFO    [30/46]
+23:24:45  INFO    Window: chr4_153374720_154685440
+23:34:10  INFO      Edits: 706  |  Last accepted step: 1983
+23:34:10  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr4_153374720_154685440_gen_seq.pt
+23:34:10  INFO    [31/46]
+23:34:10  INFO    Window: chr4_156067840_157378560
+23:43:35  INFO      Edits: 702  |  Last accepted step: 1970
+23:43:35  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr4_156067840_157378560_gen_seq.pt
+23:43:35  INFO    [32/46]
+23:43:35  INFO    Window: chr4_156864512_158175232
+23:52:59  INFO      Edits: 644  |  Last accepted step: 1999
+23:52:59  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr4_156864512_158175232_gen_seq.pt
+23:52:59  INFO    [33/46]
+23:52:59  INFO    Window: chr4_167192576_168503296
+00:02:24  INFO      Edits: 733  |  Last accepted step: 1960
+00:02:24  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr4_167192576_168503296_gen_seq.pt
+00:02:24  INFO    [34/46]
+00:02:24  INFO    Window: chr4_171872256_173182976
+00:11:49  INFO      Edits: 791  |  Last accepted step: 1888
+00:11:49  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr4_171872256_173182976_gen_seq.pt
+00:11:49  INFO    [35/46]
+00:11:49  INFO    Window: chr7_47998976_49309696
+00:21:14  INFO      Edits: 779  |  Last accepted step: 1958
+00:21:14  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr7_47998976_49309696_gen_seq.pt
+00:21:14  INFO    [36/46]
+00:21:14  INFO    Window: chr8_13455360_14766080
+00:30:39  INFO      Edits: 693  |  Last accepted step: 1988
+00:30:39  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr8_13455360_14766080_gen_seq.pt
+00:30:39  INFO    [37/46]
+00:30:39  INFO    Window: chr8_15783936_17094656
+00:40:04  INFO      Edits: 658  |  Last accepted step: 1992
+00:40:04  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr8_15783936_17094656_gen_seq.pt
+00:40:04  INFO    [38/46]
+00:40:04  INFO    Window: chr8_20137984_21448704
+00:49:28  INFO      Edits: 599  |  Last accepted step: 1977
+00:49:29  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr8_20137984_21448704_gen_seq.pt
+00:49:29  INFO    [39/46]
+00:49:29  INFO    Window: chr8_20621312_21932032
+00:58:53  INFO      Edits: 524  |  Last accepted step: 1987
+00:58:53  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr8_20621312_21932032_gen_seq.pt
+00:58:53  INFO    [40/46]
+00:58:53  INFO    Window: chr8_24043520_25354240
+01:08:18  INFO      Edits: 839  |  Last accepted step: 1987
+01:08:18  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr8_24043520_25354240_gen_seq.pt
+01:08:18  INFO    [41/46]
+01:08:18  INFO    Window: chr8_25106432_26417152
+01:17:43  INFO      Edits: 690  |  Last accepted step: 1997
+01:17:43  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr8_25106432_26417152_gen_seq.pt
+01:17:43  INFO    [42/46]
+01:17:43  INFO    Window: chr8_26365952_27676672
+01:27:08  INFO      Edits: 798  |  Last accepted step: 1991
+01:27:08  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr8_26365952_27676672_gen_seq.pt
+01:27:08  INFO    [43/46]
+01:27:08  INFO    Window: chr8_31188992_32499712
+01:36:33  INFO      Edits: 647  |  Last accepted step: 1970
+01:36:33  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr8_31188992_32499712_gen_seq.pt
+01:36:33  INFO    [44/46]
+01:36:33  INFO    Window: chr8_35876864_37187584
+01:45:57  INFO      Edits: 598  |  Last accepted step: 1986
+01:45:57  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr8_35876864_37187584_gen_seq.pt
+01:45:57  INFO    [45/46]
+01:45:57  INFO    Window: chr8_39948288_41259008
+01:55:22  INFO      Edits: 567  |  Last accepted step: 1998
+01:55:22  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr8_39948288_41259008_gen_seq.pt
+01:55:22  INFO    [46/46]
+01:55:22  INFO    Window: chr9_598016_1908736
+02:04:47  INFO      Edits: 707  |  Last accepted step: 1994
+02:04:47  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4/chr9_598016_1908736_gen_seq.pt
+02:04:47  INFO  Saved enriched table → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold4_selected_genomic_windows_centered_opt.tsv
+02:04:47  INFO  ============================================================
+02:04:47  INFO  Fold 5
+02:04:47  INFO  ============================================================
+02:04:47  INFO  Loaded 45 windows from /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/analysis/flat_regions/human_flat_regions_tsv/fold5_selected_genomic_windows_centered.tsv
+02:04:47  INFO    [1/45]
+02:04:47  INFO    Window: chr11_28274688_29585408
+02:14:12  INFO      Edits: 748  |  Last accepted step: 1996
+02:14:12  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr11_28274688_29585408_gen_seq.pt
+02:14:12  INFO    [2/45]
+02:14:12  INFO    Window: chr11_29093888_30404608
+02:23:37  INFO      Edits: 684  |  Last accepted step: 1989
+02:23:37  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr11_29093888_30404608_gen_seq.pt
+02:23:37  INFO    [3/45]
+02:23:37  INFO    Window: chr12_114296832_115607552
+02:33:02  INFO      Edits: 629  |  Last accepted step: 1980
+02:33:02  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr12_114296832_115607552_gen_seq.pt
+02:33:02  INFO    [4/45]
+02:33:02  INFO    Window: chr12_114683904_115994624
+02:42:26  INFO      Edits: 533  |  Last accepted step: 1979
+02:42:26  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr12_114683904_115994624_gen_seq.pt
+02:42:26  INFO    [5/45]
+02:42:26  INFO    Window: chr12_127236096_128546816
+02:51:51  INFO      Edits: 582  |  Last accepted step: 1998
+02:51:51  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr12_127236096_128546816_gen_seq.pt
+02:51:51  INFO    [6/45]
+02:51:51  INFO    Window: chr2_113588224_114898944
+03:01:16  INFO      Edits: 616  |  Last accepted step: 1949
+03:01:16  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr2_113588224_114898944_gen_seq.pt
+03:01:16  INFO    [7/45]
+03:01:16  INFO    Window: chr2_121495552_122806272
+03:10:41  INFO      Edits: 579  |  Last accepted step: 1997
+03:10:41  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr2_121495552_122806272_gen_seq.pt
+03:10:41  INFO    [8/45]
+03:10:41  INFO    Window: chr2_137635840_138946560
+03:20:06  INFO      Edits: 604  |  Last accepted step: 1979
+03:20:06  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr2_137635840_138946560_gen_seq.pt
+03:20:06  INFO    [9/45]
+03:20:06  INFO    Window: chr2_142161920_143472640
+03:29:30  INFO      Edits: 776  |  Last accepted step: 1992
+03:29:31  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr2_142161920_143472640_gen_seq.pt
+03:29:31  INFO    [10/45]
+03:29:31  INFO    Window: chr2_145489920_146800640
+03:38:55  INFO      Edits: 663  |  Last accepted step: 1987
+03:38:55  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr2_145489920_146800640_gen_seq.pt
+03:38:55  INFO    [11/45]
+03:38:55  INFO    Window: chr2_146243584_147554304
+03:48:20  INFO      Edits: 633  |  Last accepted step: 1996
+03:48:20  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr2_146243584_147554304_gen_seq.pt
+03:48:20  INFO    [12/45]
+03:48:20  INFO    Window: chr2_146919424_148230144
+03:57:45  INFO      Edits: 648  |  Last accepted step: 1970
+03:57:45  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr2_146919424_148230144_gen_seq.pt
+03:57:45  INFO    [13/45]
+03:57:45  INFO    Window: chr2_149297152_150607872
+04:07:10  INFO      Edits: 571  |  Last accepted step: 1973
+04:07:10  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr2_149297152_150607872_gen_seq.pt
+04:07:10  INFO    [14/45]
+04:07:10  INFO    Window: chr2_152473600_153784320
+04:16:35  INFO      Edits: 754  |  Last accepted step: 1992
+04:16:35  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr2_152473600_153784320_gen_seq.pt
+04:16:35  INFO    [15/45]
+04:16:35  INFO    Window: chr2_155340800_156651520
+04:25:59  INFO      Edits: 611  |  Last accepted step: 1978
+04:25:59  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr2_155340800_156651520_gen_seq.pt
+04:25:59  INFO    [16/45]
+04:25:59  INFO    Window: chr2_161974272_163284992
+04:35:24  INFO      Edits: 740  |  Last accepted step: 1975
+04:35:24  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr2_161974272_163284992_gen_seq.pt
+04:35:24  INFO    [17/45]
+04:35:24  INFO    Window: chr2_167112704_168423424
+04:44:49  INFO      Edits: 527  |  Last accepted step: 1992
+04:44:49  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr2_167112704_168423424_gen_seq.pt
+04:44:49  INFO    [18/45]
+04:44:49  INFO    Window: chr2_180639744_181950464
+04:54:14  INFO      Edits: 678  |  Last accepted step: 1995
+04:54:14  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr2_180639744_181950464_gen_seq.pt
+04:54:14  INFO    [19/45]
+04:54:14  INFO    Window: chr2_183052288_184363008
+05:03:39  INFO      Edits: 640  |  Last accepted step: 1998
+05:03:39  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr2_183052288_184363008_gen_seq.pt
+05:03:39  INFO    [20/45]
+05:03:39  INFO    Window: chr6_75700224_77010944
+05:13:03  INFO      Edits: 600  |  Last accepted step: 1999
+05:13:03  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr6_75700224_77010944_gen_seq.pt
+05:13:03  INFO    [21/45]
+05:13:03  INFO    Window: chr6_76503040_77813760
+05:22:28  INFO      Edits: 651  |  Last accepted step: 1970
+05:22:28  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr6_76503040_77813760_gen_seq.pt
+05:22:28  INFO    [22/45]
+05:22:28  INFO    Window: chr6_82149376_83460096
+05:31:53  INFO      Edits: 529  |  Last accepted step: 1964
+05:31:53  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr6_82149376_83460096_gen_seq.pt
+05:31:53  INFO    [23/45]
+05:31:53  INFO    Window: chr6_85776384_87087104
+05:41:18  INFO      Edits: 430  |  Last accepted step: 1951
+05:41:18  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr6_85776384_87087104_gen_seq.pt
+05:41:18  INFO    [24/45]
+05:41:18  INFO    Window: chr6_113010688_114321408
+05:50:43  INFO      Edits: 616  |  Last accepted step: 1991
+05:50:43  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr6_113010688_114321408_gen_seq.pt
+05:50:43  INFO    [25/45]
+05:50:43  INFO    Window: chr6_128376832_129687552
+06:00:08  INFO      Edits: 827  |  Last accepted step: 1939
+06:00:08  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr6_128376832_129687552_gen_seq.pt
+06:00:08  INFO    [26/45]
+06:00:08  INFO    Window: chr6_144773120_146083840
+06:09:32  INFO      Edits: 712  |  Last accepted step: 1992
+06:09:32  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr6_144773120_146083840_gen_seq.pt
+06:09:32  INFO    [27/45]
+06:09:32  INFO    Window: chr6_145631232_146941952
+06:18:57  INFO      Edits: 618  |  Last accepted step: 1997
+06:18:57  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr6_145631232_146941952_gen_seq.pt
+06:18:57  INFO    [28/45]
+06:18:57  INFO    Window: chr6_147277824_148588544
+06:28:22  INFO      Edits: 642  |  Last accepted step: 1989
+06:28:22  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr6_147277824_148588544_gen_seq.pt
+06:28:22  INFO    [29/45]
+06:28:22  INFO    Window: chr6_152903680_154214400
+06:37:47  INFO      Edits: 657  |  Last accepted step: 1995
+06:37:47  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr6_152903680_154214400_gen_seq.pt
+06:37:47  INFO    [30/45]
+06:37:47  INFO    Window: chr6_163102720_164413440
+06:47:12  INFO      Edits: 561  |  Last accepted step: 1991
+06:47:12  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr6_163102720_164413440_gen_seq.pt
+06:47:12  INFO    [31/45]
+06:47:12  INFO    Window: chr8_52791296_54102016
+06:56:37  INFO      Edits: 591  |  Last accepted step: 1949
+06:56:37  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr8_52791296_54102016_gen_seq.pt
+06:56:37  INFO    [32/45]
+06:56:37  INFO    Window: chr8_58320896_59631616
+07:06:01  INFO      Edits: 719  |  Last accepted step: 1980
+07:06:02  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr8_58320896_59631616_gen_seq.pt
+07:06:02  INFO    [33/45]
+07:06:02  INFO    Window: chr8_64468992_65779712
+07:15:26  INFO      Edits: 602  |  Last accepted step: 1971
+07:15:26  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr8_64468992_65779712_gen_seq.pt
+07:15:26  INFO    [34/45]
+07:15:26  INFO    Window: chr8_70522880_71833600
+07:24:51  INFO      Edits: 522  |  Last accepted step: 1998
+07:24:51  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr8_70522880_71833600_gen_seq.pt
+07:24:51  INFO    [35/45]
+07:24:51  INFO    Window: chr8_86632448_87943168
+07:34:16  INFO      Edits: 696  |  Last accepted step: 1984
+07:34:16  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr8_86632448_87943168_gen_seq.pt
+07:34:16  INFO    [36/45]
+07:34:16  INFO    Window: chr8_89618432_90929152
+07:43:41  INFO      Edits: 681  |  Last accepted step: 1963
+07:43:41  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr8_89618432_90929152_gen_seq.pt
+07:43:41  INFO    [37/45]
+07:43:41  INFO    Window: chr9_27250688_28561408
+07:53:06  INFO      Edits: 687  |  Last accepted step: 1999
+07:53:06  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr9_27250688_28561408_gen_seq.pt
+07:53:06  INFO    [38/45]
+07:53:06  INFO    Window: chr9_98922496_100233216
+08:02:30  INFO      Edits: 709  |  Last accepted step: 1988
+08:02:30  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr9_98922496_100233216_gen_seq.pt
+08:02:30  INFO    [39/45]
+08:02:30  INFO    Window: chr9_105428992_106739712
+08:11:55  INFO      Edits: 666  |  Last accepted step: 1968
+08:11:55  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr9_105428992_106739712_gen_seq.pt
+08:11:55  INFO    [40/45]
+08:11:55  INFO    Window: chr9_107153408_108464128
+08:21:20  INFO      Edits: 514  |  Last accepted step: 1984
+08:21:20  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr9_107153408_108464128_gen_seq.pt
+08:21:20  INFO    [41/45]
+08:21:20  INFO    Window: chr9_115218432_116529152
+08:30:45  INFO      Edits: 627  |  Last accepted step: 1990
+08:30:45  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr9_115218432_116529152_gen_seq.pt
+08:30:45  INFO    [42/45]
+08:30:45  INFO    Window: chr9_116486144_117796864
+08:40:10  INFO      Edits: 712  |  Last accepted step: 1986
+08:40:10  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr9_116486144_117796864_gen_seq.pt
+08:40:10  INFO    [43/45]
+08:40:10  INFO    Window: chr9_123084800_124395520
+08:49:34  INFO      Edits: 736  |  Last accepted step: 1990
+08:49:35  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chr9_123084800_124395520_gen_seq.pt
+08:49:35  INFO    [44/45]
+08:49:35  INFO    Window: chrX_41490432_42801152
+08:58:59  INFO      Edits: 559  |  Last accepted step: 1949
+08:58:59  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chrX_41490432_42801152_gen_seq.pt
+08:58:59  INFO    [45/45]
+08:58:59  INFO    Window: chrX_45477888_46788608
+09:08:24  INFO      Edits: 768  |  Last accepted step: 1974
+09:08:24  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5/chrX_45477888_46788608_gen_seq.pt
+09:08:24  INFO  Saved enriched table → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold5_selected_genomic_windows_centered_opt.tsv
+09:08:24  INFO  ============================================================
+09:08:24  INFO  Fold 6
+09:08:24  INFO  ============================================================
+09:08:24  INFO  Loaded 47 windows from /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/analysis/flat_regions/human_flat_regions_tsv/fold6_selected_genomic_windows_centered.tsv
+09:08:24  INFO    [1/47]
+09:08:24  INFO    Window: chr1_238004224_239314944
+09:17:49  INFO      Edits: 679  |  Last accepted step: 1996
+09:17:49  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr1_238004224_239314944_gen_seq.pt
+09:17:49  INFO    [2/47]
+09:17:49  INFO    Window: chr1_238540800_239851520
+09:27:14  INFO      Edits: 613  |  Last accepted step: 1987
+09:27:14  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr1_238540800_239851520_gen_seq.pt
+09:27:14  INFO    [3/47]
+09:27:14  INFO    Window: chr10_901120_2211840
+09:36:39  INFO      Edits: 669  |  Last accepted step: 1969
+09:36:39  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr10_901120_2211840_gen_seq.pt
+09:36:39  INFO    [4/47]
+09:36:39  INFO    Window: chr10_2889728_4200448
+09:46:04  INFO      Edits: 611  |  Last accepted step: 1996
+09:46:04  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr10_2889728_4200448_gen_seq.pt
+09:46:04  INFO    [5/47]
+09:46:04  INFO    Window: chr10_4386816_5697536
+09:55:28  INFO      Edits: 781  |  Last accepted step: 1981
+09:55:28  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr10_4386816_5697536_gen_seq.pt
+09:55:28  INFO    [6/47]
+09:55:28  INFO    Window: chr10_15534080_16844800
+10:04:53  INFO      Edits: 610  |  Last accepted step: 1987
+10:04:53  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr10_15534080_16844800_gen_seq.pt
+10:04:53  INFO    [7/47]
+10:04:53  INFO    Window: chr10_18497536_19808256
+10:14:18  INFO      Edits: 585  |  Last accepted step: 1963
+10:14:18  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr10_18497536_19808256_gen_seq.pt
+10:14:18  INFO    [8/47]
+10:14:18  INFO    Window: chr10_25391104_26701824
+10:23:43  INFO      Edits: 721  |  Last accepted step: 1990
+10:23:43  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr10_25391104_26701824_gen_seq.pt
+10:23:43  INFO    [9/47]
+10:23:43  INFO    Window: chr10_66471936_67782656
+10:33:08  INFO      Edits: 517  |  Last accepted step: 1993
+10:33:08  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr10_66471936_67782656_gen_seq.pt
+10:33:08  INFO    [10/47]
+10:33:08  INFO    Window: chr10_75071488_76382208
+10:42:32  INFO      Edits: 654  |  Last accepted step: 1986
+10:42:32  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr10_75071488_76382208_gen_seq.pt
+10:42:32  INFO    [11/47]
+10:42:32  INFO    Window: chr10_76118016_77428736
+10:51:57  INFO      Edits: 780  |  Last accepted step: 1996
+10:51:57  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr10_76118016_77428736_gen_seq.pt
+10:51:57  INFO    [12/47]
+10:51:57  INFO    Window: chr11_94763008_96073728
+11:01:22  INFO      Edits: 819  |  Last accepted step: 1998
+11:01:22  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr11_94763008_96073728_gen_seq.pt
+11:01:22  INFO    [13/47]
+11:01:22  INFO    Window: chr11_103262208_104572928
+11:10:46  INFO      Edits: 689  |  Last accepted step: 1991
+11:10:46  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr11_103262208_104572928_gen_seq.pt
+11:10:46  INFO    [14/47]
+11:10:46  INFO    Window: chr11_108490752_109801472
+11:20:10  INFO      Edits: 533  |  Last accepted step: 1994
+11:20:10  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr11_108490752_109801472_gen_seq.pt
+11:20:10  INFO    [15/47]
+11:20:10  INFO    Window: chr11_121247744_122558464
+11:29:35  INFO      Edits: 639  |  Last accepted step: 1979
+11:29:35  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr11_121247744_122558464_gen_seq.pt
+11:29:35  INFO    [16/47]
+11:29:35  INFO    Window: chr11_131919872_133230592
+11:38:59  INFO      Edits: 647  |  Last accepted step: 1985
+11:38:59  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr11_131919872_133230592_gen_seq.pt
+11:38:59  INFO    [17/47]
+11:38:59  INFO    Window: chr11_132683776_133994496
+11:48:24  INFO      Edits: 707  |  Last accepted step: 1948
+11:48:24  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr11_132683776_133994496_gen_seq.pt
+11:48:24  INFO    [18/47]
+11:48:24  INFO    Window: chr15_36767744_38078464
+11:57:48  INFO      Edits: 563  |  Last accepted step: 1999
+11:57:48  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr15_36767744_38078464_gen_seq.pt
+11:57:48  INFO    [19/47]
+11:57:48  INFO    Window: chr15_60772352_62083072
+12:07:13  INFO      Edits: 756  |  Last accepted step: 1974
+12:07:13  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr15_60772352_62083072_gen_seq.pt
+12:07:13  INFO    [20/47]
+12:07:13  INFO    Window: chr20_6889472_8200192
+12:16:37  INFO      Edits: 775  |  Last accepted step: 1993
+12:16:37  INFO      Saved → /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/cross_celltype_boundaries/H1hESC_strong_neg0p5_HFF_weak_neg0p2/fold6/chr20_6889472_8200192_gen_seq.pt
+12:16:37  INFO    [21/47]
+12:16:37  INFO    Window: chr20_16445440_17756160

@@ -86,10 +86,7 @@ class LocalL1LossWithCTCFPenalty(nn.Module):
         self.fimo_threshold = fimo_threshold
         self.seq_wrapper    = seq_wrapper
 
-    def _ctcf_penalty(self) -> torch.Tensor:
-        print(f"[DEBUG] seq_wrapper is None: {self.seq_wrapper is None}")
-        print(f"[DEBUG] last_x is None: {self.seq_wrapper.last_x is None if self.seq_wrapper else 'N/A'}")
-        
+    def _ctcf_penalty(self) -> torch.Tensor:        
         """Run FIMO on the edited region and return γ * Σ(scores) as a scalar."""
         if self.seq_wrapper is None or self.seq_wrapper.last_x is None:
             return torch.tensor(0.0)

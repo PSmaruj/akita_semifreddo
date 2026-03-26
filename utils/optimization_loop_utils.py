@@ -195,6 +195,7 @@ def run_fold(
     run_one_fn,
     flat_regions_base: str,
     results_base_dir: str,
+    tsv_suffix: str = "fold{fold}_selected_genomic_windows_centered_chrom_states.tsv",
 ) -> None:
     """Iterate over all windows in a fold's flat-regions table.
 
@@ -208,6 +209,11 @@ def run_fold(
         All feature-specific setup (wrapper, loss, tensor loading) happens inside.
     flat_regions_base : str
     results_base_dir : str
+    tsv_suffix : str, optional
+        Filename template for the flat-regions TSV. Must contain '{fold}' which
+        will be formatted with the current fold index. Default is the mouse
+        chrom-states suffix. For human flat regions, pass:
+        "fold{fold}_selected_genomic_windows_centered.tsv"
     """
     log.info(f"{'=' * 60}")
     log.info(f"Fold {fold}")
@@ -216,10 +222,7 @@ def run_fold(
     out_dir = os.path.join(results_base_dir, args.run_name, f"fold{fold}")
     os.makedirs(out_dir, exist_ok=True)
 
-    tsv_path = (
-        f"{flat_regions_base}/"
-        f"fold{fold}_selected_genomic_windows_centered_chrom_states.tsv"
-    )
+    tsv_path = os.path.join(flat_regions_base, tsv_suffix.format(fold=fold))
     df = pd.read_csv(tsv_path, sep="\t")
     log.info(f"Loaded {len(df)} windows from {tsv_path}")
 
@@ -236,7 +239,7 @@ def run_fold(
     df_out  = pd.concat([df, pd.DataFrame(results, index=df.index)], axis=1)
     out_tsv = os.path.join(
         os.path.dirname(out_dir),
-        f"fold{fold}_selected_genomic_windows_centered_chrom_states_opt.tsv",
+        tsv_suffix.format(fold=fold).replace(".tsv", "_opt.tsv"),
     )
     df_out.to_csv(out_tsv, sep="\t", index=False)
     log.info(f"Saved enriched table → {out_tsv}")
