@@ -1,13 +1,16 @@
 """
-prepare_original_sequences.py
-------------------------------
-Generate original (unedited) FASTA files for all folds.
-Run once — output is shared by boundary, dot, and flame validation.
+prepare_human_original_sequences.py
+-------------------------------------
+Generate original (unedited) FASTA files for all human folds.
+Run once — output is shared by cross-cell-type boundary validation.
 """
 
+import os
 import torch
 import pandas as pd
-from helper import load_and_splice, trim_and_decode, save_to_fasta
+from helper import (
+    load_and_splice, trim_and_decode, save_to_fasta
+)
 
 BASE = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
 
@@ -18,11 +21,13 @@ for fold in FOLDS:
     print(f"\n=== Fold {fold} ===")
 
     flat_regions_path = (
-        f"{BASE}/analysis/flat_regions/mouse_flat_regions_chrom_states_tsv/"
-        f"fold{fold}_selected_genomic_windows_centered_chrom_states.tsv"
+        f"{BASE}/analysis/flat_regions/human_flat_regions_tsv/"
+        f"fold{fold}_selected_genomic_windows_centered.tsv"
     )
-    ohe_dir = f"{BASE}/analysis/flat_regions/mouse_sequences/fold{fold}"
-    out_dir = f"{BASE}/analysis/alpha_genome_validation/original/fold{fold}"
+    ohe_dir = f"{BASE}/analysis/flat_regions/human_sequences/fold{fold}"
+    out_dir = f"{BASE}/analysis/alpha_genome_validation/human_original/fold{fold}"
+
+    os.makedirs(out_dir, exist_ok=True)
 
     df = pd.read_csv(flat_regions_path, sep="\t")
 
