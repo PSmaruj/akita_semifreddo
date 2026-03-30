@@ -10,6 +10,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 from pyfaidx import Fasta
+import seqpro as sp
 
 from .data_utils import one_hot_encode_sequence
 
