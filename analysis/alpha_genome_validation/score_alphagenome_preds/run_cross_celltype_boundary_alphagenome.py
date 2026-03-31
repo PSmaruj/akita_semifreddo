@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 from alphagenome.models import dna_client
 
-from helper import read_fasta, predict_contact_map, boundary_score, score_fasta_dir
+from helper import boundary_score, score_fasta_dir
 import helper as alpha_helper
 
 # ── Constants ─────────────────────────────────────────────────────────────────

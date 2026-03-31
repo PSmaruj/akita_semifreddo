@@ -20,6 +20,7 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import DataLoader
+from scipy.stats import pearsonr
 
 # Project root — gives access to utils/
 sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
@@ -32,7 +33,6 @@ from utils.insulation_utils import (insulation_full,
                                     recenter_flat_region,
                                     remove_close_regions
 )
-from scipy.stats import pearsonr
 
 # Fixed PearsonR thresholds — average across all folds per species
 PEARSON_THRESHOLD = {

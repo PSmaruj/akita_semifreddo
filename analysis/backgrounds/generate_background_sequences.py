@@ -137,7 +137,7 @@ def main():
 
             for attempt in range(1, MAX_TRIES_PER_SEQ + 1):
                 # k-mer-preserving shuffle
-                shuffled_seq = b"".join(sp.k_shuffle(seq, k=K)).decode()
+                shuffled_seq = b"".join(sp.k_shuffle(seq.encode(), k=K, alphabet=b"ACGT")).decode()
 
                 # Model forward pass
                 one_hot = one_hot_encode_sequence(shuffled_seq)

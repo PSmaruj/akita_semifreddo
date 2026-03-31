@@ -1,13 +1,13 @@
 """
-run_dot_scd_alphagenome.py
---------------------------
-Compute Alpha Genome SCD (Squared Contact Difference) for dot designs
+run_dot_rmsd_alphagenome.py
+---------------------------
+Compute Alpha Genome RMSD (Root Mean Squared Difference) for dot designs
 across all 8 folds and append the result to the existing per-fold TSVs.
 """
 
 import pandas as pd
 from alphagenome.models import dna_client
-from helper import scd_fasta_dirs
+from helper import rmsd_fasta_dirs
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 
@@ -31,7 +31,7 @@ for fold in FOLDS:
     df = pd.read_csv(tsv_path, sep="\t")
 
     print(f"\nComputing SCD ({len(df)} loci):")
-    df["alpha_scd"] = scd_fasta_dirs(dna_model, df, og_fasta_dir, mod_fasta_dir, label=f"fold{fold}")
+    df["alpha_scd"] = rmsd_fasta_dirs(dna_model, df, og_fasta_dir, mod_fasta_dir, label=f"fold{fold}")
 
     df.to_csv(tsv_path, sep="\t", index=False)
     print(f"\nSaved → {tsv_path}")

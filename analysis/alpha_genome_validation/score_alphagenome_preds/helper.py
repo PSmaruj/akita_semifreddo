@@ -21,7 +21,18 @@ ONTOLOGY = ["EFO:0004038"]  # mESC
 # ── FASTA I/O ──────────────────────────────────────────────────────────────────
 
 def read_fasta(fasta_path: str) -> str:
-    """Read a single-record FASTA and return the sequence as one uppercase string."""
+    """Read a single-record FASTA file and return the sequence as an uppercase string.
+
+    Parameters
+    ----------
+    fasta_path : str
+        Path to the FASTA file.
+
+    Returns
+    -------
+    str
+        Concatenated uppercase sequence string with header line removed.
+    """
     seq_lines = []
     with open(fasta_path) as f:
         for line in f:
@@ -32,20 +43,19 @@ def read_fasta(fasta_path: str) -> str:
 # ── Alpha Genome prediction ────────────────────────────────────────────────────
 
 def predict_contact_map(dna_model, seq: str) -> np.ndarray:
-    """
-    Run Alpha Genome on a sequence and return the 2D contact map as a numpy array.
+    """Run Alpha Genome on a sequence and return the 2D contact map.
 
     Parameters
     ----------
-    dna_model :
+    dna_model : dna_client.DnaModel
         Alpha Genome model instance from dna_client.create().
     seq : str
-        Nucleotide sequence string.
+        Nucleotide sequence string of the expected input length.
 
     Returns
     -------
     np.ndarray
-        2D contact map array (shape: [N, N]).
+        2D contact map array of shape (N, N).
     """
     output = dna_model.predict_sequence(
         organism=ORGANISM,
@@ -58,7 +68,22 @@ def predict_contact_map(dna_model, seq: str) -> np.ndarray:
 # ── Scoring functions ──────────────────────────────────────────────────────────
 
 def boundary_score(matrix: np.ndarray) -> float:
-    """URQ mean insulation score for boundary designs."""
+    """Compute the URQ mean insulation score for a boundary design.
+
+    Returns the mean contact frequency in the upper-right quadrant of the
+    contact map (rows 0:250, cols 260:512), where insulation manifests as
+    reduced contact frequency across the boundary.
+
+    Parameters
+    ----------
+    matrix : np.ndarray
+        2D contact map array of shape (N, N).
+
+    Returns
+    -------
+    float
+        Mean contact frequency in the upper-right quadrant.
+    """
     return float(np.nanmean(matrix[0:250, 260:512]))
 
 
@@ -81,6 +106,11 @@ def dot_score(
         Half-width of the scoring window in bins (default: 7, giving a 14×14 window).
     map_center : int
         Centre bin of the contact map (default: 256 for a 512×512 map).
+    
+    Returns
+    -------
+    float
+        Mean contact frequency in the scoring window centred on the dot position.
     """
     dist_half = dot_dist // 2
     dot_r = map_center - dist_half
@@ -108,6 +138,11 @@ def flame_score(
         Width of the scoring stripe in bins (default: 3).
     map_size : int
         Height/width of the contact map (default: 512).
+    
+    Returns
+    -------
+    float
+        Mean contact frequency in the vertical stripe centred on the map column.
     """
     half_r = map_size // 2
     half_c = map_size // 2
@@ -117,58 +152,62 @@ def flame_score(
     ))
 
 
-# ── SCD ───────────────────────────────────────────────────────────────────────
+# ── RMSD ───────────────────────────────────────────────────────────────────────
 
-def scd(matrix_orig: np.ndarray, matrix_designed: np.ndarray) -> float:
-    """
-    Squared Contact Difference: mean squared pixelwise difference between
-    two contact maps, computed over the upper triangle only (excluding diagonal).
+def rmsd(matrix_orig: np.ndarray, matrix_designed: np.ndarray) -> float:
+    """Compute the Root Mean Squared Difference (RMSD) between two contact maps.
+
+    Computes the root mean squared pixelwise difference over the upper
+    triangle (excluding the first two diagonals), consistent with the
+    contact map comparison metric used in Akita model evaluation.
 
     Parameters
     ----------
     matrix_orig : np.ndarray
-        Contact map for the original sequence, shape [N, N].
+        Contact map for the original sequence, shape (N, N).
     matrix_designed : np.ndarray
-        Contact map for the designed sequence, shape [N, N].
+        Contact map for the designed sequence, shape (N, N).
 
     Returns
     -------
     float
-        Mean squared difference over upper-triangle pixels.
+        Root mean squared difference over upper-triangle pixels.
     """
     diff = matrix_designed - matrix_orig
     upper_tri_idx = np.triu_indices(diff.shape[0], k=2)
     return float(np.sqrt(np.nanmean(diff[upper_tri_idx] ** 2)))
 
 
-def scd_fasta_dirs(
+def rmsd_fasta_dirs(
     dna_model,
     df: pd.DataFrame,
     og_fasta_dir: str,
     mod_fasta_dir: str,
     label: str = "",
 ) -> list[float]:
-    """
-    Compute Alpha Genome SCD for each locus by predicting both original and
-    designed contact maps and computing their upper-triangle squared difference.
+    """Compute Alpha Genome RMSD for each locus in df.
+
+    For each locus, predicts contact maps for both the original and designed
+    sequences and computes their upper-triangle RMSD.
 
     Parameters
     ----------
-    dna_model :
-        Alpha Genome model instance.
+    dna_model : dna_client.DnaModel
+        Alpha Genome model instance from dna_client.create().
     df : pd.DataFrame
-        Table with columns chrom, centered_start, centered_end.
+        Table with columns [chrom, centered_start, centered_end].
     og_fasta_dir : str
-        Directory of original FASTA files.
+        Directory containing original FASTA files named
+        {chrom}_{centered_start}_{centered_end}.fasta.
     mod_fasta_dir : str
-        Directory of designed FASTA files.
+        Directory containing designed FASTA files, same naming convention.
     label : str
-        Short label for progress printing.
+        Short label for progress printing (default '').
 
     Returns
     -------
     list of float
-        SCD per locus; NaN for any locus that failed.
+        RMSD per locus; NaN for any locus that failed.
     """
     scores   = []
     failures = []
@@ -183,7 +222,7 @@ def scd_fasta_dirs(
             mod_seq = read_fasta(f"{mod_fasta_dir}/{locus}.fasta")
             mat_og  = predict_contact_map(dna_model, og_seq)
             mat_mod = predict_contact_map(dna_model, mod_seq)
-            score   = scd(mat_og, mat_mod)
+            score   = rmsd(mat_og, mat_mod)
             scores.append(score)
             print(f"{score:.6f}")
         except Exception as e:

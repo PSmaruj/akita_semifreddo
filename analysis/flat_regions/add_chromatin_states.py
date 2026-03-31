@@ -2,7 +2,6 @@
 add_chromatin_states.py
 
 Adds chromatin state (ChromHMM) annotations to flat-region windows.
-Mouse only — human does not require this step.
 
 Usage:
     python add_chromatin_states.py --folds 0 1 2 3 4 5 6 7
