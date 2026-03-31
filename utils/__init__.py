@@ -39,7 +39,7 @@ from .plot_utils import (
     save_movie_frame,
 )
 from .scores_utils import (
-    insulation_score,
+    compute_insulation_scores,
     compute_dot_scores,
     compute_flame_scores,
 )

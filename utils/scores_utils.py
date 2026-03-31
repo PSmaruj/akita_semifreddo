@@ -19,7 +19,7 @@ import numpy as np
 MAP_CENTER = 256   # centre bin of the 512-bin contact map
 
 
-def insulation_score(
+def compute_insulation_scores(
     maps: np.ndarray,
     row_slice: slice,
     col_slice: slice,

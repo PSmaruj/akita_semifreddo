@@ -1,21 +1,37 @@
 """
-optimization_loop_utils.py
+semifreddo/optimization_loop.py
 
-Shared building blocks for sequence design optimisation scripts.
+Shared building blocks for sequence design optimization scripts.
 Imported by run_boundary_design.py, run_flame_design.py, and run_dot_design.py.
+
+Each run_one_* function handles a single genomic window: it wraps a pre-built
+Semifreddo wrapper and output loss in a Ledidi optimizer, runs the optimization,
+saves the generated sequence, and returns edit statistics. run_fold iterates
+run_one_* over all windows in a fold's flat-regions table.
+
+Optimization loop
+-----------------
+run_one_design     : run Ledidi optimization for a single-bin feature (boundary, flame)
+run_one_design_dot : run Ledidi optimization for a two-anchor-bin feature (dot)
+run_fold           : iterate a run_one_* function over all windows in a fold
+
+Utilities
+---------
+build_stem         : build a filesystem-safe stem string from genomic coordinates
+strength_tag       : convert a float feature strength to a filesystem-safe string
+last_accepted_step : return the last Ledidi iteration that introduced a new edit
+count_edits        : count nucleotide positions that differ between two sequences
 """
 
+import sys
 import os
 import logging
-
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
 
 from ledidi import Ledidi
-from utils.optimization_utils import build_stem, last_accepted_step, count_edits
-
 
 log = logging.getLogger(__name__)
 
@@ -35,38 +51,44 @@ def run_one_design(
     out_dir: str,
     input_mask: torch.Tensor | None = None,
 ) -> dict:
-    """Run Ledidi optimisation for a single genomic window.
+    """Run Ledidi optimization for a single genomic window (single-bin feature).
 
-    Accepts a pre-built Semifreddo wrapper and output loss, so it works for
-    any single-bin feature type (boundary, flame). For dots, use run_one_design_dot.
+    Wraps a pre-built Semifreddo wrapper and output loss in a Ledidi optimizer,
+    runs optimization on the central editable bin, saves the generated sequence,
+    and returns edit statistics. For dot optimization (two anchor bins), use
+    run_one_design_dot instead.
 
     Parameters
     ----------
     row : pd.Series
-        Row from the flat-regions table (used only for logging via stem).
+        Row from the flat-regions table with columns [chrom, centered_start,
+        centered_end]; used to build the output filename stem.
     fold : int
-        Fold index (used only for logging).
+        Fold index; currently used for logging only.
     args : argparse.Namespace
-        Must carry .L, .tau, .eps.
-    sf_wrapper :
-        Any SemifreddoLedidiWrapper instance with .center_bp_start / .center_bp_end.
+        Must carry .L (Ledidi regularization weight), .tau (temperature),
+        and .eps (step size).
+    sf_wrapper : SemifreddoLedidiWrapper or CTCFAwareSemifreddoWrapper
+        Pre-built wrapper exposing .center_bp_start and .center_bp_end.
     output_loss : nn.Module
-        Pre-built output loss (e.g. LocalL1Loss with the feature mask).
+        Pre-built output loss, e.g. LocalL1Loss or LocalL1LossWithCTCFPenalty.
     X : torch.Tensor
-        Full one-hot sequence, shape (1, 4, L), already on device.
+        Full one-hot sequence of shape (1, 4, L), already on device.
     target : torch.Tensor
-        Optimisation target, already on device.
+        Optimization target of shape (1, 1, N_triu), already on device.
     device : torch.device
+        Device X and target live on.
     out_dir : str
-        Directory where <stem>_gen_seq.pt is saved.
-    input_mask : torch.Tensor or None, shape (seq_len,)
-        Boolean mask passed to Ledidi — True positions are frozen (weight set
-        to -inf). Used e.g. to freeze CTCF motif positions during suppression.
-        If None, no positions are masked. Default is None.
-        
+        Directory where {stem}_gen_seq.pt is saved.
+    input_mask : torch.Tensor or None
+        Shape (seq_len,); boolean mask passed to Ledidi where True positions
+        are frozen (weight set to -inf). Used to freeze CTCF motif positions
+        during suppression. If None, no positions are frozen (default).
+
     Returns
     -------
-    dict with keys 'n_edits' and 'last_accepted_step'.
+    dict
+        Keys: 'n_edits' (int), 'last_accepted_step' (int).
     """
     chrom = row["chrom"]
     start = int(row["centered_start"])
@@ -123,23 +145,43 @@ def run_one_design_dot(
     out_dir: str,
     bin_size: int = 2048,
 ) -> dict:
-    """Run Ledidi optimisation for a single genomic window with two anchor bins.
+    """Run Ledidi optimization for a single genomic window (two-anchor-bin dot feature).
 
-    Identical to run_one_design except generated_anchors is split into lo/hi
-    bins for edit counting and only the concatenated anchor tensor is saved.
+    Identical to run_one_design except the editable region consists of two
+    anchor bins (lo and hi) concatenated into a single (1, 4, 2*bin_size)
+    input. The generated anchors are split back into lo/hi for edit counting,
+    and saved as a single concatenated tensor.
 
     Parameters
     ----------
-    sf_wrapper :
-        TwoAnchorSemifreddoLedidiWrapper with .center_bp_start/.center_bp_end
-        and .bp_lo_start/.bp_lo_end/.bp_hi_start/.bp_hi_end.
+    row : pd.Series
+        Row from the flat-regions table with columns [chrom, centered_start,
+        centered_end]; used to build the output filename stem.
+    fold : int
+        Fold index; currently used for logging only.
+    args : argparse.Namespace
+        Must carry .L (Ledidi regularization weight), .tau (temperature),
+        and .eps (step size).
+    sf_wrapper : TwoAnchorSemifreddoLedidiWrapper
+        Pre-built wrapper exposing .bp_lo_start, .bp_lo_end,
+        .bp_hi_start, .bp_hi_end.
+    output_loss : nn.Module
+        Pre-built output loss, e.g. LocalL1Loss with a dot mask.
+    X : torch.Tensor
+        Full one-hot sequence of shape (1, 4, L), already on device.
+    target : torch.Tensor
+        Optimization target of shape (1, 1, N_triu), already on device.
+    device : torch.device
+        Device X and target live on.
+    out_dir : str
+        Directory where {stem}_gen_seq.pt is saved.
     bin_size : int
         Size of each anchor bin in bp (default 2048).
-    All other parameters are identical to run_one_design.
 
     Returns
     -------
-    dict with keys 'n_edits' and 'last_accepted_step'.
+    dict
+        Keys: 'n_edits' (int), 'last_accepted_step' (int).
     """
     chrom = row["chrom"]
     start = int(row["centered_start"])
@@ -195,23 +237,30 @@ def run_fold(
     results_base_dir: str,
     tsv_suffix: str = "fold{fold}_selected_genomic_windows_centered_chrom_states.tsv",
 ) -> None:
-    """Iterate over all windows in a fold's flat-regions table.
+    """Iterate a run_one_* function over all windows in a fold's flat-regions table.
+
+    Loads the flat-regions TSV for the given fold, calls run_one_fn on each
+    row, collects edit statistics, and writes an enriched TSV with results
+    appended as new columns.
 
     Parameters
     ----------
     fold : int
+        Fold index.
     args : argparse.Namespace
-        Passed through to run_one_fn.
+        Passed through to run_one_fn; must carry .run_name for output directory.
     run_one_fn : callable
-        Signature: (row, fold, args, out_dir) -> dict.
-        All feature-specific setup (wrapper, loss, tensor loading) happens inside.
+        Signature: (row, fold, args, out_dir) -> dict. All feature-specific
+        setup (wrapper, loss, tensor loading) is handled inside this function.
     flat_regions_base : str
+        Directory containing the flat-regions TSV files.
     results_base_dir : str
-    tsv_suffix : str, optional
-        Filename template for the flat-regions TSV. Must contain '{fold}' which
-        will be formatted with the current fold index. Default is the mouse
-        chrom-states suffix. For human flat regions, pass:
-        "fold{fold}_selected_genomic_windows_centered.tsv"
+        Root directory for output; results are written to
+        results_base_dir/args.run_name/fold{fold}/.
+    tsv_suffix : str
+        Filename template for the flat-regions TSV; must contain '{fold}'.
+        Defaults to the mouse chrom-states filename. For human flat regions,
+        pass "fold{fold}_selected_genomic_windows_centered.tsv".
     """
     log.info(f"{'=' * 60}")
     log.info(f"Fold {fold}")
@@ -243,22 +292,49 @@ def run_fold(
     log.info(f"Saved enriched table → {out_tsv}")
 
 
+# =============================================================================
+# Utilities
+# =============================================================================
+
+
 def strength_tag(strength: float) -> str:
-    """Convert a float boundary strength to a filesystem-safe string.
-    e.g. -0.5 -> 'neg0p5', 1.0 -> 'pos1p0', 0.0 -> '0p0'
+    """Convert a float feature strength to a filesystem-safe string.
+
+    Parameters
+    ----------
+    strength : float
+        Feature strength value, e.g. -0.5, 1.0, 0.0.
+
+    Returns
+    -------
+    str
+        Filesystem-safe string representation, e.g. -0.5 → 'neg0p5',
+        1.0 → 'pos1p0', 0.0 → '0p0'.
     """
-    # Use :.1f to ensure at least one decimal, or :.4g if you prefer precision.
-    # We'll use a helper to determine the prefix.
     prefix = "neg" if strength < 0 else ("pos" if strength > 0 else "")
-    
-    # format to a string with a guaranteed decimal point
-    # 'abs' prevents double negatives in the string formatting
     val_str = f"{abs(strength):.1f}".replace(".", "p")
     
     return f"{prefix}{val_str}"
 
 
 def build_stem(chrom: str, start: int, end: int) -> str:
+    """Build a filesystem-safe stem string from genomic coordinates.
+
+    Parameters
+    ----------
+    chrom : str
+        Chromosome name, e.g. 'chr1'.
+    start : int
+        Window start coordinate.
+    end : int
+        Window end coordinate.
+
+    Returns
+    -------
+    str
+        Stem string of the form '{chrom}_{start}_{end}',
+        e.g. 'chr1_1000000_2097152'.
+    """
     return f"{chrom}_{start}_{end}"
 
 
@@ -283,10 +359,22 @@ def last_accepted_step(history: dict) -> int:
 
 
 def count_edits(original_X: torch.Tensor, generated_full: torch.Tensor) -> int:
-    """Number of nucleotide positions that differ between original and generated."""
+    """Count nucleotide positions that differ between the original and generated sequence.
+
+    Parameters
+    ----------
+    original_X : torch.Tensor
+        Original one-hot sequence of shape (1, 4, L).
+    generated_full : torch.Tensor
+        Generated one-hot sequence of the same shape.
+
+    Returns
+    -------
+    int
+        Number of positions where argmax differs between the two sequences.
+    """
     return int(
         (torch.argmax(generated_full, dim=1) != torch.argmax(original_X, dim=1))
         .sum()
         .item()
     )
-

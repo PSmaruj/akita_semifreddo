@@ -1,28 +1,58 @@
+"""
+semifreddo/losses.py
+
+Loss functions for Ledidi-based sequence optimization in the AkitaSF pipeline.
+
+Classes
+-------
+LocalL1Loss                  : masked L1 loss scaled by inverse mask coverage
+LocalL1LossWithCTCFPenalty   : LocalL1Loss with an additional FIMO-based CTCF penalty
+MultiHeadLocalL1Loss         : LocalL1Loss summed across multiple model heads
+"""
+
 import torch
 import torch.nn as nn
+import sys
+import os
 
-from ..utils.fimo_utils import run_fimo
-from semifreddo.semifreddo import CTCFAwareSemifreddoWrapper
+sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
+from utils.fimo_utils import run_fimo
+from .semifreddo import CTCFAwareSemifreddoWrapper
+
 
 class LocalL1Loss(nn.Module):
-    """
-    L1 loss computed only over the indices specified by a mask, scaled by the
-    inverse of the mask's coverage so that a mask covering X% of the full
-    upper-tri vector contributes the same magnitude as a full-map loss.
+    """L1 loss computed over a masked subset of the upper-triangular contact vector.
 
-    Scale factor = N_triu / K, where K is the number of masked positions.
-    E.g. a mask covering 10% of positions is multiplied by 10.
+    The loss is scaled by the inverse of the mask's fractional coverage
+    (scale = N_triu / K, where K is the number of masked positions), so that
+    a mask covering X% of the full upper-tri vector contributes the same
+    magnitude as a full-map loss regardless of mask size.
+
+    In the simplest use case the mask corresponds exactly to the positions
+    where the desired feature is expected to appear on the contact map
+    (e.g. the boundary stripe or dot position). However, the mask can also
+    be larger than the feature itself to implement a *semi-local* loss: the
+    additional positions outside the feature region are included in the loss
+    to encourage the optimizer to preserve their contact values while still
+    designing the target feature. For example, to strengthen a dot while
+    keeping a nearby boundary intact, the mask can combine the dot positions
+    with the boundary positions, effectively constraining both simultaneously.
+
+    Parameters
+    ----------
+    mask : torch.Tensor
+        1-D integer index tensor of shape (K,), indexing positions in the
+        upper-tri vector. Typically loaded from boundary_mask.pt or
+        flame_mask.pt.
+    n_triu : int
+        Total length of the upper-tri vector (N_triu); used to compute
+        the coverage scale factor.
+    reduction : str
+        Reduction mode passed to the underlying nn.L1Loss: 'sum' or 'mean'
+        (default 'sum').
     """
 
     def __init__(self, mask: torch.Tensor, n_triu: int, reduction: str = 'sum'):
-        """
-        Args:
-            mask      : 1-D integer index tensor of shape (K,).
-                        Loaded from boundary_mask.pt / flame_mask.pt.
-            n_triu    : Total length of the upper-tri vector (N_triu).
-                        Used to compute the coverage scale factor.
-            reduction : 'sum' or 'mean', passed to the underlying L1Loss.
-        """
         super().__init__()
         self.register_buffer("mask", mask)
         self.loss_fn = nn.L1Loss(reduction=reduction)
@@ -113,8 +143,20 @@ class LocalL1LossWithCTCFPenalty(nn.Module):
 class MultiHeadLocalL1Loss(nn.Module):
     """Apply LocalL1Loss independently to each model head and sum the results.
 
-    Expects predictions of shape (batch, n_models, N_triu) and targets of
-    the same shape.
+    Used for ensemble optimization where predictions have shape
+    (batch, n_models, N_triu) and each model head is penalized separately
+    using the same mask.
+
+    Parameters
+    ----------
+    mask : torch.Tensor
+        1-D integer index tensor of shape (K,), passed to LocalL1Loss.
+    n_triu : int
+        Total length of the upper-tri vector (N_triu).
+    n_models : int
+        Number of model heads (size of dim=1 in predictions).
+    reduction : str
+        Reduction mode passed to LocalL1Loss (default 'sum').
     """
     def __init__(self, mask: torch.Tensor, n_triu: int, n_models: int,
                  reduction: str = 'sum'):

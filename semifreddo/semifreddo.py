@@ -1,5 +1,5 @@
 """
-semifreddo.py
+semifreddo/semifreddo.py
 
 Semifreddo-AkitaPT: a "half-frozen" Akita wrapper that caches convolutional
 trunk activations and recomputes only the bins affected by sequence edits.
@@ -17,18 +17,17 @@ producing identical predictions (Pearson R = 1.0).
 
 Classes
 -------
-Semifreddo
-    Core half-frozen forward pass. Accepts pre-cached trunk activations and
-    a small padded sequence slice; returns the full model output.
-
-SemifreddoLedidiWrapper
-    Thin nn.Module wrapper around Semifreddo that exposes a standard
-    model(X) → y_hat interface compatible with Ledidi.
+Semifreddo                      : core half-frozen forward pass
+SemifreddoLedidiWrapper         : single-bin Ledidi-compatible wrapper
+TwoAnchorSemifreddoLedidiWrapper : two-anchor-bin Ledidi-compatible wrapper (dots)
+CTCFAwareSemifreddoWrapper      : wrapper that caches the last input for CTCF penalty
+MultiBinSemifreddoLedidiWrapper : multi-bin Ledidi-compatible wrapper (fountains)
+StackingDesignWrapper           : ensemble wrapper stacking outputs along dim=1
 """
+
 
 import torch
 import torch.nn as nn
-
 
 # Number of bins of sequence context required on each side of the edited bin.
 # Derived from the convolutional tower receptive field (~5 bins at 2048 bp/bin).
@@ -48,6 +47,7 @@ _BIN_SIZE = 2048
 # =============================================================================
 # Helpers
 # =============================================================================
+
 
 def _splice_activations(
     x: torch.Tensor,
@@ -80,21 +80,34 @@ def _splice_activations(
 # Semifreddo
 # =============================================================================
 
+
 class Semifreddo:
     """Half-frozen Akita forward pass.
 
+    Accepts pre-cached trunk activations and one or two small padded sequence
+    slices around the edited bin(s). Recomputes only the affected conv tower
+    window(s), splices the result back into the cached activations, and runs
+    the rest of the model.
+
     Parameters
     ----------
-    model                   : Akita SeqNN in eval mode
-    slice_0_padded_seq      : (1, 4, 11*2048) sequence window around edit 0
-    edited_indices_slice_0  : iterable of bin indices (in 640-bin space) for edit 0
-    precomputed_full_output : (1, C, 640) cached trunk activations
-    slice_1_padded_seq      : optional second edit window (same format as slice_0)
-    edited_indices_slice_1  : optional bin indices for edit 1
-    batch_size              : batch size (default 1)
-    cropping_applied        : bins cropped from each side by Akita (default 64)
+    model : torch.nn.Module
+        Akita SeqNN in eval mode.
+    slice_0_padded_seq : torch.Tensor
+        Shape (1, 4, 11*2048); padded sequence window around edit 0.
+    edited_indices_slice_0 : iterable of int
+        Bin indices in 640-bin tower space for edit 0.
+    precomputed_full_output : torch.Tensor
+        Shape (1, C, 640); cached trunk activations from the initial sequence.
+    slice_1_padded_seq : torch.Tensor or None
+        Shape (1, 4, 11*2048); padded sequence window around edit 1 (optional).
+    edited_indices_slice_1 : iterable of int or None
+        Bin indices in 640-bin tower space for edit 1 (optional).
+    batch_size : int
+        Batch size (default 1).
+    cropping_applied : int
+        Bins cropped from each side by Akita (default 64).
     """
-
     def __init__(
         self,
         model,
@@ -185,21 +198,29 @@ class Semifreddo:
 # Ledidi wrapper
 # =============================================================================
 
-class SemifreddoLedidiWrapper(nn.Module):
-    """Wraps Semifreddo to expose a standard model(X) → y_hat interface for Ledidi.
 
-    On each call, extracts the 11-bin padded sequence slice around the edited
-    bin from the full input X, and delegates to Semifreddo.
+class SemifreddoLedidiWrapper(nn.Module):
+    """Ledidi-compatible wrapper for single-bin Semifreddo optimization.
+
+    Exposes a standard model(X_center) → y_hat interface. On each forward
+    call, splices the edited central bin into the frozen full sequence,
+    builds the 11-bin padded window, and delegates to Semifreddo.
 
     Parameters
     ----------
-    model                   : Akita SeqNN
-    precomputed_full_output : (1, C, 640) trunk activations cached from initial X
-    edited_bin              : 0-indexed bin being optimised (in 640-bin space)
-    context_bins            : bins of context on each side (default 5 → 11-bin window)
-    cropping_applied        : bins cropped by Akita (default 64)
+    model : torch.nn.Module
+        Akita SeqNN in eval mode.
+    precomputed_full_output : torch.Tensor
+        Shape (1, C, 640); trunk activations cached from the initial sequence.
+    full_X : torch.Tensor
+        Shape (1, 4, L); full one-hot encoded sequence (frozen).
+    edited_bin : int
+        0-indexed bin being optimised in 512-bin map space.
+    context_bins : int
+        Bins of context on each side of the edited bin (default 5 → 11-bin window).
+    cropping_applied : int
+        Bins cropped from each side by Akita (default 64).
     """
-
     def __init__(self, model, precomputed_full_output, full_X,
                  edited_bin, context_bins=5, cropping_applied=64):
         super().__init__()
@@ -235,13 +256,30 @@ class SemifreddoLedidiWrapper(nn.Module):
 
 
 class TwoAnchorSemifreddoLedidiWrapper(nn.Module):
-    """Semifreddo wrapper for optimising two sequence bins simultaneously.
+    """Ledidi-compatible wrapper for two-anchor-bin Semifreddo optimization (dots).
 
-    Expects X_anchors of shape (1, 4, 2*BIN_SIZE) — the two anchor bins
-    concatenated — and internally routes each half to Semifreddo's
+    Expects X_anchors of shape (1, 4, 2*BIN_SIZE) — the lo and hi anchor bins
+    concatenated. On each forward call, splits the input into per-anchor bins,
+    builds two 11-bin padded windows, and delegates to Semifreddo's
     slice_0 / slice_1 mechanism.
+
+    Parameters
+    ----------
+    model : torch.nn.Module
+        Akita SeqNN in eval mode.
+    precomputed_full_output : torch.Tensor
+        Shape (1, C, 640); trunk activations cached from the initial sequence.
+    full_X : torch.Tensor
+        Shape (1, 4, L); full one-hot encoded sequence (frozen).
+    bin_lo : int
+        0-indexed lo anchor bin in 512-bin map space.
+    bin_hi : int
+        0-indexed hi anchor bin in 512-bin map space.
+    context_bins : int
+        Bins of context on each side of each anchor (default 5 → 11-bin window).
+    cropping_applied : int
+        Bins cropped from each side by Akita (default 64).
     """
-    
     def __init__(self, model, precomputed_full_output, full_X,
                  bin_lo, bin_hi, context_bins=5, cropping_applied=64):
         super().__init__()
@@ -295,6 +333,19 @@ class TwoAnchorSemifreddoLedidiWrapper(nn.Module):
 
 
 class CTCFAwareSemifreddoWrapper(nn.Module):
+    """Wrapper that caches the last input sequence for CTCF penalty computation.
+
+    Thin decorator around any SemifreddoLedidiWrapper. On each forward call,
+    stores the input tensor as self.last_x before delegating to the wrapped
+    wrapper. LocalL1LossWithCTCFPenalty reads last_x to run FIMO on the
+    current edited bin without requiring an explicit sequence hand-off.
+
+    Parameters
+    ----------
+    sf_wrapper : nn.Module
+        Any SemifreddoLedidiWrapper instance exposing center_bp_start
+        and center_bp_end properties.
+    """
     def __init__(self, sf_wrapper: nn.Module):
         super().__init__()
         self.sf_wrapper = sf_wrapper
@@ -473,9 +524,18 @@ class MultiBinSemifreddoLedidiWrapper(nn.Module):
     
 
 class StackingDesignWrapper(nn.Module):
-    """Combines multiple models by stacking outputs along dim=1.
-    Each model must return (batch, 1, N_triu); result is (batch, n_models, N_triu).
-    Use instead of tangermeme DesignWrapper which concatenates on dim=-1.
+    """Ensemble wrapper that stacks per-model outputs along dim=1.
+
+    Each model must return a tensor of shape (batch, 1, N_triu). Outputs
+    are concatenated along dim=1 to produce (batch, n_models, N_triu),
+    compatible with MultiHeadLocalL1Loss. Use instead of tangermeme's
+    DesignWrapper, which concatenates along dim=-1.
+
+    Parameters
+    ----------
+    models : list of nn.Module
+        List of Akita SeqNN instances (or any model returning
+        (batch, 1, N_triu)).
     """
     def __init__(self, models):
         super().__init__()
