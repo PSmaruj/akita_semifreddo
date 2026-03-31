@@ -1,3 +1,15 @@
+"""
+utils/plot_utils.py
+
+Visualization utilities for contact maps and CTCF tracks in the AkitaSF pipeline.
+
+Functions
+---------
+plot_matrix       : plot a single contact map and save as SVG
+plot_ctcf_track   : bar plot of binned CTCF motif hits on both strands
+save_movie_frame  : render a contact map + CTCF track as a PNG frame for animations
+"""
+
 import os
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -5,9 +17,24 @@ import numpy as np
 
 
 def plot_matrix(matrix, save_path, vmin=-0.6, vmax=0.6, title=None):
-    """
-    Ensures input is a numpy object, plots it, and saves as an SVG.
-    """   
+    """Plot a contact map and save it as an SVG.
+
+    Accepts either a NumPy array or a PyTorch tensor; tensors are
+    converted to NumPy automatically.
+
+    Parameters
+    ----------
+    matrix : np.ndarray or torch.Tensor
+        2-D contact map to plot.
+    save_path : str
+        Output path for the SVG file.
+    vmin : float
+        Minimum value for the colormap (default -0.6).
+    vmax : float
+        Maximum value for the colormap (default 0.6).
+    title : str or None
+        Optional plot title.
+    """  
     if hasattr(matrix, "detach"):
         matrix = matrix.detach().cpu().numpy()
     
@@ -26,7 +53,22 @@ def plot_matrix(matrix, save_path, vmin=-0.6, vmax=0.6, title=None):
 
 
 def plot_ctcf_track(ctcf_plus, ctcf_minus, title="CTCF", save_path=None):
-    """Bar plot of binned CTCF motif hits (+ strand up, - strand down)."""
+    """Plot binned CTCF motif hit counts as a two-strand bar chart.
+
+    Plus-strand hits are plotted upward (black) and minus-strand hits
+    downward (red), with a shared zero baseline.
+
+    Parameters
+    ----------
+    ctcf_plus : np.ndarray
+        Shape (n_bins,); hit counts on the + strand per bin.
+    ctcf_minus : np.ndarray
+        Shape (n_bins,); hit counts on the − strand per bin.
+    title : str
+        Plot title (default 'CTCF').
+    save_path : str or None
+        If provided, save the figure as an SVG to this path.
+    """
     n_bins = len(ctcf_plus)
     x = np.arange(n_bins)
 
@@ -60,8 +102,38 @@ def save_movie_frame(
     vmax=0.6, 
     max_ctcf=5
 ):
-    """
-    Render contact map + CTCF track → PNG frame.
+    """Render a contact map and CTCF track as a PNG frame for animations.
+
+    Produces a two-panel figure: the contact map on top and the CTCF
+    strand bar chart below, sharing the x-axis. Frames are named
+    frame_NNN.png and saved to frames_dir.
+
+    Accepts NumPy arrays or PyTorch tensors for all array inputs;
+    tensors are converted to NumPy automatically.
+
+    Parameters
+    ----------
+    contact_map : np.ndarray or torch.Tensor
+        2-D contact map of shape (map_size, map_size).
+    ctcf_plus : np.ndarray or torch.Tensor
+        Shape (map_size,); + strand CTCF hit counts per bin.
+    ctcf_minus : np.ndarray or torch.Tensor
+        Shape (map_size,); − strand CTCF hit counts per bin.
+    frame_idx : int
+        Frame index used for zero-padded filename (e.g. 007 → frame_007.png).
+    frames_dir : str
+        Directory where PNG frames are saved (default 'frames').
+    vmin : float
+        Minimum value for the contact map colormap (default -0.6).
+    vmax : float
+        Maximum value for the contact map colormap (default 0.6).
+    max_ctcf : int
+        Y-axis limit for the CTCF track (default 5).
+
+    Returns
+    -------
+    str
+        Full path to the saved PNG frame.
     """
     # Ensure the directory exists
     os.makedirs(frames_dir, exist_ok=True)

@@ -42,10 +42,9 @@ sys.path.insert(0, "/home1/smaruj/ledidi/ledidi/")
 sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 
 from semifreddo.semifreddo import SemifreddoLedidiWrapper
-from utils.losses_utils import LocalL1Loss
-from utils.optimization_utils import build_stem
+from semifreddo.losses import LocalL1Loss
+from semifreddo.optimization_loop import build_stem, run_one_design
 from utils.model_utils import load_model
-from utils.optimization_loop_utils import run_one_design
 from helper import make_ctcf_exclusion_mask
 
 # ── Paths ─────────────────────────────────────────────────────────────────────

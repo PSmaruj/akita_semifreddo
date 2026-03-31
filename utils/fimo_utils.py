@@ -1,20 +1,89 @@
+"""
+utils/fimo_utils.py
+
+FIMO-based motif scanning and PWM scoring utilities for the AkitaSF pipeline.
+
+FIMO / CTCF utilities
+---------------------
+run_fimo                         : run FIMO on a (1, 4, L) sequence tensor
+ctcf_hits_per_seq                : summarize FIMO hits per sequence in a batch
+ctcf_hits_from_fimo              : bin FIMO hits by strand into per-bin arrays
+hits_to_site_set                 : convert hits DataFrame to a set of (position, strand) tuples
+jaccard_index                    : Jaccard similarity between two site sets
+
+PWM I/O and sequence utilities
+-------------------------------
+get_sequence                     : extract an uppercase DNA string from a pyfaidx Fasta
+reverse_complement               : reverse-complement a DNA string
+reverse_complement_pwm           : reverse-complement a (L, 4) PWM array
+read_meme_pwm                    : parse a MEME file → (4, L) torch tensor
+read_meme_pwm_as_numpy           : parse a MEME file → (L, 4) numpy array
+
+Scoring
+-------
+estimate_background_probs        : estimate per-base background frequencies from genomic windows
+seq_score                        : log-likelihood score of a sequence window against a PWM
+sliding_scores                   : sliding-window PWM scores over a sequence
+aggregated_positive_motif_score  : sum of positive-strand PWM scores across both strands
+compute_aggregated_positive_motif_scores : compute and store motif scores for all rows in a DataFrame
+"""
+
 import numpy as np
 import torch
 from memelite import fimo
 import pandas as pd
 from pyfaidx import Fasta
 from tqdm import tqdm
+from collections import Counter
+
+from .data_utils import get_sequence
+
+
+# ---------------------------------------------------------------------------
+# FIMO / CTCF utilities
+# ---------------------------------------------------------------------------
 
 
 def run_fimo(seq_tensor, motifs_dict, threshold=1e-4):
-    """Run FIMO on a (1, 4, L) tensor; returns the hits DataFrame."""
+    """Run FIMO motif scanning on a batch of one-hot encoded sequences.
+
+    Parameters
+    ----------
+    seq_tensor : torch.Tensor
+        Shape (1, 4, L); converted to NumPy internally.
+    motifs_dict : dict
+        Motif dictionary as expected by memelite.fimo,
+        e.g. {"CTCF": pwm_tensor} with PWM shape (4, motif_len).
+    threshold : float
+        p-value threshold for reporting hits (default 1e-4).
+
+    Returns
+    -------
+    pd.DataFrame
+        FIMO hits table with columns [sequence_name, start, end, strand, score].
+    """
     arr = seq_tensor.cpu().detach().numpy()
     return fimo(motifs=motifs_dict, sequences=arr,
                 threshold=threshold, reverse_complement=True)[0]
 
 
 def ctcf_hits_per_seq(hits: pd.DataFrame, batch_size: int) -> list[dict]:
-    """Summarise FIMO hits per sequence index within a batch."""
+    """Summarize FIMO hits per sequence index within a batch.
+
+    Parameters
+    ----------
+    hits : pd.DataFrame
+        FIMO hits table with columns [sequence_name, start, end, strand, score].
+    batch_size : int
+        Number of sequences in the batch; used to iterate over sequence indices.
+
+    Returns
+    -------
+    list of dict
+        One dict per sequence with keys:
+        n, score_sum, score_max, positions (list of (start, end) tuples), strands.
+        Sequences with no hits get n=0, score_sum=0.0, score_max=0.0.
+    """
     records = []
     for seq_idx in range(batch_size):
         eh = hits[hits["sequence_name"] == seq_idx]
@@ -34,7 +103,24 @@ def ctcf_hits_per_seq(hits: pd.DataFrame, batch_size: int) -> list[dict]:
 
 
 def ctcf_hits_from_fimo(fimo_df, seq_len=1310720, bin_size=2048):
-    """Bin FIMO hits by strand → (hits_plus, hits_minus) arrays of length n_bins."""
+    """Bin FIMO hits by strand into per-bin hit count arrays.
+
+    Parameters
+    ----------
+    fimo_df : pd.DataFrame
+        FIMO hits table with columns [start, strand].
+    seq_len : int
+        Full sequence length in bp (default 1,310,720).
+    bin_size : int
+        Bin size in bp (default 2048).
+
+    Returns
+    -------
+    hits_plus : np.ndarray
+        Shape (n_bins,); hit counts on the + strand per bin.
+    hits_minus : np.ndarray
+        Shape (n_bins,); hit counts on the − strand per bin.
+    """
     n_bins = seq_len // bin_size
     hits_plus  = np.zeros(n_bins)
     hits_minus = np.zeros(n_bins)
@@ -50,6 +136,23 @@ def ctcf_hits_from_fimo(fimo_df, seq_len=1310720, bin_size=2048):
 
 
 def hits_to_site_set(hits_df, bin_size=10):
+    """Convert a FIMO hits DataFrame to a set of binned (position, strand) tuples.
+
+    Each hit's center position is rounded to the nearest bin_size boundary,
+    producing a position that is comparable across runs for Jaccard analysis.
+
+    Parameters
+    ----------
+    hits_df : pd.DataFrame
+        FIMO hits table with columns [start, end, strand].
+    bin_size : int
+        Bin width in bp for position rounding (default 10).
+
+    Returns
+    -------
+    set of (int, str)
+        Each element is a (binned_center_position, strand) tuple.
+    """
     site_set = set()
     for _, row in hits_df.iterrows():
         start, end, strand = row['start'], row['end'], row['strand']
@@ -60,33 +163,116 @@ def hits_to_site_set(hits_df, bin_size=10):
 
 
 def jaccard_index(set1, set2):
+    """Compute the Jaccard similarity index between two sets.
+
+    Returns 1.0 if both sets are empty (identical by convention).
+
+    Parameters
+    ----------
+    set1, set2 : set
+        Sets to compare, typically from hits_to_site_set.
+
+    Returns
+    -------
+    float
+        |set1 ∩ set2| / |set1 ∪ set2|, or 1.0 if both are empty.
+    """
     if not set1 and not set2:
         return 1.0
     union = set1 | set2
     return len(set1 & set2) / len(union) if union else 0.0
 
 
-def get_sequence(genome: Fasta, chrom: str, start: int, end: int) -> str:
-    """Extract an uppercase DNA sequence from a pyfaidx Fasta object."""
-    return genome[chrom][start:end].seq.upper()
+# ---------------------------------------------------------------------------
+# PWM I/O and sequence utilities
+# ---------------------------------------------------------------------------
 
 
 def reverse_complement(seq):
+    """Return the reverse complement of a DNA string.
+
+    Handles both upper and lower case bases.
+
+    Parameters
+    ----------
+    seq : str
+        DNA string, e.g. 'ACGTacgt'.
+
+    Returns
+    -------
+    str
+        Reverse-complemented DNA string.
+    """
     comp = str.maketrans("ACGTacgt", "TGCAtgca")
     return seq.translate(comp)[::-1]
 
 
 def reverse_complement_pwm(pwm: np.ndarray) -> np.ndarray:
-    """
-    Return the reverse-complement of a PWM.
-    Assumes column order A=0, C=1, G=2, T=3.
+    """Return the reverse complement of a PWM.
+
+    Parameters
+    ----------
+    pwm : np.ndarray
+        Shape (L, 4), column order A=0, C=1, G=2, T=3.
+
+    Returns
+    -------
+    np.ndarray
+        Reverse-complemented PWM of the same shape.
     """
     return np.flipud(pwm)[:, [3, 2, 1, 0]].copy()
+
+
+def read_meme_pwm_as_numpy(filename: str) -> np.ndarray:
+    """Parse a MEME-format file and return the first PWM as a (L, 4) array.
+
+    Counterpart to read_meme_pwm, which returns a (4, L) torch tensor.
+
+    Parameters
+    ----------
+    filename : str
+        Path to a MEME-format motif file.
+
+    Returns
+    -------
+    np.ndarray
+        Shape (motif_len, 4), dtype float32, column order A=0, C=1, G=2, T=3.
+    """
+    rows, in_matrix = [], False
+    with open(filename) as fh:
+        for line in fh:
+            line = line.strip()
+            if line.startswith("letter-probability matrix"):
+                in_matrix = True
+                continue
+            if in_matrix and line.startswith("MOTIF"):
+                break
+            if in_matrix and line:
+                rows.append([float(v) for v in line.split()])
+    return np.array(rows, dtype=np.float32)
+
+
+def read_meme_pwm(filename: str) -> torch.Tensor:
+    """Parse a MEME-format file and return the first PWM as a (4, L) tensor.
+
+    Parameters
+    ----------
+    filename : str
+        Path to a MEME-format motif file.
+
+    Returns
+    -------
+    torch.Tensor
+        Shape (4, motif_len), dtype float32, row order A=0, C=1, G=2, T=3.
+    """
+    pwm = read_meme_pwm_as_numpy(filename)   # (L, 4)
+    return torch.from_numpy(pwm.T)            # (4, L)
 
 
 # ---------------------------------------------------------------------------
 # Background probabilities
 # ---------------------------------------------------------------------------
+
 
 def estimate_background_probs(
     df,
@@ -95,23 +281,28 @@ def estimate_background_probs(
     start_col: str = "centered_start",
     end_col: str = "centered_end",
 ) -> dict[str, float]:
-    """
-    Estimate nucleotide background probabilities from a set of genomic windows.
+    """Estimate nucleotide background probabilities from a set of genomic windows.
 
     Counts A/C/G/T across all sequences in df (ignoring Ns), then normalises.
 
-    Args:
-        df:        DataFrame with genomic window rows.
-        genome:    pyfaidx Fasta object.
-        chrom_col: Column name for chromosome.
-        start_col: Column name for window start coordinate.
-        end_col:   Column name for window end coordinate.
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Table with genomic window rows.
+    genome : pyfaidx.Fasta
+        Reference genome.
+    chrom_col : str
+        Column name for chromosome (default 'chrom').
+    start_col : str
+        Column name for window start coordinate (default 'centered_start').
+    end_col : str
+        Column name for window end coordinate (default 'centered_end').
 
-    Returns:
-        Dict mapping each base in "ACGT" to its relative frequency.
+    Returns
+    -------
+    dict of str → float
+        Mapping each base in "ACGT" to its relative frequency.
     """
-    from collections import Counter
-
     counts = Counter()
     for _, row in df.iterrows():
         seq = get_sequence(genome, row[chrom_col], row[start_col], row[end_col])
@@ -161,31 +352,6 @@ def seq_score(
     return score
 
 
-def read_meme_pwm_as_numpy(filename: str) -> np.ndarray:
-    """
-    Parse a MEME-format file and return the PWM as a (L, 4) float32 array.
-    (Counterpart to read_meme_pwm, which returns a (4, L) torch tensor.)
-    """
-    rows, in_matrix = [], False
-    with open(filename) as fh:
-        for line in fh:
-            line = line.strip()
-            if line.startswith("letter-probability matrix"):
-                in_matrix = True
-                continue
-            if in_matrix and line.startswith("MOTIF"):
-                break
-            if in_matrix and line:
-                rows.append([float(v) for v in line.split()])
-    return np.array(rows, dtype=np.float32)
-
-
-def read_meme_pwm(filename: str) -> torch.Tensor:
-    """Parse a MEME-format file and return the PWM as a (4, L) float32 tensor."""
-    pwm = read_meme_pwm_as_numpy(filename)   # (L, 4)
-    return torch.from_numpy(pwm.T)            # (4, L)
-
-
 def sliding_scores(
     seq: str,
     pwm: np.ndarray,
@@ -216,20 +382,26 @@ def aggregated_positive_motif_score(
     bg: dict[str, float] | None = None,
     step: int = 1,
 ) -> float:
-    """
-    Sum of all positive-valued sliding-window scores across both strands.
+    """Sum of positive-valued sliding-window scores across both strands.
 
     For each position the strand score is max(forward_score, rc_score),
     and only positions with a combined score > 0 contribute to the sum.
 
-    Args:
-        seq:  DNA string.
-        pwm:  (L, 4) forward PWM array.
-        bg:   Background probabilities passed to seq_score.
-        step: Stride for the sliding window.
+    Parameters
+    ----------
+    seq : str
+        DNA string.
+    pwm : np.ndarray
+        Shape (L, 4) forward PWM array.
+    bg : dict of str → float, optional
+        Background probabilities passed to seq_score.
+    step : int
+        Stride for the sliding window (default 1).
 
-    Returns:
-        Scalar aggregated positive motif score.
+    Returns
+    -------
+    float
+        Aggregated positive motif score.
     """
     pwm_rc = reverse_complement_pwm(pwm)
     fwd = sliding_scores(seq, pwm, bg=bg, step=step)
@@ -250,23 +422,34 @@ def compute_aggregated_positive_motif_scores(
     start_col: str = "centered_start",
     score_col: str = "sum_positive_scores",
 ) -> None:
-    """
-    Compute aggregated positive motif scores for every row in df (in-place).
+    """Compute aggregated positive motif scores for every row in df (in-place).
 
-    The extracted sequence is genome[chrom][centered_start + seq_start_offset :
-                                            centered_start + seq_end_offset].
+    The extracted sequence spans
+    genome[chrom][start + seq_start_offset : start + seq_end_offset].
 
-    Args:
-        df:               DataFrame with genomic window rows.
-        genome:           pyfaidx Fasta object.
-        pwm:              (L, 4) PWM array.
-        seq_start_offset: Offset from centered_start to begin sequence extraction.
-        seq_end_offset:   Offset from centered_start to end sequence extraction.
-        bg:               Background probabilities (None → uniform).
-        step:             Sliding-window stride.
-        chrom_col:        Column name for chromosome.
-        start_col:        Column name for window start coordinate.
-        score_col:        Name of the new score column written into df.
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Table with genomic window rows; modified in-place.
+    genome : pyfaidx.Fasta
+        Reference genome.
+    pwm : np.ndarray
+        Shape (L, 4) PWM array.
+    seq_start_offset : int
+        Offset from start_col to begin sequence extraction.
+    seq_end_offset : int
+        Offset from start_col to end sequence extraction.
+    bg : dict of str → float, optional
+        Background probabilities (None → uniform).
+    step : int
+        Sliding-window stride (default 1).
+    chrom_col : str
+        Column name for chromosome (default 'chrom').
+    start_col : str
+        Column name for window start coordinate (default 'centered_start').
+    score_col : str
+        Name of the new score column written into df
+        (default 'sum_positive_scores').
     """
     df[score_col] = 0.0
     for i, row in tqdm(df.iterrows(), total=len(df)):

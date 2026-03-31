@@ -1,7 +1,32 @@
+"""
+utils/df_utils.py
+
+DataFrame utilities for loading and summarizing AkitaSF optimization results.
+
+Loading functions
+-----------------
+load_bed_fold               : load Akita BED file filtered to a single fold
+load_parameter_results      : load result TSVs across a parameter sweep
+load_optimization_results   : load result TSVs across target-strength directories
+load_indep_runs_results     : load result TSVs from independent-run (seed) directories
+simple_load_results         : load result TSVs from arbitrary subdirectories
+
+Annotation helpers
+------------------
+build_optimization_table    : pair each window with the next as its target (circular shift)
+parse_target_from_dirname   : extract target strength from a directory name
+parse_dot_distance_from_dirname : extract dot distance from a directory name
+
+Summary
+-------
+summarize_by_target         : per-target success rate and edit statistics
+"""
+
 import os
 import pandas as pd
 import re
 from pathlib import Path
+import logging
 
 
 def load_parameter_results(
@@ -59,13 +84,19 @@ def load_parameter_results(
 
 
 def parse_target_from_dirname(dirname: str) -> float:
-    """
-    Extract target strength from a directory name.
+    """Extract target strength from a directory name.
+
     Handles optional 'neg'/'pos' sign prefix and 'p' as decimal separator.
-    Examples:
-        boundary_neg0p5  -> -0.5
-        boundary_neg0p4  -> -0.4
-        flame_pos1p0     ->  1.0
+
+    Parameters
+    ----------
+    dirname : str
+        Directory name, e.g. 'boundary_neg0p5' or 'flame_pos1p0'.
+
+    Returns
+    -------
+    float
+        Parsed target value, e.g. -0.5 or 1.0.
     """
     match = re.search(r'(neg|pos)?(\d+)p(\d+)', dirname)
     if not match:
@@ -77,11 +108,17 @@ def parse_target_from_dirname(dirname: str) -> float:
 
 
 def parse_dot_distance_from_dirname(dirname: str) -> float:
-    """
-    Extract target dot distance from a directory name.
-    Example:
-        dot_d30 -> 30.0
-        dot_d50 -> 50.0
+    """Extract target dot distance from a directory name.
+
+    Parameters
+    ----------
+    dirname : str
+        Directory name, e.g. 'dot_d30' or 'dot_d50'.
+
+    Returns
+    -------
+    float
+        Parsed distance value, e.g. 30.0 or 50.0.
     """
     match = re.search(r'd(\d+)', dirname)
     if not match:
@@ -96,17 +133,24 @@ def load_optimization_results(
     folds: range,
     parser_func=parse_target_from_dirname
 ) -> pd.DataFrame:
-    """
-    Load all optimization result TSVs from the given subdirectories,
-    annotate with fold number and target strength, and concatenate.
+    """Load optimization result TSVs across target-strength directories.
 
-    Args:
-        result_dirs: List of subdirectory names under base_dir.
-        base_dir:    Root directory containing the subdirectories.
-        folds:       Iterable of fold indices (default 0–7).
+    Parameters
+    ----------
+    result_dirs : list[str]
+        Subdirectory names under base_dir, e.g. ['boundary_neg0p5', 'boundary_neg0p4'].
+    base_dir : Path
+        Root directory containing the subdirectories.
+    folds : range
+        Fold indices to load, e.g. range(8).
+    parser_func : callable
+        Function mapping a directory name to a numeric target value.
+        Defaults to parse_target_from_dirname.
 
-    Returns:
-        Concatenated DataFrame with added 'fold' and 'target' columns.
+    Returns
+    -------
+    pd.DataFrame
+        Concatenated results with added 'fold' and 'target' columns.
     """
     dfs = []
     
@@ -138,21 +182,28 @@ def load_indep_runs_results(
     folds: range = range(4),
     seed_prefix: str = "seed",
 ) -> pd.DataFrame:
-    """
-    Load all optimization result TSVs from independent runs directory structure:
+    """Load optimization result TSVs from independent-run (seed) directories.
+
+    Expects the following structure:
         indep_runs_dir/
-            seed0/fold0_selected_genomic_windows_centered_chrom_states_results.tsv
-            seed0/fold1_...
-            seed1/fold0_...
+            seed0/fold0_..._results.tsv
+            seed0/fold1_..._results.tsv
+            seed1/fold0_..._results.tsv
             ...
 
-    Args:
-        indep_runs_dir: Path to the directory containing seed subdirectories.
-        folds:          Iterable of fold indices (default 0–4).
-        seed_prefix:    Prefix of seed subdirectory names (default "seed").
+    Parameters
+    ----------
+    indep_runs_dir : Path
+        Directory containing seed subdirectories.
+    folds : range
+        Fold indices to load (default range(4)).
+    seed_prefix : str
+        Prefix of seed subdirectory names (default 'seed').
 
-    Returns:
-        Concatenated DataFrame with added 'fold' and 'run' columns.
+    Returns
+    -------
+    pd.DataFrame
+        Concatenated results with added 'fold' and 'run' columns.
     """
     seed_dirs = sorted(
         [d for d in indep_runs_dir.iterdir() if d.is_dir() and d.name.startswith(seed_prefix)],
@@ -182,16 +233,24 @@ def load_indep_runs_results(
 
 
 def summarize_by_target(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    For each target strength, compute:
-      - n_total:              total number of optimization runs
-      - n_no_edits:           runs where no edits were accepted (n_edits == 0)
-      - n_no_depletion:       runs with edits but no contact depletion
-                              (n_edits > 0 and optimization_success == False)
-      - success_rate_pct:     percentage of successful optimizations
-    For successful runs only:
-      - mean_n_edits:         average number of accepted edits
-      - mean_last_step:       average last accepted optimization step
+    """Summarize optimization outcomes per target strength.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Concatenated results table with columns [target, n_edits,
+        optimization_success, last_accepted_step].
+
+    Returns
+    -------
+    pd.DataFrame
+        One row per target strength with columns:
+        - n_total           : total number of optimization windows
+        - n_no_edits        : windows where no edits were accepted
+        - n_no_depletion    : windows with edits but optimization_success == False
+        - success_rate_pct  : percentage of successful optimizations
+        - mean_n_edits      : mean accepted edits (successful runs only)
+        - mean_last_step    : mean last accepted step (successful runs only)
     """
     rows = []
     for target, grp in df.groupby("target"):
@@ -226,21 +285,23 @@ def simple_load_results(
     folds: range,
     tsv_suffix: str,
 ) -> pd.DataFrame:
-    """
-    Load all result TSVs from the given subdirectories and concatenate
-    into a single DataFrame.
+    """Load result TSVs from arbitrary subdirectories and concatenate.
 
-    Args:
-        result_dirs: List of subdirectory names under base_dir.
-        base_dir:    Root directory containing the subdirectories.
-        folds:       Iterable of fold indices.
-        tsv_suffix:  Suffix of the TSV files to load. The expected filename
-                     pattern is fold{N}_{tsv_suffix}. Default is
-                     'suppression_opt.tsv'.
+    Parameters
+    ----------
+    result_dirs : list[str]
+        Subdirectory names under base_dir.
+    base_dir : Path
+        Root directory containing the subdirectories.
+    folds : range
+        Fold indices to load.
+    tsv_suffix : str
+        Filename suffix; expected pattern is fold{N}_{tsv_suffix}.
 
-    Returns:
-        Concatenated DataFrame with an added 'run_name' column identifying
-        the source subdirectory.
+    Returns
+    -------
+    pd.DataFrame
+        Concatenated results from all found TSV files.
     """
     dfs = []
 
@@ -261,3 +322,50 @@ def simple_load_results(
     if not dfs:
         raise RuntimeError("No TSV files were loaded. Check your paths.")
     return pd.concat(dfs, ignore_index=True)
+
+
+def load_bed_fold(bed_file: str, fold: int) -> pd.DataFrame:
+    """Load the Akita BED file and filter to a specific fold.
+
+    Parameters
+    ----------
+    bed_file:
+        Path to the sequences.bed file (chrom, start, end, fold columns).
+    fold:
+        Integer fold index to select (matched against the string "fold{fold}").
+
+    Returns
+    -------
+    pd.DataFrame
+        Filtered dataframe with columns chrom, start, end, fold.
+    """
+    df = pd.read_csv(bed_file, sep="\t", header=None, names=["chrom", "start", "end", "fold"])
+    df_fold = df[df["fold"] == f"fold{fold}"].reset_index(drop=True)
+    logging.info(f"Loaded {len(df_fold)} windows for fold {fold}.")
+    return df_fold
+
+
+def build_optimization_table(df: pd.DataFrame) -> pd.DataFrame:
+    """Pair each window with the next one as its optimization target.
+
+    Adds target_chrom, target_start, and target_end columns by shifting the
+    coordinate columns by one row (circular: the last window's target is the
+    first window). Also initializes a last_accepted_step column to -1.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Table with columns [chrom, start, end].
+
+    Returns
+    -------
+    pd.DataFrame
+        Copy of df with added columns: target_chrom, target_start,
+        target_end, last_accepted_step.
+    """
+    df = df.copy()
+    df["target_chrom"] = df["chrom"].shift(-1).fillna(df["chrom"].iloc[0])
+    df["target_start"] = df["start"].shift(-1).fillna(df["start"].iloc[0]).astype(int)
+    df["target_end"]   = df["end"].shift(-1).fillna(df["end"].iloc[0]).astype(int)
+    df["last_accepted_step"] = -1
+    return df

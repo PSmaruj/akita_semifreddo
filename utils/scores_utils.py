@@ -1,4 +1,20 @@
+"""
+utils/scores_utils.py
+
+Contact map scoring functions for AkitaSF-designed sequences.
+
+Each function operates on a batch of symmetric contact matrices of shape
+(B, 512, 512) and returns per-sequence scores.
+
+Functions
+---------
+insulation_score      : mean contact in a specified upper-right map region (boundary)
+compute_dot_scores    : mean contact in a square window around a dot position
+compute_flame_scores  : mean contact in a vertical stripe centred on the map column
+"""
+
 import numpy as np
+
 
 MAP_CENTER = 256   # centre bin of the 512-bin contact map
 
@@ -8,7 +24,26 @@ def insulation_score(
     row_slice: slice,
     col_slice: slice,
 ) -> list[float]:
-    """Per-sequence mean of the specified upper-right region of contact maps."""
+    """Compute the mean contact in a rectangular region for each map in a batch.
+
+    Used as a boundary insulation score: the specified region is typically
+    the upper-right block adjacent to the boundary position, where insulation
+    manifests as reduced contact frequency.
+
+    Parameters
+    ----------
+    maps : np.ndarray
+        Shape (B, 512, 512); batch of symmetric contact maps.
+    row_slice : slice
+        Row range of the region to average.
+    col_slice : slice
+        Column range of the region to average.
+
+    Returns
+    -------
+    list of float
+        Per-sequence mean contact values, length B.
+    """
     return np.nanmean(
         maps[:, row_slice, col_slice],
         axis=(1, 2)
@@ -21,19 +56,26 @@ def compute_dot_scores(
     dot_col: int,
     half_widths: list[int],
 ) -> dict[str, list[float]]:
-    """Compute mean dot score at multiple window sizes for a batch of maps.
+    """Compute mean contact in a square window around a dot position.
+
+    Scores are computed at multiple window sizes, allowing comparison
+    across resolutions.
 
     Parameters
     ----------
-    maps : np.ndarray, shape (B, 512, 512)
-    dot_row, dot_col : int
-        Row and column of the dot centre in map coordinates.
-    half_widths : list[int]
+    maps : np.ndarray
+        Shape (B, 512, 512); batch of symmetric contact maps.
+    dot_row : int
+        Row index of the dot centre in map coordinates.
+    dot_col : int
+        Column index of the dot centre in map coordinates.
+    half_widths : list of int
         Half-widths to measure; window size = 2*hw + 1.
 
     Returns
     -------
-    dict mapping f"dot{2*hw+1}" → list of per-sequence mean values.
+    dict of str → list of float
+        Maps f"dot{2*hw+1}" to a list of B per-sequence mean values.
     """
     scores = {}
     for hw in half_widths:
@@ -51,23 +93,26 @@ def compute_flame_scores(
     half_widths: list[int],
     map_center: int = MAP_CENTER,
 ) -> dict[str, list[float]]:
-    """Compute mean flame score at multiple column widths for a batch of maps.
+    """Compute mean contact in a vertical stripe centred on the map column.
 
-    A flame is a vertical stripe of elevated contact in the upper half of the
-    map, centred on the middle column. For each half-width hw, the score is
-    the mean over rows 0..map_center-1 and cols map_center-hw..map_center+hw.
+    A flame is a vertical stripe of elevated contact in the upper half of
+    the map, centred on the middle column. Scores are computed at multiple
+    stripe widths.
 
     Parameters
     ----------
-    maps : np.ndarray, shape (B, 512, 512)
-    half_widths : list[int]
+    maps : np.ndarray
+        Shape (B, 512, 512); batch of symmetric contact maps.
+    half_widths : list of int
         Half-widths to measure; stripe width = 2*hw + 1.
     map_center : int
-        Centre bin index (default 256).
+        Centre bin index, used as both the column centre and the upper
+        row boundary (default 256).
 
     Returns
     -------
-    dict mapping f"flame{2*hw+1}" → list of per-sequence mean values.
+    dict of str → list of float
+        Maps f"flame{2*hw+1}" to a list of B per-sequence mean values.
     """
     scores = {}
     for hw in half_widths:

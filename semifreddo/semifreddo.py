@@ -470,3 +470,16 @@ class MultiBinSemifreddoLedidiWrapper(nn.Module):
         x = self.model.final(x)
 
         return x
+    
+
+class StackingDesignWrapper(nn.Module):
+    """Combines multiple models by stacking outputs along dim=1.
+    Each model must return (batch, 1, N_triu); result is (batch, n_models, N_triu).
+    Use instead of tangermeme DesignWrapper which concatenates on dim=-1.
+    """
+    def __init__(self, models):
+        super().__init__()
+        self.models = nn.ModuleList(models)
+
+    def forward(self, X):
+        return torch.cat([m(X) for m in self.models], dim=1)

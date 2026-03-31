@@ -1,7 +1,27 @@
+"""
+utils/data_utils.py
+
+Low-level data utilities shared across the AkitaSF pipeline.
+
+Functions
+---------
+one_hot_encode_sequence : encode a DNA string as a (1, 4, L) float32 array
+get_sequence            : extract an uppercase DNA string from a pyfaidx Fasta
+gc_content              : compute mean GC fraction over a batch of OHE sequences
+
+Matrix utilities (Akita upper-triangular format)
+------------------------------------------------
+set_diag                      : set a matrix diagonal to a given value in-place
+from_upper_triu               : reconstruct a symmetric contact matrix from a flat vector
+from_upper_triu_batch         : reconstruct a batch of contact matrices
+upper_triangular_to_vector    : extract the upper-tri portion of a matrix into a vector
+fragment_indices_in_upper_triangular : map a 2-D fragment mask to upper-tri indices
+"""
+
 import numpy as np
 import random
 import torch
-import pandas as pd
+
 
 def one_hot_encode_sequence(sequence_obj: object) -> np.ndarray:
     """One-hot encode a pyfaidx Sequence object.
@@ -99,8 +119,18 @@ def fragment_indices_in_upper_triangular(
     return selected_indices
 
 
-# Helper function to set diagonal elements to a specific value
 def set_diag(matrix, value, k):
+    """Set the k-th diagonal of a 2-D matrix to a given value, in-place.
+
+    Parameters
+    ----------
+    matrix : np.ndarray
+        2-D array to modify in-place.
+    value : float
+        Value to assign to the diagonal (e.g. np.nan).
+    k : int
+        Diagonal offset: 0 = main diagonal, positive = above, negative = below.
+    """
     # Explicitly set the diagonal to 'value' (in this case, np.nan) for each k
     rows, cols = matrix.shape
     for i in range(rows):
@@ -109,6 +139,28 @@ def set_diag(matrix, value, k):
 
 
 def from_upper_triu(vector_repr, matrix_len, num_diags):
+    """Reconstruct a symmetric contact matrix from an upper-triangular vector.
+
+    Accepts either a NumPy array or a PyTorch tensor. The near-diagonal entries
+    (within num_diags of the main diagonal) are set to np.nan to match Akita's
+    output convention.
+
+    Parameters
+    ----------
+    vector_repr : np.ndarray or torch.Tensor
+        Flat upper-triangular vector of length N_triu.
+    matrix_len : int
+        Side length of the output square matrix.
+    num_diags : int
+        Number of diagonals to blank (set to np.nan), matching the diagonal
+        offset used when extracting the upper triangle (typically 2 for Akita).
+
+    Returns
+    -------
+    np.ndarray
+        Symmetric matrix of shape (matrix_len, matrix_len) with np.nan
+        on the first num_diags diagonals.
+    """
     # Ensure vector_repr is a NumPy array (if it's a PyTorch tensor, convert it)
     if isinstance(vector_repr, torch.Tensor):
         vector_repr = vector_repr.detach().flatten().cpu().numpy()  # Flatten and convert to NumPy array
@@ -131,7 +183,23 @@ def from_upper_triu(vector_repr, matrix_len, num_diags):
 
 
 def from_upper_triu_batch(batch_vectors, matrix_len=512, num_diags=2):
-    """Convert a batch of upper-triangular vectors into symmetric matrices with np.nan on diagonals."""
+    """Reconstruct a batch of symmetric contact matrices from upper-triangular vectors.
+
+    Parameters
+    ----------
+    batch_vectors : np.ndarray or torch.Tensor
+        Shape (B, N_triu). If a tensor, converted to NumPy automatically.
+    matrix_len : int
+        Side length of each output square matrix (default 512).
+    num_diags : int
+        Number of near-diagonal entries to set to np.nan (default 2).
+
+    Returns
+    -------
+    np.ndarray
+        Shape (B, matrix_len, matrix_len), dtype float32, with np.nan
+        on the first num_diags diagonals of each matrix.
+    """
     if isinstance(batch_vectors, torch.Tensor):
         batch_vectors = batch_vectors.detach().cpu().numpy()
 
@@ -150,16 +218,6 @@ def from_upper_triu_batch(batch_vectors, matrix_len=512, num_diags=2):
             set_diag(matrices[i], np.nan, k)
 
     return matrices  # shape: [B, 512, 512]
-
-
-def build_optimization_table(df: pd.DataFrame) -> pd.DataFrame:
-    """Pair each window with the next one as its target (circular shift)."""
-    df = df.copy()
-    df["target_chrom"] = df["chrom"].shift(-1).fillna(df["chrom"].iloc[0])
-    df["target_start"] = df["start"].shift(-1).fillna(df["start"].iloc[0]).astype(int)
-    df["target_end"]   = df["end"].shift(-1).fillna(df["end"].iloc[0]).astype(int)
-    df["last_accepted_step"] = -1
-    return df
 
 
 def gc_content(X: torch.Tensor, bp_start: int = 0, bp_end: int = -1) -> np.ndarray:

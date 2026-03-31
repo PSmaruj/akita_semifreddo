@@ -30,11 +30,9 @@ sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 
 from akita.model import SeqNN
 from ledidi import Ledidi
-from semifreddo.semifreddo import MultiBinSemifreddoLedidiWrapper
-from utils.losses_utils import MultiHeadLocalL1Loss
-from utils.optimization_utils import strength_tag, build_stem, count_edits, last_accepted_step
-from utils.optimization_loop_utils import run_fold
-from utils.model_utils import StackingDesignWrapper
+from semifreddo.semifreddo import MultiBinSemifreddoLedidiWrapper, StackingDesignWrapper
+from semifreddo.losses import MultiHeadLocalL1Loss
+from semifreddo.optimization_loop import strength_tag, build_stem, count_edits, last_accepted_step, run_fold
 
 # ── Default paths ─────────────────────────────────────────────────────────────
 _PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
