@@ -17,7 +17,7 @@ BASE    = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita
 FEATURE = "boundary_no_ctcf"
 FOLDS   = range(8)
 
-API_KEY      = "AIzaSyBh9ICxEr8WOH63OELhl13TtqI1xvNo6LY"
+# API_KEY      = # set your API key here
 ORGANISM     = dna_client.Organism.MUS_MUSCULUS
 ONTOLOGY     = ["EFO:0004038"]  # mESC
 

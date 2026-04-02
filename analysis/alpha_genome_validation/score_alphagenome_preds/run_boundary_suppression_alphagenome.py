@@ -15,7 +15,7 @@ BASE    = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita
 FEATURE = "boundary_suppression"
 FOLDS   = range(8)
 
-API_KEY = "AIzaSyBh9ICxEr8WOH63OELhl13TtqI1xvNo6LY"
+# API_KEY = # set your API key here
 
 DF_PATH = f"{BASE}/optimizations/boundaries/successful_optimizations_-0.5.tsv"
 

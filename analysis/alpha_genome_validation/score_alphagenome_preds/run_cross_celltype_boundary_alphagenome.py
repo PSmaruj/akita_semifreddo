@@ -21,7 +21,7 @@ import helper as alpha_helper
 BASE  = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
 FOLDS = range(8)
 
-API_KEY  = "AIzaSyBh9ICxEr8WOH63OELhl13TtqI1xvNo6LY"
+# API_KEY  = # set your API key here
 ORGANISM = dna_client.Organism.HOMO_SAPIENS
 
 CELL_TYPES = {
