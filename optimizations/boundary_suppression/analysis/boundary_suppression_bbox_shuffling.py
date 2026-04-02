@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 
 from utils.data_utils import from_upper_triu_batch, gc_content
 from utils.model_utils import load_model
-from utils.scores_utils import insulation_score
+from utils.scores_utils import compute_insulation_scores
 
 # ── Fixed paths ───────────────────────────────────────────────────────────────
 _PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
@@ -54,7 +54,7 @@ BBOX_CONSENSUS = [
     {"A", "G"},              # R
     {"G"},                   # G
     {"T"},                   # T
-    {"T"},                   # Ts
+    {"T"},                   # T
     {"C"},                   # C
     {"A", "G"},              # R
     {"A", "C", "G", "T"},   # N
@@ -266,7 +266,7 @@ def main() -> None:
         for seqs, hit_counts in loader:
             seqs = seqs.to(device)
             maps = from_upper_triu_batch(model(seqs).cpu())
-            urq_bbox_shuffled.extend(insulation_score(maps, URQ_ROW_SLICE, URQ_COL_SLICE))
+            urq_bbox_shuffled.extend(compute_insulation_scores(maps, URQ_ROW_SLICE, URQ_COL_SLICE))
             bbox_hit_counts.extend(hit_counts.tolist())
 
     # ── Assemble & save results ───────────────────────────────────────────────

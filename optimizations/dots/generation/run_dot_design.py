@@ -25,8 +25,8 @@ sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 
 from semifreddo.semifreddo import TwoAnchorSemifreddoLedidiWrapper
 from semifreddo.losses import LocalL1Loss
+from semifreddo.optimization_loop import build_stem, run_one_design_dot, run_fold
 from utils.model_utils import load_model
-from utils.optimization_loop_utils import build_stem, run_one_design_dot, run_fold
 
 # ── Default paths ─────────────────────────────────────────────────────────────
 _PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"

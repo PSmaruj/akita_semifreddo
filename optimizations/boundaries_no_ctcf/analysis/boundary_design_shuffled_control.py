@@ -29,10 +29,11 @@ from torch.utils.data import DataLoader, Dataset
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
 sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 
+from semifreddo.optimization_loop import strength_tag
+from utils.dataset_utils import ShuffledCentralInsertionDataset
 from utils.data_utils import from_upper_triu_batch
 from utils.model_utils import load_model
-from utils.optimization_utils import strength_tag
-from utils.scores_utils import insulation_score
+from utils.scores_utils import compute_insulation_scores
 
 # ── Fixed paths ───────────────────────────────────────────────────────────────
 _PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
@@ -54,79 +55,6 @@ EDIT_END       = EDIT_START + BIN_SIZE
 # ── URQ slice ─────────────────────────────────────────────────────────────────
 URQ_ROW_SLICE = slice(0, 250)
 URQ_COL_SLICE = slice(260, 512)
-
-# ── Shuffle constants ─────────────────────────────────────────────────────────
-K           = 2                                          # dinucleotide shuffle
-BASES       = np.array(["A", "C", "G", "T"])
-BASE_TO_IDX = {"A": 0, "C": 1, "G": 2, "T": 3}
-
-
-# ── OHE ↔ sequence helpers ────────────────────────────────────────────────────
-
-def ohe_to_bytes(ohe: np.ndarray) -> bytes:
-    """Convert (4, L) OHE array to a byte string."""
-    indices = np.argmax(ohe, axis=0)           # (L,)
-    return "".join(BASES[indices]).encode()
-
-
-def bytes_to_ohe(seq: bytes, length: int) -> np.ndarray:
-    """Convert a byte string back to a (4, L) OHE float32 array."""
-    ohe = np.zeros((4, length), dtype=np.float32)
-    for i, base in enumerate(seq.decode()):
-        ohe[BASE_TO_IDX[base], i] = 1.0
-    return ohe
-
-
-# ── Dataset ───────────────────────────────────────────────────────────────────
-
-class ShuffledCentralInsertionDataset(Dataset):
-    """Reconstruct full sequences with a dinucleotide-shuffled optimised bin.
-
-    For each window, the optimised central bin (_gen_seq.pt) is shuffled using
-    seqpro's dinucleotide-preserving shuffle, then spliced back into the full
-    original sequence at the same position as the optimised bin.
-
-    Parameters
-    ----------
-    coord_df   : DataFrame with chrom, centered_start, centered_end columns.
-    seq_path   : Directory containing {stem}_X.pt full sequence tensors.
-    slice_path : Directory containing {stem}_gen_seq.pt optimised bin tensors.
-    edit_start : bp start of the central bin in the full sequence.
-    edit_end   : bp end   of the central bin in the full sequence.
-    """
-
-    def __init__(self, coord_df: pd.DataFrame, seq_path: str, slice_path: str,
-                 edit_start: int, edit_end: int):
-        self.coords     = coord_df
-        self.seq_path   = seq_path
-        self.slice_path = slice_path
-        self.edit_start = edit_start
-        self.edit_end   = edit_end
-
-    def __len__(self) -> int:
-        return len(self.coords)
-
-    def __getitem__(self, idx: int) -> torch.Tensor:
-        row   = self.coords.iloc[idx]
-        chrom = row["chrom"]
-        start = int(row["centered_start"])
-        end   = int(row["centered_end"])
-        stem  = f"{chrom}_{start}_{end}"
-
-        X      = torch.load(f"{self.seq_path}{stem}_X.pt",         weights_only=True)
-        slice_ = torch.load(f"{self.slice_path}{stem}_gen_seq.pt",  weights_only=True)
-
-        # Dinucleotide-preserving shuffle: OHE → bytes → k_shuffle → OHE
-        ohe_np      = slice_.squeeze(0).numpy()          # (4, BIN_SIZE)
-        seq_bytes   = ohe_to_bytes(ohe_np)               # b"ACGT..."
-        shuffled_bytes = b"".join(sp.k_shuffle(seq_bytes, k=K, alphabet=b"ACGT"))
-        shuffled_ohe   = bytes_to_ohe(shuffled_bytes, BIN_SIZE)  # (4, BIN_SIZE)
-        shuffled = torch.from_numpy(shuffled_ohe).unsqueeze(0)   # (1, 4, BIN_SIZE)
-
-        edited = X.clone()
-        edited[:, :, self.edit_start:self.edit_end] = shuffled
-        return edited.squeeze(0)
-
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
@@ -189,7 +117,7 @@ def main() -> None:
         for batch in shuffled_loader:
             batch      = batch.to(device)
             maps       = from_upper_triu_batch(model(batch).cpu())
-            urq_shuffled.extend(insulation_score(maps, URQ_ROW_SLICE, URQ_COL_SLICE))
+            urq_shuffled.extend(compute_insulation_scores(maps, URQ_ROW_SLICE, URQ_COL_SLICE))
 
     # ── Save ──────────────────────────────────────────────────────────────────
     df["insul_score_shuffled"] = urq_shuffled

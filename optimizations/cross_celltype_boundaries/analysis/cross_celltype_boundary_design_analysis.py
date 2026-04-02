@@ -32,10 +32,10 @@ sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
 sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 
 from akita.model import SeqNN
+from semifreddo.optimization_loop import strength_tag
 from utils.dataset_utils import CentralInsertionDataset, SequenceDataset
 from utils.data_utils import from_upper_triu_batch
-from utils.optimization_utils import strength_tag
-from utils.scores_utils import insulation_score
+from utils.scores_utils import compute_insulation_scores
 
 # ── Fixed paths ───────────────────────────────────────────────────────────────
 _PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
@@ -132,7 +132,7 @@ def predict_insulation(
             batch = batch.to(device)
             for i, m in enumerate(models):
                 maps = from_upper_triu_batch(m(batch).cpu())
-                per_model[i].extend(insulation_score(maps, URQ_ROW_SLICE, URQ_COL_SLICE))
+                per_model[i].extend(compute_insulation_scores(maps, URQ_ROW_SLICE, URQ_COL_SLICE))
 
     if average:
         return np.mean(per_model, axis=0).tolist()

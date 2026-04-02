@@ -27,7 +27,7 @@ sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
 sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 # --------------------------------------------------------------------------
 
-from utils.data_utils import build_optimization_table
+from utils.df_utils import build_optimization_table
 from utils.fimo_utils import read_meme_pwm, hits_to_site_set, jaccard_index
 
 

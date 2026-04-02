@@ -11,8 +11,7 @@ Usage:
     python run_fountain_design.py \
         --folds 0 1 2 3 \
         --run_name results \
-        --fountain_strength 0.5 \
-        --L 125.0 \
+        --fountain_strength 0.5
 """
 
 import os

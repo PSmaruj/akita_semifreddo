@@ -5,11 +5,12 @@ Batch boundary optimisation over all genomic windows in a fold's flat-regions ta
 Saves per-window generated sequences and an enriched TSV with optimisation metadata.
 
 Usage:
-    python run_boundary_design.py \\
-        --folds 0 1 2 3 \\
-        --run_name lambda/lambda_0.01 \\
-        --boundary_strength -0.5 \\
-        --L 0.01 \\
+    python run_boundary_design.py \
+        --folds 0 1 2 3 \
+        --seeds 0 \
+        --run_name indep_runs_lambda_125.0/seed0 \
+        --boundary_strength -0.5 \
+        --L 125.0 \
 """
 
 import os
@@ -66,8 +67,12 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument("--folds",    type=int, nargs="+", required=True,
                    help="One or more fold indices, e.g. --folds 0 1 2 3")
+    p.add_argument("--seeds",    type=int, nargs="+", default=[0],
+                   help="One or more random seeds, e.g. --seeds 0 1 2 3 4 5 6 7 8 9")
     p.add_argument("--run_name", type=str, required=True,
-                   help="Results subdirectory name (e.g. 'lambda/lambda_0.01')")
+                   help="Results subdirectory name (e.g. 'lambda/lambda_0.01'). "
+                        "When multiple seeds are used, each seed's outputs are written "
+                        "to '<run_name>/seed<seed>/'.")
     p.add_argument("--boundary_strength", type=float, required=True,
                    help="Value applied to the off-diagonal quadrants of the boundary mask "
                         "(e.g. -0.5). Negative values suppress contacts.")
@@ -90,34 +95,42 @@ def main() -> None:
     tag    = strength_tag(args.boundary_strength)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    log.info(f"Device: {device}  |  Folds: {args.folds}  |  Run: {args.run_name}")
+    log.info(f"Device: {device}  |  Folds: {args.folds}  |  Seeds: {args.seeds}  |  Run: {args.run_name}")
     log.info(f"Boundary strength: {args.boundary_strength} (tag: {tag})")
     log.info(f"Ledidi params — L={args.L}  tau={args.tau}  eps={args.eps}")
 
-    # ── Shared resources (loaded once across all folds) ───────────────────────
+    # ── Shared resources (loaded once across all folds / seeds) ───────────────
     model       = load_model(args.model_path, device)
     mask        = torch.load(args.mask_path, weights_only=True).to(device)
     output_loss = LocalL1Loss(mask, n_triu=N_TRIU, reduction="sum").to(device)
 
-    # ── Boundary-specific run_one closure ─────────────────────────────────────
-    def run_one_fn(row, fold, args, out_dir):
-        stem = build_stem(row["chrom"], int(row["centered_start"]), int(row["centered_end"]))
-        log.info(f"  Window: {stem}")
-        X      = torch.load(f"{args.seq_base_dir}/mouse_sequences/fold{fold}/{stem}_X.pt", weights_only=True).to(device)
-        tower  = torch.load(f"{args.seq_base_dir}/mouse_tower_outputs/fold{fold}/{stem}_tower_out.pt", weights_only=True).to(device)
-        target = torch.load(f"{args.target_base_dir}/boundary_{tag}/fold{fold}/{stem}_target.pt", weights_only=True).to(device)
-        sf_wrapper = SemifreddoLedidiWrapper(
-            model=model, precomputed_full_output=tower, full_X=X,
-            edited_bin=CENTER_BIN_MAP, context_bins=CONTEXT_BINS,
-            cropping_applied=CROPPING_APPLIED,
-        )
-        return run_one_design(row, fold, args, sf_wrapper, output_loss, X, target, device, out_dir)
+    # ── Outer loop: seeds ─────────────────────────────────────────────────────
+    for seed in args.seeds:
+        torch.manual_seed(seed)
+        log.info(f"=== Seed {seed} ===")
 
-    # ── Run all folds ─────────────────────────────────────────────────────────
-    for fold in args.folds:
-        run_fold(fold, args, run_one_fn, args.flat_regions_base, args.results_base_dir)
+        # Nest seed outputs under <results_base_dir>/<run_name>/
+        # seed_results_dir = os.path.join(args.results_base_dir, args.run_name)
 
-    log.info("All folds complete.")
+        # ── Boundary-specific run_one closure (captures current seed) ─────────
+        def run_one_fn(row, fold, args, out_dir, _seed=seed):
+            stem = build_stem(row["chrom"], int(row["centered_start"]), int(row["centered_end"]))
+            log.info(f"  Window: {stem}  seed={_seed}")
+            X      = torch.load(f"{args.seq_base_dir}/mouse_sequences/fold{fold}/{stem}_X.pt", weights_only=True).to(device)
+            tower  = torch.load(f"{args.seq_base_dir}/mouse_tower_outputs/fold{fold}/{stem}_tower_out.pt", weights_only=True).to(device)
+            target = torch.load(f"{args.target_base_dir}/boundary_{tag}/fold{fold}/{stem}_target.pt", weights_only=True).to(device)
+            sf_wrapper = SemifreddoLedidiWrapper(
+                model=model, precomputed_full_output=tower, full_X=X,
+                edited_bin=CENTER_BIN_MAP, context_bins=CONTEXT_BINS,
+                cropping_applied=CROPPING_APPLIED,
+            )
+            return run_one_design(row, fold, args, sf_wrapper, output_loss, X, target, device, out_dir)
+
+        # ── Run all folds for this seed ───────────────────────────────────────
+        for fold in args.folds:
+            run_fold(fold, args, run_one_fn, args.flat_regions_base, args.results_base_dir)
+
+    log.info("All seeds and folds complete.")
 
 
 if __name__ == "__main__":

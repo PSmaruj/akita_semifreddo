@@ -36,9 +36,8 @@ DEFAULT_MODEL_SRC = "/home1/smaruj/pytorch_akita/"
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 from utils.data_utils import one_hot_encode_sequence
-from utils.model_utils import (load_model, 
-                               run_model)
-from utils.io_utils import load_bed_fold
+from utils.model_utils import (load_model, run_model)
+from utils.df_utils import load_bed_fold
 
 
 def make_output_dirs(out_dir: str, fold: int) -> tuple[str, str]:

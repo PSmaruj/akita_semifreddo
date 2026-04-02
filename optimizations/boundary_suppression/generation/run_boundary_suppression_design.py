@@ -24,7 +24,6 @@ python run_boundary_suppression_design.py \\
     --folds 0 1 2 3 \\
     --run_name ctcf_flank15/lambda_0.01 \\
     --L 0.01
-
 """
 
 import ast
@@ -91,6 +90,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--L",   type=float, default=0.01,  help="Input-loss regularisation weight")
     p.add_argument("--tau", type=float, default=1.0,   help="Ledidi tau parameter")
     p.add_argument("--eps", type=float, default=1e-4,  help="Ledidi eps parameter")
+    p.add_argument("--no_ctcf_mask", action="store_true",
+                   help="If set, allow edits everywhere (no CTCF exclusion mask). "
+                        "Use for control runs.")
     p.add_argument("--model_path",       default=DEFAULT_MODEL_PATH)
     p.add_argument("--mask_path",        default=DEFAULT_MASK_PATH)
     p.add_argument("--suppression_dir",  default=DEFAULT_SUPPRESSION_DIR)
@@ -135,6 +137,14 @@ def run_fold_suppression(
         return
     log.info(f"Loaded {len(fold_df)} windows for fold {fold}")
 
+    # Drop columns added by the boundary design analysis step to avoid
+    # duplicate column names (e.g. n_edits.1) when suppression metadata
+    # is concatenated below.
+    cols_to_drop = [c for c in fold_df.columns if c in (
+        "insul_score_diff", "optimization_success", "n_edits", "last_accepted_step"
+    )]
+    fold_df = fold_df.drop(columns=cols_to_drop)
+
     seq_dir    = os.path.join(args.suppression_dir, "initial_sequences",    f"fold{fold}")
     tower_dir  = os.path.join(args.suppression_dir, "initial_tower_outputs", f"fold{fold}")
     target_dir = os.path.join(args.suppression_dir, "targets",              f"fold{fold}")
@@ -161,13 +171,17 @@ def run_fold_suppression(
                 cropping_applied        = CROPPING_APPLIED,
             )
 
-            # Build per-window CTCF exclusion mask
+            # Build per-window CTCF exclusion mask (skipped for control runs)
             ctcf_positions = ast.literal_eval(row["positions"])
-            input_mask = make_ctcf_exclusion_mask(
-                ctcf_positions, flank=CTCF_FLANK, seq_len=BIN_SIZE,
-            )
-            log.info(f"    CTCF positions: {ctcf_positions}  |  "
-                     f"Frozen bp: {input_mask.sum().item()}")
+            if args.no_ctcf_mask:
+                input_mask = None
+                log.info(f"    No CTCF mask (control run)")
+            else:
+                input_mask = make_ctcf_exclusion_mask(
+                    ctcf_positions, flank=CTCF_FLANK, seq_len=BIN_SIZE,
+                )
+                log.info(f"    CTCF positions: {ctcf_positions}  |  "
+                         f"Frozen bp: {input_mask.sum().item()}")
 
             meta = run_one_design(
                 row, fold, args, sf_wrapper, output_loss, X, target, device,
@@ -196,7 +210,7 @@ def main() -> None:
 
     log.info(f"Device: {device}  |  Folds: {args.folds}  |  Run: {args.run_name}")
     log.info(f"Ledidi params — L={args.L}  tau={args.tau}  eps={args.eps}")
-    log.info(f"CTCF flank: {CTCF_FLANK} bp")
+    log.info(f"CTCF flank: {CTCF_FLANK} bp  |  CTCF mask: {'disabled (control)' if args.no_ctcf_mask else 'enabled'}")
 
     # ── Shared resources (loaded once across all folds) ───────────────────────
     model       = load_model(args.model_path, device)

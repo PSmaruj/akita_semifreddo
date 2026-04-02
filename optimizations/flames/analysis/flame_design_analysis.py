@@ -24,10 +24,10 @@ from memelite import fimo
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
 sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 
+from semifreddo.optimization_loop import strength_tag
 from utils.dataset_utils import CentralInsertionDataset, SequenceDataset, TriuMatrixDataset
 from utils.data_utils import from_upper_triu_batch, gc_content
 from utils.fimo_utils import read_meme_pwm, ctcf_hits_per_seq
-from utils.optimization_utils import strength_tag
 from utils.model_utils import load_model
 from utils.scores_utils import compute_flame_scores
 

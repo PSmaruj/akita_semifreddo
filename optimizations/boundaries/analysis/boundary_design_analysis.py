@@ -14,7 +14,6 @@ python boundary_design_analysis.py \
 import argparse
 import os
 import sys
-
 import numpy as np
 import pandas as pd
 import torch
@@ -24,12 +23,12 @@ from memelite import fimo
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
 sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 
+from semifreddo.optimization_loop import strength_tag
 from utils.dataset_utils import CentralInsertionDataset, SequenceDataset, TriuMatrixDataset
 from utils.data_utils import from_upper_triu_batch, gc_content
 from utils.fimo_utils import read_meme_pwm, ctcf_hits_per_seq
-from utils.optimization_utils import strength_tag
 from utils.model_utils import load_model
-from utils.scores_utils import insulation_score
+from utils.scores_utils import compute_insulation_scores
 
 # ── Fixed paths ───────────────────────────────────────────────────────────────
 _PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
@@ -138,9 +137,9 @@ def main() -> None:
             maps_edited = from_upper_triu_batch(model(edited_b).cpu())
             maps_target = from_upper_triu_batch(target_b.cpu())
 
-            urq_orig.extend(insulation_score(maps_orig, URQ_ROW_SLICE, URQ_COL_SLICE))
-            urq_edited.extend(insulation_score(maps_edited, URQ_ROW_SLICE, URQ_COL_SLICE))
-            urq_target.extend(insulation_score(maps_target, URQ_ROW_SLICE, URQ_COL_SLICE))
+            urq_orig.extend(compute_insulation_scores(maps_orig, URQ_ROW_SLICE, URQ_COL_SLICE))
+            urq_edited.extend(compute_insulation_scores(maps_edited, URQ_ROW_SLICE, URQ_COL_SLICE))
+            urq_target.extend(compute_insulation_scores(maps_target, URQ_ROW_SLICE, URQ_COL_SLICE))
 
     # ── CTCF loop ─────────────────────────────────────────────────────────────
     pwm     = read_meme_pwm(PWM_PATH)

@@ -35,7 +35,7 @@ sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 
 from ledidi import ledidi
 from utils.model_utils import load_model
-from utils.data_utils import build_optimization_table
+from utils.df_utils import build_optimization_table
 
 # ==========================================================================
 # Helpers

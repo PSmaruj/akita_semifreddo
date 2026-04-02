@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 
 from utils.data_utils import from_upper_triu_batch
 from utils.model_utils import load_model
-from utils.scores_utils import insulation_score
+from utils.scores_utils import compute_insulation_scores
 
 TSV_PATH   = (
     "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/"
@@ -168,7 +168,7 @@ def main():
         x        = torch.from_numpy(orig_ohe).unsqueeze(0).float().to(device)
         with torch.no_grad():
             orig_maps = from_upper_triu_batch(model(x).cpu())
-        urq_orig  = insulation_score(orig_maps, URQ_ROW_SLICE, URQ_COL_SLICE)[0]
+        urq_orig  = compute_insulation_scores(orig_maps, URQ_ROW_SLICE, URQ_COL_SLICE)[0]
 
         base_record = {
             'chrom': chrom, 'fold': fold,
@@ -192,7 +192,7 @@ def main():
             x_mod = torch.from_numpy(mod_ohe).unsqueeze(0).float().to(device)
             with torch.no_grad():
                 mod_maps = from_upper_triu_batch(model(x_mod).cpu())
-            urq_sine = insulation_score(mod_maps, URQ_ROW_SLICE, URQ_COL_SLICE)[0]
+            urq_sine = compute_insulation_scores(mod_maps, URQ_ROW_SLICE, URQ_COL_SLICE)[0]
 
             print(f"  {chrom}:{cstart}-{cend}  n={n}  "
                   f"URQ_orig={urq_orig:.4f}  URQ_sine={urq_sine:.4f}  "

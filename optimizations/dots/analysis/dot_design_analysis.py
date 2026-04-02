@@ -18,7 +18,7 @@ import sys
 import numpy as np
 import pandas as pd
 import torch
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 from memelite import fimo
 
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))

@@ -42,8 +42,9 @@ sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
 sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
 
 from akita.model import SeqNN
+from semifreddo.optimization_loop import strength_tag
 from utils.data_utils import one_hot_encode_sequence
-from utils.optimization_utils import strength_tag, store_tower_output, make_target
+from utils.model_utils import store_tower_output, make_target
 
 # =============================================================================
 # Constants
