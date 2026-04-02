@@ -28,7 +28,7 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 
-sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
+sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
 sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
 from akita.model import SeqNN
@@ -41,7 +41,7 @@ from utils.scores_utils import compute_insulation_scores
 _PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
 
 MODEL_PATH_PATTERN = (
-    "/home1/smaruj/pytorch_akita/models/finetuned/human/"
+    "/home1/smaruj/akita_pytorch/models/finetuned/human/"
     "Krietenstein2019_{cell_type}/checkpoints/"
     "Akita_v2_human_Krietenstein2019_{cell_type}_model{model_idx}_finetuned.pth"
 )

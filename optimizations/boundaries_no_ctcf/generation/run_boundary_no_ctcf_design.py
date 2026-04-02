@@ -20,7 +20,7 @@ import logging
 
 import torch
 
-sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
+sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
 sys.path.insert(0, "/home1/smaruj/ledidi/ledidi/")
 sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
@@ -34,7 +34,7 @@ from utils.fimo_utils import read_meme_pwm
 _PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
 
 DEFAULT_MODEL_PATH = (
-    "/home1/smaruj/pytorch_akita/models/finetuned/mouse/Hsieh2019_mESC/checkpoints/"
+    "/home1/smaruj/akita_pytorch/models/finetuned/mouse/Hsieh2019_mESC/checkpoints/"
     "Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
 )
 DEFAULT_SEQ_BASE_DIR      = f"{_PROJ}/analysis/flat_regions"

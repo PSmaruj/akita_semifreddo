@@ -36,7 +36,7 @@ import sys
 import pandas as pd
 import torch
 
-sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
+sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
 sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
 from akita.model import SeqNN
@@ -69,7 +69,7 @@ GEN_SEQ_PATH_PATTERN = (
     "fold{fold}/{chrom}_{start}_{end}_gen_seq.pt"
 )
 MODEL_PATH_PATTERN = (
-    "/home1/smaruj/pytorch_akita/models/finetuned/mouse/Hsieh2019_mESC/checkpoints/"
+    "/home1/smaruj/akita_pytorch/models/finetuned/mouse/Hsieh2019_mESC/checkpoints/"
     "Akita_v2_mouse_Hsieh2019_mESC_model{model_idx}_finetuned.pth"
 )
 

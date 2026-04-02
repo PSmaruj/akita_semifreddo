@@ -18,7 +18,7 @@ import pandas as pd
 import torch
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-sys.path.insert(0, "/home1/smaruj/pytorch_akita")
+sys.path.insert(0, "/home1/smaruj/akita_pytorch")
 sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
 from utils.data_utils import from_upper_triu_batch
@@ -34,7 +34,7 @@ OHE_ROOT   = (
     "boundary_suppression/initial_sequences"
 )
 MODEL_PATH = (
-    "/home1/smaruj/pytorch_akita/models/finetuned/mouse/"
+    "/home1/smaruj/akita_pytorch/models/finetuned/mouse/"
     "Hsieh2019_mESC/checkpoints/"
     "Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
 )

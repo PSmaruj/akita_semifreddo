@@ -18,7 +18,7 @@ Usage:
         --fold 0 \
         --bed_file /project2/fudenber_735/tensorflow_models/akita/v2/data/mm10/sequences.bed \
         --fasta_file /project2/fudenber_735/genomes/mm10/mm10.fa \
-        --model_weights /home1/smaruj/pytorch_akita/models/finetuned/mouse/Hsieh2019_mESC/checkpoints/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth \
+        --model_weights /home1/smaruj/akita_pytorch/models/finetuned/mouse/Hsieh2019_mESC/checkpoints/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth \
         --out_dir /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/genome_rewiring
 """
 
@@ -32,7 +32,7 @@ import torch
 import pandas as pd
 from pyfaidx import Fasta
 
-DEFAULT_MODEL_SRC = "/home1/smaruj/pytorch_akita/"
+DEFAULT_MODEL_SRC = "/home1/smaruj/akita_pytorch/"
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 from utils.data_utils import one_hot_encode_sequence

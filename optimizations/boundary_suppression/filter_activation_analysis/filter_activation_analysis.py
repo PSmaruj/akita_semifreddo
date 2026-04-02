@@ -32,7 +32,7 @@ from pysam import FastaFile
 import warnings
 warnings.filterwarnings("ignore")
 
-sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
+sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
 from akita.model import SeqNN
 
 # ---------------------------------------------------------------------------
@@ -48,7 +48,7 @@ CTCF_TSV        = "/home1/smaruj/akita_semifreddo/data/ctcf_tables/CTCFs_jaspar_
 SINEB2_WITH_CTCF = "/home1/smaruj/akita_semifreddo/data/sine_b2_tables/sineB2_with_ctcf_300.tsv"
 SINEB2_NO_CTCF   = "/home1/smaruj/akita_semifreddo/data/sine_b2_tables/sineB2_no_ctcf_300.tsv"
 MODEL_PATH      = (
-    "/home1/smaruj/pytorch_akita/models/finetuned/mouse/Hsieh2019_mESC"
+    "/home1/smaruj/akita_pytorch/models/finetuned/mouse/Hsieh2019_mESC"
     "/checkpoints/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
 )
 OUTPUT_DIR = (

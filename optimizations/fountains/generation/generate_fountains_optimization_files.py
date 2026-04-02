@@ -34,7 +34,7 @@ import pandas as pd
 import torch
 from pyfaidx import Fasta
 
-sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
+sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
 sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
 from akita.model import SeqNN
@@ -57,7 +57,7 @@ TSV_PATTERN = (
     "fold{fold}_selected_genomic_windows_centered_chrom_states.tsv"
 )
 MODEL_PATH_PATTERN = (
-    "/home1/smaruj/pytorch_akita/models/trained_from_scratch/Vian2018_Bcells/checkpoints/"
+    "/home1/smaruj/akita_pytorch/models/trained_from_scratch/Vian2018_Bcells/checkpoints/"
     "Akita_v2_mouse_Vian2018_Bcells_model{model_idx}_from_scratch.pth"
 )
 

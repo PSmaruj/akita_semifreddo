@@ -16,7 +16,7 @@ python estimate_flame_strength.py \
     --stripes /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/analysis/natural_features/flames/mouse_selected_stripes.tsv \
     --out /project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/analysis/natural_features/flames/mouse_selected_stripes_strength.tsv \
     --fasta /project2/fudenber_735/genomes/mm10/mm10.fa \
-    --model-weights /home1/smaruj/pytorch_akita/models/finetuned/mouse/Hsieh2019_mESC/checkpoints/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth \
+    --model-weights /home1/smaruj/akita_pytorch/models/finetuned/mouse/Hsieh2019_mESC/checkpoints/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth \
     --batch-size 16 --device cuda:0
 """
 
@@ -33,7 +33,7 @@ from torch.utils.data import DataLoader
 # ---------------------------------------------------------------------------
 # Project-local imports – adjust paths via CLI or environment if needed.
 # ---------------------------------------------------------------------------
-sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
+sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
 sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
 from akita.model import SeqNN

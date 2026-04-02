@@ -21,7 +21,7 @@ from memelite import fimo
 sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi/"))
 
 # Akita model package — appended so its utils/ does NOT shadow akita_semifreddo/utils/
-sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
+sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
 
 # Project root — gives access to utils/
 sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))

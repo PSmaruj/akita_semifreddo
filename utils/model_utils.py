@@ -15,7 +15,7 @@ import torch
 import torch.nn as nn
 
 
-DEFAULT_MODEL_SRC = "/home1/smaruj/pytorch_akita/"
+DEFAULT_MODEL_SRC = "/home1/smaruj/akita_pytorch/"
 
 def load_model(model_weights_path: str, device: torch.device,
                model_src: str = DEFAULT_MODEL_SRC) -> torch.nn.Module:

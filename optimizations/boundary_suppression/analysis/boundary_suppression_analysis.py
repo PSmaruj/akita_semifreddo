@@ -20,7 +20,7 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 from memelite import fimo
 
-sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
+sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
 sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
 from utils.dataset_utils import CentralInsertionDataset, SequenceDataset, TriuMatrixDataset
@@ -33,14 +33,14 @@ from utils.scores_utils import insulation_score
 _PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
 
 MODEL_CKPT        = (
-    "/home1/smaruj/pytorch_akita/models/finetuned/mouse/Hsieh2019_mESC"
+    "/home1/smaruj/akita_pytorch/models/finetuned/mouse/Hsieh2019_mESC"
     "/checkpoints/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
 )
 SEQ_BASE_DIR      = f"{_PROJ}/optimizations/boundary_suppression/initial_sequences"
 TARGET_BASE_DIR   = f"{_PROJ}/optimizations/boundary_suppression/targets"
 RESULTS_BASE_DIR  = f"{_PROJ}/optimizations/boundary_suppression"
 FLAT_REGIONS_BASE = f"{_PROJ}/optimizations/boundaries/successful_optimizations_-0.5.tsv"
-PWM_PATH          = "/home1/smaruj/ledidi_akita/data/pwm/MA0139.1.meme"
+PWM_PATH          = "/home1/smaruj/akita_semifreddo/data/pwm/MA0139.1.meme"
 
 # ── Architecture constants ────────────────────────────────────────────────────
 CENTER_BIN_MAP = 256
