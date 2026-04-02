@@ -34,7 +34,7 @@ from torch.utils.data import DataLoader
 # Project-local imports – adjust paths via CLI or environment if needed.
 # ---------------------------------------------------------------------------
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
+sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
 from akita.model import SeqNN
 from utils.data_utils import from_upper_triu_batch

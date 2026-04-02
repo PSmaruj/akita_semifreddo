@@ -19,7 +19,7 @@ from pyfaidx import Fasta
 from torch.utils.data import DataLoader, Dataset
 
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
+sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
 from akita.model import SeqNN
 from utils.data_utils import from_upper_triu_batch, one_hot_encode_sequence

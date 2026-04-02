@@ -19,7 +19,7 @@ import torch
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 sys.path.insert(0, "/home1/smaruj/pytorch_akita")
-sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
+sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
 from utils.data_utils import from_upper_triu_batch
 from utils.model_utils import load_model

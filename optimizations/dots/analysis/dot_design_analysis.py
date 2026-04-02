@@ -22,7 +22,7 @@ from torch.utils.data import DataLoader
 from memelite import fimo
 
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
+sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
 from utils.dataset_utils import DoubleInsertionDataset, SequenceDataset, TriuMatrixDataset
 from utils.data_utils import from_upper_triu_batch, gc_content

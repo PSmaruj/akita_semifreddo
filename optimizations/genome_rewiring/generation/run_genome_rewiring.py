@@ -26,11 +26,11 @@ import torch
 # Cloned ledidi repo takes priority over any pip-installed version
 sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi/"))
 
-# Akita model package — appended so its utils/ does NOT shadow ledidi_akita/utils/
+# Akita model package — appended so its utils/ does NOT shadow akita_semifreddo/utils/
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
 
 # Project root — gives access to utils/
-sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
+sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 # --------------------------------------------------------------------------
 
 from ledidi import ledidi

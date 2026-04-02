@@ -29,7 +29,7 @@ import torch.nn as nn
 
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
 sys.path.insert(0, "/home1/smaruj/ledidi/ledidi/")
-sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
+sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
 from akita.model import SeqNN
 from ledidi import Ledidi

@@ -15,7 +15,7 @@ import torch.nn as nn
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
+sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 from utils.fimo_utils import run_fimo
 from .semifreddo import CTCFAwareSemifreddoWrapper
 

@@ -37,7 +37,7 @@ import pandas as pd
 import torch
 
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
+sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
 from akita.model import SeqNN
 from utils.model_utils import store_tower_output

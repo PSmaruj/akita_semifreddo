@@ -29,7 +29,7 @@ import torch
 from torch.utils.data import DataLoader
 
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
+sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
 from akita.model import SeqNN
 from semifreddo.optimization_loop import strength_tag

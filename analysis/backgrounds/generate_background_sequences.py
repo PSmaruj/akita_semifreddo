@@ -39,7 +39,7 @@ import seqpro as sp
 from pyfaidx import Fasta
 
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
+sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
 from utils.model_utils import load_model
 from utils.data_utils import one_hot_encode_sequence, from_upper_triu

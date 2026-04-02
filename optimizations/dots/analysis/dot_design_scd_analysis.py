@@ -18,7 +18,7 @@ import torch
 from torch.utils.data import DataLoader
 
 sys.path.append(os.path.abspath("/home1/smaruj/pytorch_akita/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi_akita/"))
+sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
 from utils.dataset_utils import DoubleInsertionDataset, SequenceDataset
 from utils.model_utils import load_model
