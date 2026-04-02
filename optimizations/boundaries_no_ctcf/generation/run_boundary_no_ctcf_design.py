@@ -43,7 +43,7 @@ DEFAULT_MASK_PATH         = f"{_PROJ}/optimizations/feature_masks/boundary_mask.
 DEFAULT_RESULTS_BASE_DIR  = f"{_PROJ}/optimizations/boundaries_no_ctcf"
 DEFAULT_FLAT_REGIONS_BASE = f"{_PROJ}/analysis/flat_regions/mouse_flat_regions_chrom_states_tsv"
 
-CTCF_PWM_PATH = "/home1/smaruj/ledidi_akita/data/pwm/MA0139.1.meme"
+CTCF_PWM_PATH = "/home1/smaruj/akita_semifreddo/data/pwm/MA0139.1.meme"
 
 # ── Semifreddo / architecture constants ───────────────────────────────────────
 CENTER_BIN_MAP   = 256
