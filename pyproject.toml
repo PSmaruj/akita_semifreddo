@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "akita_semifreddo"
+version = "0.1.0"
+description = "Sequence design for 3D genome folding using a half-frozen Akita model and the Ledidi optimizer"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+
+authors = [
+    { name = "Paulina Smaruj", email = "smaruj@usc.edu" }
+]
+
+keywords = [
+    "genomics", "deep learning", "3D genome", "sequence design",
+    "chromatin", "Hi-C", "CTCF", "Akita", "Ledidi"
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+
+dependencies = [
+    "torch>=1.13",
+    "numpy>=1.23",
+    "pandas>=1.5",
+    "scipy>=1.9",
+    "matplotlib>=3.6",
+    "seaborn>=0.12",
+    "pyfaidx>=0.7",
+    "cooltools>=0.5",
+    "ledidi @ git+https://github.com/jmschrei/ledidi/"
+]
+
+[project.optional-dependencies]
+dev = [
+    "jupyter",
+    "ipykernel",
+    "pytest",
+    "black",
+    "ruff",
+]
+
+[project.urls]
+Homepage = "https://github.com/PSmaruj/akita_semifreddo"
+Repository = "https://github.com/PSmaruj/akita_semifreddo"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["semifreddo*", "utils*"]

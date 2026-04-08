@@ -31,6 +31,12 @@ conda env create -f environment.yml
 conda activate akita_semifreddo
 ```
 
+### Alternative: Install via pip (no cloning required)
+
+```bash
+pip install git+https://github.com/PSmaruj/akita_semifreddo.git
+```
+
 ### 3. Install PyTorch Akita
 
 Akita Semifreddo requires the PyTorch Akita V2 model. Clone and install it separately:
