@@ -187,10 +187,34 @@ See the `tutorial/` directory for complete step-by-step notebooks.
 
 ## Tutorials
 
-Two tutorials are provided in `tutorial/`:
+Four tutorials are provided in `tutorial/`, written as annotated Python scripts
+with cells delimited by `# %%` comments (compatible with Jupyter, VS Code, and
+Spyder). Each tutorial is self-contained: it generates all required intermediate
+files from scratch, saves them to a local `tmp_data/` directory, and removes
+them at the end. Before running any tutorial, make sure your environment matches
+`environment.yml` / `requirements.txt` and update the path constants at the top
+of each script.
 
-- **`boundary_optimization.ipynb`** — end-to-end walkthrough of designing a new TAD boundary in a flat genomic region, covering flat region selection, target construction, Semifreddo setup, Ledidi optimization, and result visualization
-- **`smiley_face.ipynb`** — designing a sequence toward an arbitrary custom contact map target (smiley face), demonstrating that the pipeline is not limited to biologically-motivated features
+- **`tutorial_01_boundary_design.ipynb`** — end-to-end walkthrough of designing a
+  strong TAD boundary in a flat genomic region. Covers one-hot encoding,
+  boundary mask construction, tower output caching, `SemifreddoLedidiWrapper`
+  setup and sanity-checking, Ledidi optimisation, CTCF motif analysis, and
+  result visualisation. Recommended starting point.
+
+- **`tutorial_02_dot_design.ipynb`** — designing a chromatin loop (dot) using a
+  data-driven 15×15 Hi-C pileup patch (provided in `data/`) as the target.
+  Introduces `TwoAnchorSemifreddoLedidiWrapper`, which optimises two anchor
+  bins simultaneously — one per loop anchor.
+
+- **`tutorial_03_flame_design.ipynb`** — designing a chromatin stripe (flame) by
+  stamping an analytical 'L'-shaped stripe mask onto the contact map. Uses the
+  same single-anchor `SemifreddoLedidiWrapper` as Tutorial 1.
+
+- **`tutorial_04_custom_target.ipynb`** — designing a sequence toward a fully
+  arbitrary custom contact map target (a smiley face). Demonstrates that the
+  only requirement for a custom AkitaSF design is a mask function that converts
+  an idea into an upper-triangular index vector. Results should be interpreted
+  critically and assessed visually.
 
 ## Key Design Choices
 
