@@ -116,13 +116,14 @@ akita_semifreddo/
 │   └── sine_b2_tables/             # SINE B2 element tables
 │
 ├── 📁 tutorial/                    # Step-by-step worked examples
-│   ├── tutorial_01_boundary_design.py   # End-to-end boundary design
-│   ├── tutorial_02_dot_design.py        # Chromatin loop (dot) design
-│   ├── tutorial_03_flame_design.py      # Stripe (flame) design
-│   └── tutorial_04_custom_target.py       # Custom contact map target design (smiley face)
+│   ├── tutorial_01_boundary_design.ipynb   # End-to-end boundary design
+│   ├── tutorial_02_dot_design.ipynb        # Chromatin loop (dot) design
+│   ├── tutorial_03_flame_design.ipynb      # Stripe (flame) design
+│   └── tutorial_04_custom_target.ipynb       # Custom contact map target design (smiley face)
 │
 ├── environment.yml
 ├── requirements.txt
+├── pyproject.toml
 └── LICENSE
 ```
 
