@@ -119,7 +119,7 @@ akita_semifreddo/
 │   ├── tutorial_01_boundary_design.py   # End-to-end boundary design
 │   ├── tutorial_02_dot_design.py        # Chromatin loop (dot) design
 │   ├── tutorial_03_flame_design.py      # Stripe (flame) design
-│   └── tutorial_04_smiley_face.py       # Custom contact map target design (smiley face)
+│   └── tutorial_04_custom_target.py       # Custom contact map target design (smiley face)
 │
 ├── environment.yml
 ├── requirements.txt
