@@ -35,6 +35,7 @@ dependencies = [
     "seaborn>=0.12",
     "pyfaidx>=0.7",
     "cooltools>=0.5",
+    "memelite",
     "ledidi @ git+https://github.com/jmschrei/ledidi/"
 ]
 
