@@ -17,35 +17,44 @@ Five design experiments are performed across 8 cross-validation folds in mouse m
 
 ## Installation
 
-### 1. Clone the Repository
+### Option A — pip
 
-```bash
-git clone https://github.com/PSmaruj/akita_semifreddo.git
-cd akita_semifreddo
-```
-
-### 2. Set Up Environment
-
-```bash
-conda env create -f environment.yml
-conda activate akita_semifreddo
-```
-
-### Alternative: Install via pip (no cloning required)
+If you want to use the `semifreddo` and `utils` modules in your own code
+without modifying them:
 
 ```bash
 pip install git+https://github.com/PSmaruj/akita_semifreddo.git
 ```
 
-### 3. Install PyTorch Akita
+> **Note:** The pip installation does not include the tutorial scripts,
+> analysis notebooks, or optimization code. If you want to run the tutorials
+> or modify the source code, please clone the repository (Option B).
 
-Akita Semifreddo requires the PyTorch Akita V2 model. Clone and install it separately:
+### Option B — clone (recommended for tutorials and development)
+
+```bash
+git clone https://github.com/PSmaruj/akita_semifreddo.git
+cd akita_semifreddo
+
+conda env create -f environment.yml
+conda activate akita_semifreddo
+```
+
+### Installing PyTorch Akita
+
+Both options require the PyTorch Akita V2 model. Clone it separately to gain
+access to the pretrained and fine-tuned model weights:
 
 ```bash
 git clone https://github.com/PSmaruj/akita_pytorch.git
 ```
 
-Pre-trained and fine-tuned model weights are available in that repository.
+The model class can also be pip-installed on its own, but note that **model
+weights are only available by cloning the repository**:
+
+```bash
+pip install git+https://github.com/PSmaruj/akita_pytorch.git
+```
 
 
 ### 4. AlphaGenome (optional — validation only)
