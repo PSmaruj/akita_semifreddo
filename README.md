@@ -56,6 +56,25 @@ weights are only available by cloning the repository**:
 pip install git+https://github.com/PSmaruj/akita_pytorch.git
 ```
 
+### Using AkitaSF together with AkitaPT (recommended)
+
+If you plan to use AkitaSF with AkitaPT as described in the paper, we recommend
+setting up a single shared environment based on AkitaPT's `environment.yml` and
+installing the additional AkitaSF dependencies on top:
+
+```bash
+# Clone both repositories
+git clone https://github.com/PSmaruj/akita_pytorch.git
+git clone https://github.com/PSmaruj/akita_semifreddo.git
+
+# Create and activate the AkitaPT environment
+cd akita_pytorch
+conda env create -f environment.yml
+conda activate pytorch_akita
+
+# Install the additional AkitaSF dependencies
+pip install memelite==0.2.0 tangermeme==1.0.0 ledidi==2.1.0 seqpro==0.9.0 tqdm==4.67.1
+```
 
 ### 4. AlphaGenome (optional — validation only)
 
