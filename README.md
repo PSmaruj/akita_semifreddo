@@ -145,6 +145,7 @@ akita_semifreddo/
 │
 ├── 📁 data/                        # Reference data
 │   ├── ctcf_tables/                # CTCF binding site tables
+│   ├── data_driven_dot/            # Data-driven dot patch used to construct the dot mask
 │   ├── pwm/                        # Position weight matrices (JASPAR CTCF MA0139.1)
 │   └── sine_b2_tables/             # SINE B2 element tables
 │
