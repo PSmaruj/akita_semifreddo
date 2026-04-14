@@ -40,6 +40,11 @@ conda env create -f environment.yml
 conda activate akita_semifreddo
 ```
 
+> **Note:** The default environment is configured for GPU systems (CUDA 11.8).
+> If you are on a CPU-only system, see the comments in
+> [`environment.yml`](environment.yml) and [`requirements.txt`](requirements.txt)
+> for instructions on switching to the CPU-only PyTorch build.
+
 ### Installing PyTorch Akita
 
 Both options require the PyTorch Akita V2 model. Clone it separately to gain

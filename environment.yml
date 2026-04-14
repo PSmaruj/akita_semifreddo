@@ -22,9 +22,10 @@ dependencies:
   - tqdm=4.67.1
   - pip
   - pip:
-    # PyTorch (CUDA 11.8 — adjust for your hardware)
-    # For CPU-only: pip install torch==2.3.1
+    # PyTorch — GPU (CUDA 11.8, default)
+    # CPU-only: comment out the line below and uncomment the CPU line
     - torch==2.3.1+cu118 --index-url https://download.pytorch.org/whl/cu118
+    # - torch==2.3.1  # CPU-only
     # Sequence design
     - ledidi==2.1.0
     # Motif scanning

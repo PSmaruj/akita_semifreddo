@@ -3,10 +3,13 @@ numpy==1.26.4
 pandas==2.3.3
 scipy==1.15.2
 matplotlib==3.10.8
+seaborn==0.13.2
 
-# PyTorch (CUDA 11.8 — adjust for your hardware)
-# Install via: pip install torch==2.3.1+cu118 --index-url https://download.pytorch.org/whl/cu118
+# PyTorch — GPU (CUDA 11.8, default)
+# CPU-only: comment out the --index-url line and change the package to torch==2.3.1
+--index-url https://download.pytorch.org/whl/cu118
 torch==2.3.1+cu118
+# torch==2.3.1  # CPU-only (uncomment and remove the two lines above)
 
 # Genomics
 pyfaidx==0.9.0.3
@@ -25,4 +28,3 @@ ledidi==2.1.0
 
 # Utilities
 tqdm==4.67.1
-seaborn==0.13.2
