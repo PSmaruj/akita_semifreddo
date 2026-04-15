@@ -28,3 +28,7 @@ ledidi==2.1.0
 
 # Utilities
 tqdm==4.67.1
+
+# AkitaPT and AkitaSF
+git+https://github.com/PSmaruj/akita_pytorch.git
+git+https://github.com/PSmaruj/akita_semifreddo.git

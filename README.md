@@ -47,18 +47,38 @@ conda activate akita_semifreddo
 
 ### Installing PyTorch Akita
 
-Both options require the PyTorch Akita V2 model. Clone it separately to gain
-access to the pretrained and fine-tuned model weights:
+Both options require the PyTorch Akita V2 model. Clone it separately:
 
 ```bash
 git clone https://github.com/PSmaruj/akita_pytorch.git
 ```
 
-The model class can also be pip-installed on its own, but note that **model
-weights are only available by cloning the repository**:
+The model class can also be pip-installed on its own:
 
 ```bash
 pip install git+https://github.com/PSmaruj/akita_pytorch.git
+```
+
+### Downloading Model Weights
+
+The fine-tuned PyTorch AkitaV2 model weights are hosted on Zenodo: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19599537.svg)](https://doi.org/10.5281/zenodo.19599537)
+
+**The weights are required to reproduce the analyses from the paper and to run the tutorials.** To download and extract them, run from the root of the `akita_pytorch` directory:
+
+```bash
+wget -O akita_pytorch_model_weights.tar.gz https://zenodo.org/record/19599537/files/akita_pytorch_model_weights.tar.gz
+tar -xzf akita_pytorch_model_weights.tar.gz && rm akita_pytorch_model_weights.tar.gz
+```
+
+This will recreate the `models/` directory with the following structure:
+
+```
+models/
+├── finetuned/
+│   ├── mouse/<dataset>/checkpoints/*.pth
+│   └── human/<dataset>/checkpoints/*.pth
+└── trained_from_scratch/
+    └── mouse/<dataset>/checkpoints/*.pth
 ```
 
 ### Using AkitaSF together with AkitaPT (recommended)
@@ -81,7 +101,7 @@ conda activate pytorch_akita
 pip install memelite==0.2.0 tangermeme==1.0.0 ledidi==2.1.0 seqpro==0.9.0 tqdm==4.67.1
 ```
 
-### 4. AlphaGenome (optional — validation only)
+### AlphaGenome (optional — validation only)
 
 The cross-model validation notebooks (`analysis/alpha_genome_validation/`)
 require AlphaGenome, which is not available on PyPI and must be set up
@@ -89,7 +109,7 @@ separately:
 
 1. Follow the installation instructions at the [AlphaGenome repository](https://github.com/google-deepmind/alphagenome)
 2. AlphaGenome requires its own conda environment — we recommend keeping
-   it separate from the main `akitaSF` environment and running the
+   it separate from the main `akita_semifreddo` environment and running the
    validation notebooks within it
 3. Obtain your own API key from Google and set it in the notebooks:
    ```python
@@ -99,7 +119,7 @@ separately:
 
 > **Note:** AlphaGenome validation is not required to run the core AkitaSF
 > sequence design pipeline. All optimization scripts and tutorials work
-> with the main `akitaSF` environment only.
+> with the main `akita_semifreddo` environment only.
 
 
 ## Repository Structure
@@ -160,65 +180,6 @@ akita_semifreddo/
 ├── pyproject.toml
 └── LICENSE
 ```
-
-## Quick Start
-
-### Running a boundary design optimization
-
-```python
-from semifreddo.semifreddo import SemifreddoLedidiWrapper
-from semifreddo.losses import LocalL1Loss
-from utils.model_utils import load_model, store_tower_output, make_target
-from utils.data_utils import one_hot_encode_sequence, fragment_indices_in_upper_triangular
-
-import torch
-from ledidi import Ledidi
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-# Load model and sequence
-model = load_model("path/to/model.pth", device)
-X = torch.load("path/to/sequence_X.pt", weights_only=True).to(device)  # (1, 4, 1310720)
-
-# Cache convolutional tower activations
-store_tower_output(X, model, "tower_out.pt")
-tower = torch.load("tower_out.pt").to(device)
-
-# Build Semifreddo wrapper for the central bin
-sf_wrapper = SemifreddoLedidiWrapper(
-    model=model,
-    precomputed_full_output=tower,
-    full_X=X,
-    edited_bin=256,       # centre of the 512-bin contact map
-    context_bins=5,
-    cropping_applied=64,
-)
-
-# Define masked loss and optimization target
-mask   = torch.load("path/to/boundary_mask.pt").to(device)
-loss   = LocalL1Loss(mask, n_triu=130305, reduction="sum").to(device)
-target = torch.load("path/to/target.pt").to(device)
-
-# Run Ledidi optimization
-X_center = X[:, :, sf_wrapper.center_bp_start:sf_wrapper.center_bp_end]
-
-optimizer = Ledidi(
-    sf_wrapper,
-    shape=X_center.shape[1:],
-    input_loss=torch.nn.L1Loss(reduction="sum"),
-    output_loss=loss,
-    batch_size=1,
-    l=0.01,
-    max_iter=2000,
-    early_stopping_iter=2000,
-    return_history=True,
-    verbose=True,
-).cuda()
-
-generated_seq, history = optimizer.fit_transform(X_center, target)
-```
-
-See the `tutorial/` directory for complete step-by-step notebooks.
 
 ## Tutorials
 
