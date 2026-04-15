@@ -36,7 +36,8 @@ dependencies = [
     "pyfaidx>=0.7",
     "cooltools>=0.5",
     "memelite",
-    "ledidi @ git+https://github.com/jmschrei/ledidi/"
+    "ledidi @ git+https://github.com/jmschrei/ledidi/",
+    "akita_pytorch @ git+https://github.com/PSmaruj/akita_pytorch.git",
 ]
 
 [project.optional-dependencies]
