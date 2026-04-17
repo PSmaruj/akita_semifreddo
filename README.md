@@ -121,6 +121,46 @@ separately:
 > sequence design pipeline. All optimization scripts and tutorials work
 > with the main `akita_semifreddo` environment only.
 
+## Tutorials
+
+Four tutorials are provided in `tutorial/`, written as annotated Python scripts
+with cells delimited by `# %%` comments (compatible with Jupyter, VS Code, and
+Spyder). Each tutorial is self-contained: it generates all required intermediate
+files from scratch, saves them to a local `tmp_data/` directory, and removes
+them at the end. Before running any tutorial, make sure your environment matches
+`environment.yml` / `requirements.txt` and update the path constants at the top
+of each script.
+
+- **`tutorial_01_boundary_design.ipynb`** — end-to-end walkthrough of designing a
+  strong TAD boundary in a flat genomic region. Covers one-hot encoding,
+  boundary mask construction, tower output caching, `SemifreddoLedidiWrapper`
+  setup and sanity-checking, Ledidi optimisation, CTCF motif analysis, and
+  result visualisation. Recommended starting point.
+
+- **`tutorial_02_dot_design.ipynb`** — designing a chromatin loop (dot) using a
+  data-driven 15×15 Hi-C pileup patch (provided in `data/`) as the target.
+  Introduces `TwoAnchorSemifreddoLedidiWrapper`, which optimises two anchor
+  bins simultaneously — one per loop anchor.
+
+- **`tutorial_03_flame_design.ipynb`** — designing a chromatin stripe (flame) by
+  stamping an analytical 'L'-shaped stripe mask onto the contact map. Uses the
+  same single-anchor `SemifreddoLedidiWrapper` as Tutorial 1.
+
+- **`tutorial_04_custom_target.ipynb`** — designing a sequence toward a fully
+  arbitrary custom contact map target (a smiley face). Demonstrates that the
+  only requirement for a custom AkitaSF design is a mask function that converts
+  an idea into an upper-triangular index vector. Results should be interpreted
+  critically and assessed visually.
+
+## Key Design Choices
+
+**Semifreddo efficiency.** The convolutional tower of Akita V2 has a receptive field of ~10 kb (~5 bins at 2048 bp/bin). Semifreddo exploits this by recomputing only an 11-bin window around the edited bin on each optimization step, reducing tower computation from 640 bins to 11 bins per step.
+
+**Local masked loss.** `LocalL1Loss` computes L1 loss only over the contact map positions where the target feature is expected, scaled by the inverse of the mask's coverage fraction to keep loss magnitudes comparable across mask sizes. The mask can be extended beyond the feature itself to implement a semi-local loss that simultaneously constrains neighboring regions.
+
+**CTCF penalty.** `LocalL1LossWithCTCFPenalty` adds a FIMO-based penalty term (γ × Σ FIMO scores) to discourage CTCF motif insertion in the edited bin, used for boundary designs that should not rely on CTCF recruitment.
+
+**Cross-validation.** All designs are run across 8 folds of the Akita V2 train/validation split, with held-out models used as independent validators within Akita, and AlphaGenome used as a fully independent external validator.
 
 ## Repository Structure
 
@@ -180,47 +220,6 @@ akita_semifreddo/
 ├── pyproject.toml
 └── LICENSE
 ```
-
-## Tutorials
-
-Four tutorials are provided in `tutorial/`, written as annotated Python scripts
-with cells delimited by `# %%` comments (compatible with Jupyter, VS Code, and
-Spyder). Each tutorial is self-contained: it generates all required intermediate
-files from scratch, saves them to a local `tmp_data/` directory, and removes
-them at the end. Before running any tutorial, make sure your environment matches
-`environment.yml` / `requirements.txt` and update the path constants at the top
-of each script.
-
-- **`tutorial_01_boundary_design.ipynb`** — end-to-end walkthrough of designing a
-  strong TAD boundary in a flat genomic region. Covers one-hot encoding,
-  boundary mask construction, tower output caching, `SemifreddoLedidiWrapper`
-  setup and sanity-checking, Ledidi optimisation, CTCF motif analysis, and
-  result visualisation. Recommended starting point.
-
-- **`tutorial_02_dot_design.ipynb`** — designing a chromatin loop (dot) using a
-  data-driven 15×15 Hi-C pileup patch (provided in `data/`) as the target.
-  Introduces `TwoAnchorSemifreddoLedidiWrapper`, which optimises two anchor
-  bins simultaneously — one per loop anchor.
-
-- **`tutorial_03_flame_design.ipynb`** — designing a chromatin stripe (flame) by
-  stamping an analytical 'L'-shaped stripe mask onto the contact map. Uses the
-  same single-anchor `SemifreddoLedidiWrapper` as Tutorial 1.
-
-- **`tutorial_04_custom_target.ipynb`** — designing a sequence toward a fully
-  arbitrary custom contact map target (a smiley face). Demonstrates that the
-  only requirement for a custom AkitaSF design is a mask function that converts
-  an idea into an upper-triangular index vector. Results should be interpreted
-  critically and assessed visually.
-
-## Key Design Choices
-
-**Semifreddo efficiency.** The convolutional tower of Akita V2 has a receptive field of ~10 kb (~5 bins at 2048 bp/bin). Semifreddo exploits this by recomputing only an 11-bin window around the edited bin on each optimization step, reducing tower computation from 640 bins to 11 bins per step.
-
-**Local masked loss.** `LocalL1Loss` computes L1 loss only over the contact map positions where the target feature is expected, scaled by the inverse of the mask's coverage fraction to keep loss magnitudes comparable across mask sizes. The mask can be extended beyond the feature itself to implement a semi-local loss that simultaneously constrains neighboring regions.
-
-**CTCF penalty.** `LocalL1LossWithCTCFPenalty` adds a FIMO-based penalty term (γ × Σ FIMO scores) to discourage CTCF motif insertion in the edited bin, used for boundary designs that should not rely on CTCF recruitment.
-
-**Cross-validation.** All designs are run across 8 folds of the Akita V2 train/validation split, with held-out models used as independent validators within Akita, and AlphaGenome used as a fully independent external validator.
 
 ## Citation
 
