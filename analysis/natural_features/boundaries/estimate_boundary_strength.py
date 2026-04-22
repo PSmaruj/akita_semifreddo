@@ -18,9 +18,6 @@ import torch
 from pyfaidx import Fasta
 from torch.utils.data import DataLoader, Dataset
 
-sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
-
 from akita.model import SeqNN
 from utils.data_utils import from_upper_triu_batch, one_hot_encode_sequence
 
@@ -29,18 +26,13 @@ from utils.data_utils import from_upper_triu_batch, one_hot_encode_sequence
 # ---------------------------------------------------------------------------
 
 BOUNDARIES_TSV = (
-    "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
-    "/analysis/natural_features/boundaries/mouse_natural_boundaries.tsv"
+    "/path/to/your/set/of/boundaries"
 )
 OUTPUT_TSV = (
-    "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
-    "/analysis/natural_features/boundaries/mouse_natural_boundaries_strength.tsv"
+    "/path/to/your/output"
 )
-FASTA_FILE = "/project2/fudenber_735/genomes/mm10/mm10.fa"
-MODEL_CKPT = (
-    "/home1/smaruj/akita_pytorch/models/finetuned/mouse/Hsieh2019_mESC"
-    "/checkpoints/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
-)
+FASTA_FILE = os.environ["MOUSE_GENOME_FASTA"]
+MODEL_CKPT = os.environ["MOUSE_MODEL_CKPT"]
 
 # ---------------------------------------------------------------------------
 # Constants

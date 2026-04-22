@@ -12,8 +12,9 @@ replace bin 295 (anchor 0) and the second 2048 bp replace bin 345 (anchor 1).
 import torch
 import pandas as pd
 from helper import load_and_splice, trim_and_decode, save_to_fasta
+import os
 
-BASE = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
+BASE = os.environ["AKITA_SF_DIR"]
 
 FEATURE      = "dot"
 FOLDS        = range(8)

@@ -8,8 +8,9 @@ Original FASTAs are written separately by prepare_original_sequences.py.
 import torch
 import pandas as pd
 from helper import load_and_splice, trim_and_decode, save_to_fasta
+import os
 
-BASE = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
+BASE = os.environ["AKITA_SF_DIR"]
 
 FEATURE = "boundary_no_ctcf"
 FOLDS   = range(8)

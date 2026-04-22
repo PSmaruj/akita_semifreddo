@@ -11,8 +11,9 @@ For dot:   copy this file, set FEATURE = "dot" and update EDIT_SPEC.
 import torch
 import pandas as pd
 from helper import load_and_splice, trim_and_decode, save_to_fasta
+import os
 
-BASE = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
+BASE = os.environ["AKITA_SF_DIR"]
 
 FEATURE = "boundary"
 FOLDS   = range(8)

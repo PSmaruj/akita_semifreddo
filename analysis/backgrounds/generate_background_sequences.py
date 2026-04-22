@@ -38,9 +38,6 @@ import torch
 import seqpro as sp
 from pyfaidx import Fasta
 
-sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
-
 from utils.model_utils import load_model
 from utils.data_utils import one_hot_encode_sequence, from_upper_triu
 
@@ -48,18 +45,13 @@ from utils.data_utils import one_hot_encode_sequence, from_upper_triu
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-MODEL_CKPT = (
-    "/home1/smaruj/akita_pytorch/models/finetuned/mouse/Hsieh2019_mESC"
-    "/checkpoints/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
-)
-GENOME_FASTA = "/project2/fudenber_735/genomes/mm10/mm10.fa"
+MODEL_CKPT = os.environ["MOUSE_MODEL_CKPT"]
+GENOME_FASTA = os.environ["MOUSE_GENOME_FASTA"]
 TSV_PATH = (
-    "/home1/smaruj/akitaV2-analyses/experiments/background_generation"
-    "/background_generation/input_data/50seqs_GCuniform_maxSCD35.tsv"
-)
+    "your/tsv/path"
+) # can be downloaded from https://github.com/Fudenberg-Research-Group/akitaV2-analyses/tree/main/experiments/background_generation/background_generation/input_data
 OUTPUT_FASTA = (
-    "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
-    "/analysis/background_generation/background_sequences_scd30_totvar1300.fasta"
+    "your/output/path"
 )
 
 # ---------------------------------------------------------------------------

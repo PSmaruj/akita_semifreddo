@@ -8,14 +8,14 @@ across all 8 folds and append the result to the existing per-fold TSVs.
 import pandas as pd
 from alphagenome.models import dna_client
 from helper import rmsd_fasta_dirs
+import os
+
+API_KEY = os.environ["ALPHAGENOME_API_KEY"]
 
 # ── Config ─────────────────────────────────────────────────────────────────────
-
-BASE    = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
+BASE = os.environ["AKITA_SF_DIR"]
 FEATURE = "dot"
 FOLDS   = range(8)
-
-# API_KEY = # set your API key here
 
 # ── Main ───────────────────────────────────────────────────────────────────────
 

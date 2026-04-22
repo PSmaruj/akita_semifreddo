@@ -16,18 +16,18 @@ Usage:
 
 import pandas as pd
 import bioframe as bf
+import os
 
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
 
-CHROM_SIZES_FILE = "/project2/fudenber_735/genomes/mm10/mm10.chrom.sizes.reduced"
+CHROM_SIZES_FILE = os.environ["MOUSE_CHROM_SIZES_FILE"]
 DOT_FILE = (
-    "/project2/fudenber_735/GEO/bonev_2017_GSE96107/distiller-0.3.1_mm10"
-    "/results/coolers/features/mustache_HiC_ES.mm10.mapq_30.10000.tsv"
+    "/path/to/your/dot/file"
 )
-JASPAR_FILE = "/project2/fudenber_735/motifs/mm10/jaspar/MA0139.1.tsv.gz"
-OUTPUT_TSV = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/analysis/natural_features/dots/mouse_convergent_dots.tsv"
+JASPAR_FILE = "/path/to/jaspar/instances"
+OUTPUT_TSV = "mouse_convergent_dots.tsv"
 
 # ---------------------------------------------------------------------------
 # Constants

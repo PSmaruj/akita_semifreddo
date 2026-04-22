@@ -22,8 +22,6 @@ import torch
 from torch.utils.data import DataLoader
 from scipy.stats import pearsonr
 
-# Project root — gives access to utils/
-sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 # --------------------------------------------------------------------------
 
 from utils.dataset_utils import HiCDataset

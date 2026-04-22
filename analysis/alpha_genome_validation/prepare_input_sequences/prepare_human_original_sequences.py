@@ -11,8 +11,9 @@ import pandas as pd
 from helper import (
     load_and_splice, trim_and_decode, save_to_fasta
 )
+import os
 
-BASE = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
+BASE = os.environ["AKITA_SF_DIR"]
 
 FOLDS  = range(8)
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")

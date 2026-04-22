@@ -8,14 +8,14 @@ sequences for all 8 folds and save per-fold TSVs with boundary and URQ scores.
 import pandas as pd
 from alphagenome.models import dna_client
 from helper import boundary_score, score_fasta_dir
+import os
+
+API_KEY = os.environ["ALPHAGENOME_API_KEY"]
 
 # ── Config ─────────────────────────────────────────────────────────────────────
-
-BASE    = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
+BASE = os.environ["AKITA_SF_DIR"]
 FEATURE = "boundary_suppression"
 FOLDS   = range(8)
-
-# API_KEY = # set your API key here
 
 DF_PATH = f"{BASE}/optimizations/boundaries/successful_optimizations_-0.5.tsv"
 

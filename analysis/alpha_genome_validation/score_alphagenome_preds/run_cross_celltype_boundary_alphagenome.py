@@ -12,16 +12,17 @@ original and designed sequences.
 import numpy as np
 import pandas as pd
 from alphagenome.models import dna_client
+import os
+
+API_KEY = os.environ["ALPHAGENOME_API_KEY"]
 
 from helper import boundary_score, score_fasta_dir
 import helper as alpha_helper
 
 # ── Constants ─────────────────────────────────────────────────────────────────
-
-BASE  = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
+BASE = os.environ["AKITA_SF_DIR"]
 FOLDS = range(8)
 
-# API_KEY  = # set your API key here
 ORGANISM = dna_client.Organism.HOMO_SAPIENS
 
 CELL_TYPES = {
