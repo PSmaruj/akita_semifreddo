@@ -28,9 +28,6 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 
-sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
-
 from akita.model import SeqNN
 from semifreddo.optimization_loop import strength_tag
 from utils.dataset_utils import CentralInsertionDataset, SequenceDataset
@@ -38,10 +35,10 @@ from utils.data_utils import from_upper_triu_batch
 from utils.scores_utils import compute_insulation_scores
 
 # ── Fixed paths ───────────────────────────────────────────────────────────────
-_PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
+_PROJ = os.environ["AKITA_SF_DIR"]
 
 MODEL_PATH_PATTERN = (
-    "/home1/smaruj/akita_pytorch/models/finetuned/human/"
+    "/path/to/downloaded/checkpoints"
     "Krietenstein2019_{cell_type}/checkpoints/"
     "Akita_v2_human_Krietenstein2019_{cell_type}_model{model_idx}_finetuned.pth"
 )

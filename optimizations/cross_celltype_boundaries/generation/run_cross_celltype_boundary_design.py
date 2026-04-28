@@ -27,10 +27,6 @@ import pandas as pd
 import torch
 import torch.nn as nn
 
-sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
-sys.path.insert(0, "/home1/smaruj/ledidi/ledidi/")
-sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
-
 from akita.model import SeqNN
 from ledidi import Ledidi
 from semifreddo.semifreddo import SemifreddoLedidiWrapper, StackingDesignWrapper
@@ -38,10 +34,10 @@ from semifreddo.optimization_loop import strength_tag, build_stem, count_edits, 
 from semifreddo.losses import LocalL1Loss
 
 # ── Default paths ─────────────────────────────────────────────────────────────
-_PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
+_PROJ = os.environ["AKITA_SF_DIR"]
 
 MODEL_PATH_PATTERN = (
-    "/home1/smaruj/akita_pytorch/models/finetuned/human/"
+    "/path/to/downloaded/checkpoints"
     "Krietenstein2019_{cell_type}/checkpoints/"
     "Akita_v2_human_Krietenstein2019_{cell_type}_model{model_idx}_finetuned.pth"
 )

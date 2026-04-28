@@ -36,9 +36,6 @@ import sys
 import pandas as pd
 import torch
 
-sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
-
 from akita.model import SeqNN
 from utils.model_utils import store_tower_output
 
@@ -55,28 +52,20 @@ MOD_SLICE_START = CENTER_BIN_640 * BIN_SIZE
 MOD_SLICE_END   = (CENTER_BIN_640 + 1) * BIN_SIZE
 
 SUCCESSFUL_OPT_TSV = (
-    "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/"
-    "optimizations/boundaries/successful_optimizations_-0.5.tsv"
+    "path/to/successful_optimizations_-0.5.tsv"
 )
+BASE = os.environ["AKITA_SF_DIR"]
 SEQ_PATH_PATTERN = (
-    "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/"
-    "analysis/flat_regions/mouse_sequences/"
+    f"{BASE}/analysis/flat_regions/mouse_sequences/"
     "fold{fold}/{chrom}_{start}_{end}_X.pt"
 )
 GEN_SEQ_PATH_PATTERN = (
-    "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/"
-    "optimizations/boundaries/results/boundary_neg0p5/"
+    f"{BASE}/optimizations/boundaries/results/boundary_neg0p5/"
     "fold{fold}/{chrom}_{start}_{end}_gen_seq.pt"
 )
-MODEL_PATH_PATTERN = (
-    "/home1/smaruj/akita_pytorch/models/finetuned/mouse/Hsieh2019_mESC/checkpoints/"
-    "Akita_v2_mouse_Hsieh2019_mESC_model{model_idx}_finetuned.pth"
-)
+MODEL_PATH_PATTERN = os.environ["MOUSE_MODEL_CKPT"]
 
-ROOT_OUTPUT_DIR = (
-    "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/"
-    "optimizations/boundary_suppression"
-)
+ROOT_OUTPUT_DIR = "./../"
 
 # =============================================================================
 # Argument parsing

@@ -26,9 +26,6 @@ import seqpro as sp
 import torch
 from torch.utils.data import DataLoader, Dataset
 
-sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
-
 from semifreddo.optimization_loop import strength_tag
 from utils.dataset_utils import ShuffledCentralInsertionDataset
 from utils.data_utils import from_upper_triu_batch
@@ -36,12 +33,9 @@ from utils.model_utils import load_model
 from utils.scores_utils import compute_insulation_scores
 
 # ── Fixed paths ───────────────────────────────────────────────────────────────
-_PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
+_PROJ = os.environ["AKITA_SF_DIR"]
 
-MODEL_CKPT        = (
-    "/home1/smaruj/akita_pytorch/models/finetuned/mouse/Hsieh2019_mESC"
-    "/checkpoints/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
-)
+MODEL_CKPT        = os.environ["MOUSE_MODEL_CKPT"]
 SEQ_BASE_DIR      = f"{_PROJ}/analysis/flat_regions"
 RESULTS_BASE_DIR  = f"{_PROJ}/optimizations/boundaries_no_ctcf"
 

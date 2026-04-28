@@ -17,31 +17,14 @@ import numpy as np
 import pandas as pd
 import torch
 
-# ── Paths ─────────────────────────────────────────────────────────────────────
-sys.path.insert(0, "/home1/smaruj/akita_pytorch")
-sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
-
 from utils.data_utils import from_upper_triu_batch
 from utils.model_utils import load_model
 from utils.scores_utils import compute_insulation_scores
 
-TSV_PATH   = (
-    "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/"
-    "boundary_suppression/results/successful_optimizations.tsv"
-)
-OHE_ROOT   = (
-    "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/"
-    "boundary_suppression/initial_sequences"
-)
-MODEL_PATH = (
-    "/home1/smaruj/akita_pytorch/models/finetuned/mouse/"
-    "Hsieh2019_mESC/checkpoints/"
-    "Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
-)
-OUT_TSV = (
-    "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/"
-    "boundary_suppression/sine_b2_insertion_results.tsv"
-)
+TSV_PATH   = "/path/to/successful/optimizations.tsv"
+OHE_ROOT   = "./../initial_sequences"
+MODEL_PATH = os.environ["MOUSE_MODEL_CKPT"]
+OUT_TSV = "./sine_b2_insertion_results.tsv"
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 BIN_SIZE       = 2048

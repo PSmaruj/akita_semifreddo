@@ -31,19 +31,16 @@ from utils.model_utils import load_model
 from utils.fimo_utils import read_meme_pwm
 
 # ── Default paths ─────────────────────────────────────────────────────────────
-_PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
+_PROJ = os.environ["AKITA_SF_DIR"]
 
-DEFAULT_MODEL_PATH = (
-    "/home1/smaruj/akita_pytorch/models/finetuned/mouse/Hsieh2019_mESC/checkpoints/"
-    "Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
-)
+DEFAULT_MODEL_PATH = os.environ["MOUSE_MODEL_CKPT"]
 DEFAULT_SEQ_BASE_DIR      = f"{_PROJ}/analysis/flat_regions"
 DEFAULT_TARGET_BASE_DIR   = f"{_PROJ}/optimizations/boundaries/targets"
 DEFAULT_MASK_PATH         = f"{_PROJ}/optimizations/feature_masks/boundary_mask.pt"
 DEFAULT_RESULTS_BASE_DIR  = f"{_PROJ}/optimizations/boundaries_no_ctcf"
 DEFAULT_FLAT_REGIONS_BASE = f"{_PROJ}/analysis/flat_regions/mouse_flat_regions_chrom_states_tsv"
 
-CTCF_PWM_PATH = "/home1/smaruj/akita_semifreddo/data/pwm/MA0139.1.meme"
+PWM_PATH = "./../../../data/pwm/MA0139.1.meme"
 
 # ── Semifreddo / architecture constants ───────────────────────────────────────
 CENTER_BIN_MAP   = 256

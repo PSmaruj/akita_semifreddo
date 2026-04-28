@@ -17,10 +17,10 @@ import pandas as pd
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-RMSK_FILE    = "/project2/fudenber_735/genomes/mm10/database/rmsk.txt.gz"
-CTCF_FILE    = "/project2/fudenber_735/motifs/mm10/jaspar/MA0139.1.tsv.gz"
-OUT_WITH_CTCF = "/home1/smaruj/akita_semifreddo/data/sine_b2_tables/sineB2_with_ctcf_300.tsv"
-OUT_NO_CTCF   = "/home1/smaruj/akita_semifreddo/data/sine_b2_tables/sineB2_no_ctcf_300.tsv"
+RMSK_FILE    = "/path/to/rmsk.txt.gz"   # can be downloaded from the genome browser
+CTCF_FILE    = "/path/to/MA0139.1.tsv.gz"  # can be obtained from the jaspar website
+OUT_WITH_CTCF = "./sineB2_with_ctcf_300.tsv"
+OUT_NO_CTCF   = "./sineB2_no_ctcf_300.tsv"
 
 RMSK_COLUMNS = [
     "bin", "swScore", "milliDiv", "milliDel", "milliIns",

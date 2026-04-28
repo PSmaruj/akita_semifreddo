@@ -36,10 +36,6 @@ import numpy as np
 import pandas as pd
 import torch
 
-sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
-sys.path.insert(0, "/home1/smaruj/ledidi/ledidi/")
-sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
-
 from semifreddo.semifreddo import SemifreddoLedidiWrapper
 from semifreddo.losses import LocalL1Loss
 from semifreddo.optimization_loop import build_stem, run_one_design
@@ -47,12 +43,9 @@ from utils.model_utils import load_model
 from helper import make_ctcf_exclusion_mask
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-_PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
+_PROJ = os.environ["AKITA_SF_DIR"]
 
-DEFAULT_MODEL_PATH = (
-    "/home1/smaruj/akita_pytorch/models/finetuned/mouse/Hsieh2019_mESC/checkpoints/"
-    "Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
-)
+DEFAULT_MODEL_PATH = os.environ["MOUSE_MODEL_CKPT"]
 DEFAULT_MASK_PATH        = f"{_PROJ}/optimizations/feature_masks/boundary_mask.pt"
 DEFAULT_SUPPRESSION_DIR  = f"{_PROJ}/optimizations/boundary_suppression"
 DEFAULT_SUCCESSFUL_TSV   = f"{_PROJ}/optimizations/boundaries/successful_optimizations_-0.5.tsv"

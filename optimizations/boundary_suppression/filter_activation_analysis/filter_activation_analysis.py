@@ -32,34 +32,24 @@ from pysam import FastaFile
 import warnings
 warnings.filterwarnings("ignore")
 
-sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
 from akita.model import SeqNN
 
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-GENOME_FASTA    = "/project2/fudenber_735/genomes/mm10/mm10.fa"
-BACKGROUND_FASTA = (
-    "/project2/fudenber_735/smaruj/sequence_design/"
-    "ledidi_semifreddo_akita/analysis/background_generation/"
-    "background_sequences_scd30_totvar1300.fasta"
-)
-CTCF_TSV        = "/home1/smaruj/akita_semifreddo/data/ctcf_tables/CTCFs_jaspar_filtered_mm10_top20percent.tsv"
-SINEB2_WITH_CTCF = "/home1/smaruj/akita_semifreddo/data/sine_b2_tables/sineB2_with_ctcf_300.tsv"
-SINEB2_NO_CTCF   = "/home1/smaruj/akita_semifreddo/data/sine_b2_tables/sineB2_no_ctcf_300.tsv"
-MODEL_PATH      = (
-    "/home1/smaruj/akita_pytorch/models/finetuned/mouse/Hsieh2019_mESC"
-    "/checkpoints/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
-)
-OUTPUT_DIR = (
-    "/project2/fudenber_735/smaruj/sequence_design/"
-    "ledidi_semifreddo_akita/optimizations/boundary_suppression/"
-    "filter_activation_analysis"
-)
+GENOME_FASTA    = os.environ["MOUSE_GENOME_FASTA"]
+BACKGROUND_FASTA = "/path/to/background/sequence"
+CTCF_TSV        = "/path/to/CTCFs_jaspar_filtered_mm10_top20percent.tsv" 
+# can be found at: https://github.com/Fudenberg-Research-Group/akitaV2-analyses/tree/main/input_data/select_top20percent/output
 
-SUPPRESSION_COORD_TSV  = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/boundary_suppression/results/successful_optimizations.tsv"
-INIT_SEQ_PATH          = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/boundary_suppression/initial_sequences"
-SLICE_PATH             = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/optimizations/boundary_suppression/results"
+SINEB2_WITH_CTCF = "./sineB2_with_ctcf_300.tsv"
+SINEB2_NO_CTCF   = "./sineB2_no_ctcf_300.tsv"
+MODEL_PATH      = os.environ["MOUSE_MODEL_CKPT"]
+OUTPUT_DIR = "./filter_activation_analysis"
+
+SUPPRESSION_COORD_TSV  = "./../results/successful_optimizations.tsv"
+INIT_SEQ_PATH          = "./../initial_sequences"
+SLICE_PATH             = "./../results"
 
 # ---------------------------------------------------------------------------
 # Constants

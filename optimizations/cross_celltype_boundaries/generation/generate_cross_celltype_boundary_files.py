@@ -41,9 +41,6 @@ import pandas as pd
 import torch
 from pyfaidx import Fasta
 
-sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
-
 from akita.model import SeqNN
 from semifreddo.optimization_loop import strength_tag
 from utils.data_utils import one_hot_encode_sequence
@@ -58,15 +55,14 @@ MAP_SIZE   = 512
 NUM_DIAGS  = 2
 NUM_MODELS = 2       # model indices 0 and 1 per cell type
 
-FASTA_PATH = "/project2/fudenber_735/genomes/hg38/hg38.fa"
+FASTA_PATH = os.environ["MOUSE_GENOME_FASTA"]
 
-TSV_PATTERN = (
-    "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/"
-    "analysis/flat_regions/human_flat_regions_tsv/"
-    "fold{fold}_selected_genomic_windows_centered.tsv"
-)
+TSV_PATTERN = os.path.join(
+                os.environ["MOUSE_FLAT_REGIONS_DIR"],
+                f"fold{fold}_selected_genomic_windows_centered.tsv"
+            )
 MODEL_PATH_PATTERN = (
-    "/home1/smaruj/akita_pytorch/models/finetuned/human/"
+    "/path/to/downloaded/checkpoints"
     "Krietenstein2019_{cell_type}/checkpoints/"
     "Akita_v2_human_Krietenstein2019_{cell_type}_model{model_idx}_finetuned.pth"
 )
