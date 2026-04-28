@@ -14,8 +14,7 @@ make_target        : generate an optimization target by overwriting feature posi
 import torch
 import torch.nn as nn
 
-
-DEFAULT_MODEL_SRC = "/home1/smaruj/akita_pytorch/"
+DEFAULT_MODEL_SRC = "/path/to/akita_pytorch/"
 
 def load_model(model_weights_path: str, device: torch.device,
                model_src: str = DEFAULT_MODEL_SRC) -> torch.nn.Module:

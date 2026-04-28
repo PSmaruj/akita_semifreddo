@@ -18,17 +18,8 @@ See run_genome_rewiring.sh
 import argparse
 import os
 import sys
-
 import pandas as pd
 import torch
-
-# --- path setup -----------------------------------------------------------
-
-sys.path.insert(0, os.path.abspath("/home1/smaruj/ledidi/"))
-sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
-
-# --------------------------------------------------------------------------
 
 from ledidi import ledidi
 from utils.model_utils import load_model

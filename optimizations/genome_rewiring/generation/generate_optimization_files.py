@@ -32,9 +32,6 @@ import torch
 import pandas as pd
 from pyfaidx import Fasta
 
-DEFAULT_MODEL_SRC = "/home1/smaruj/akita_pytorch/"
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 from utils.data_utils import one_hot_encode_sequence
 from utils.model_utils import (load_model, run_model)
 from utils.df_utils import load_bed_fold

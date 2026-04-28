@@ -38,9 +38,6 @@ import pandas as pd
 import torch
 from pyfaidx import Fasta
 
-sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
-
 from akita.model import SeqNN
 from semifreddo.optimization_loop import strength_tag
 from utils.data_utils import one_hot_encode_sequence
@@ -57,18 +54,13 @@ HALF        = MAP_SIZE // 2
 NUM_DIAGS   = 2   # diagonals excluded from the upper-tri representation
 FLAME_WIDTH = 3
 
-FASTA_PATH = "/project2/fudenber_735/genomes/mm10/mm10.fa"
+FASTA_PATH =  os.environ["MOUSE_GENOME_FASTA"]
 
-TSV_PATTERN = (
-    "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/"
-    "analysis/flat_regions/mouse_flat_regions_chrom_states_tsv/"
-    "fold{fold}_selected_genomic_windows_centered_chrom_states.tsv"
+TSV_PATTERN = os.path.join(
+    os.environ["MOUSE_FLAT_REGIONS_DIR"],
+    f"fold{fold}_selected_genomic_windows_centered.tsv"
 )
-MODEL_PATH_PATTERN = (
-    "/home1/smaruj/akita_pytorch/models/finetuned/mouse/Hsieh2019_mESC/checkpoints/"
-    "Akita_v2_mouse_Hsieh2019_mESC_model{model_idx}_finetuned.pth"
-)
-
+MODEL_PATH_PATTERN = os.environ["MOUSE_MODEL_CKPT"]
 
 # =============================================================================
 # Argument parsing

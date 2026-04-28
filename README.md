@@ -101,6 +101,18 @@ conda activate pytorch_akita
 pip install memelite==0.2.0 tangermeme==1.0.0 ledidi==2.1.0 seqpro==0.9.0 tqdm==4.67.1
 ```
 
+## Setting Up Environment Variables
+
+Scripts in this repository rely on environment variables for system-specific paths (genome files, model weights, API keys). A template file is provided:
+```bash
+bashcp env_vars_template.sh env_vars.sh  # copy the template
+# edit env_vars.sh to fill in your local paths
+source env_vars.sh                   # load the variables
+```
+Add the source line to your `~/.bashrc` to make the variables permanent. 
+
+Note that `env_vars.sh` is listed in `.gitignore` — never commit it, as it contains your AlphaGenome API key.
+
 ### AlphaGenome (optional — validation only)
 
 The cross-model validation notebooks (`analysis/alpha_genome_validation/`)

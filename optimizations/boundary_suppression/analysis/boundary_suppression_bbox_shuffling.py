@@ -21,9 +21,6 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader, Dataset
 
-sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
-
 from utils.data_utils import from_upper_triu_batch, gc_content
 from utils.model_utils import load_model
 from utils.scores_utils import compute_insulation_scores

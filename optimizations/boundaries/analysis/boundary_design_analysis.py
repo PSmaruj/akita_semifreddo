@@ -29,7 +29,6 @@ from utils.scores_utils import compute_insulation_scores
 
 # ── Fixed paths ───────────────────────────────────────────────────────────────
 _PROJ = os.environ["AKITA_SF_DIR"]
-
 MODEL_CKPT        = os.environ["MOUSE_MODEL_CKPT"]
 
 SEQ_BASE_DIR      = f"{_PROJ}/analysis/flat_regions"

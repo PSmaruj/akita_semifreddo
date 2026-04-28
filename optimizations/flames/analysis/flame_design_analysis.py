@@ -21,9 +21,6 @@ import torch
 from torch.utils.data import DataLoader
 from memelite import fimo
 
-sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
-sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
-
 from semifreddo.optimization_loop import strength_tag
 from utils.dataset_utils import CentralInsertionDataset, SequenceDataset, TriuMatrixDataset
 from utils.data_utils import from_upper_triu_batch, gc_content
@@ -32,17 +29,14 @@ from utils.model_utils import load_model
 from utils.scores_utils import compute_flame_scores
 
 # ── Fixed paths ───────────────────────────────────────────────────────────────
-_PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
+_PROJ = os.environ["AKITA_SF_DIR"]
 
-MODEL_CKPT        = (
-    "/home1/smaruj/akita_pytorch/models/finetuned/mouse/Hsieh2019_mESC"
-    "/checkpoints/Akita_v2_mouse_Hsieh2019_mESC_model0_finetuned.pth"
-)
+MODEL_CKPT        = os.environ["MOUSE_MODEL_CKPT"]
 SEQ_BASE_DIR      = f"{_PROJ}/analysis/flat_regions"
 TARGET_BASE_DIR   = f"{_PROJ}/optimizations/flames/targets"
 RESULTS_BASE_DIR  = f"{_PROJ}/optimizations/flames"
 FLAT_REGIONS_BASE = f"{_PROJ}/analysis/flat_regions/mouse_flat_regions_chrom_states_tsv"
-PWM_PATH          = "/home1/smaruj/akita_semifreddo/data/pwm/MA0139.1.meme"
+PWM_PATH          = "./../../../data/pwm/MA0139.1.meme"
 
 # ── Architecture constants ────────────────────────────────────────────────────
 CENTER_BIN_MAP = 256

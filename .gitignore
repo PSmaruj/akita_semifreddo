@@ -13,3 +13,6 @@ Thumbs.db
 venv/
 env/
 .env
+
+# Temporary tutorial data
+tutorial/tmp_data/

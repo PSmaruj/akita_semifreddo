@@ -23,10 +23,6 @@ import pandas as pd
 import torch
 import torch.nn as nn
 
-sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
-sys.path.insert(0, "/home1/smaruj/ledidi/ledidi/")
-sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
-
 from akita.model import SeqNN
 from ledidi import Ledidi
 from semifreddo.semifreddo import MultiBinSemifreddoLedidiWrapper, StackingDesignWrapper
@@ -34,16 +30,11 @@ from semifreddo.losses import MultiHeadLocalL1Loss
 from semifreddo.optimization_loop import strength_tag, build_stem, count_edits, last_accepted_step, run_fold
 
 # ── Default paths ─────────────────────────────────────────────────────────────
-_PROJ = "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita"
+_PROJ = os.environ["AKITA_SF_DIR"]
 
-MODEL_PATH_PATTERN    = (
-    "/home1/smaruj/akita_pytorch/models/finetuned/mouse/Hsieh2019_mESC/checkpoints/"
-    "Akita_v2_mouse_Hsieh2019_mESC_model{model_idx}_finetuned.pth"
-)
-MASK_DIR = (
-    "/project2/fudenber_735/smaruj/sequence_design/ledidi_semifreddo_akita/"
-    "optimizations/feature_masks"
-)
+MODEL_PATH_PATTERN    = os.environ["MOUSE_MODEL_CKPT"]
+MASK_DIR = f"{_PROJ}/optimizations/feature_masks"
+
 DEFAULT_SEQ_BASE_DIR = f"{_PROJ}/analysis/flat_regions"
 DEFAULT_FOUNTAIN_DIR      = f"{_PROJ}/optimizations/fountains"
 DEFAULT_RESULTS_BASE_DIR  = f"{_PROJ}/optimizations/fountains"

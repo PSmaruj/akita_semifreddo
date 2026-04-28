@@ -17,12 +17,7 @@ import os
 import sys
 import argparse
 import logging
-
 import torch
-
-sys.path.append(os.path.abspath("/home1/smaruj/akita_pytorch/"))
-sys.path.insert(0, "/home1/smaruj/ledidi/ledidi/")
-sys.path.insert(0, os.path.abspath("/home1/smaruj/akita_semifreddo/"))
 
 from semifreddo.semifreddo import SemifreddoLedidiWrapper, CTCFAwareSemifreddoWrapper
 from semifreddo.losses import LocalL1Loss, LocalL1LossWithCTCFPenalty
