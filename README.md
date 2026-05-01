@@ -239,7 +239,10 @@ If you use Akita Semifreddo in your research, please cite:
 
 **Akita Semifreddo**:
 ```
-[PLACEHOLDER — preprint citation]
+Smaruj PN, Kelley DR, Fudenberg G (2026)
+Sequence design for three-dimensional genome folding using Akita Semifreddo.
+bioRxiv 2026.04.28.721368.
+https://doi.org/10.64898/2026.04.28.721368
 ```
 
 **Akita V2**:
