@@ -25,7 +25,7 @@ MultiBinSemifreddoLedidiWrapper : multi-bin Ledidi-compatible wrapper (fountains
 StackingDesignWrapper           : ensemble wrapper stacking outputs along dim=1
 """
 
-
+import math
 import torch
 import torch.nn as nn
 
@@ -543,3 +543,160 @@ class StackingDesignWrapper(nn.Module):
 
     def forward(self, X):
         return torch.cat([m(X) for m in self.models], dim=1)
+    
+
+def _run_trunk(model, x, cropping_applied=None):
+    """Everything after the conv tower. Shared by all Semifreddo wrappers."""
+    x, reverse_bool = model.stochastic_reverse_complement(x)
+
+    for i in range(1, 12):
+        x = getattr(model, f"residual1d_block{i}")(x)
+
+    x = model.conv_reduce(x)
+    x = model.one_to_two(x)
+    x = model.conv2d_block(x)
+    x = model.symmetrize_2d(x)
+
+    for i in range(1, 7):
+        x = getattr(model, f"residual2d_block{i}")(x)
+
+    x = model.squeeze_excite(x)
+    x = model.cropping_2d(x)
+    x = model.upper_tri(x, reverse_complement_flags=reverse_bool)
+    return model.final(x)
+
+
+class RegionSemifreddoLedidiWrapper(nn.Module):
+    """Semifreddo wrapper for optimising an arbitrary base-pair interval.
+
+    Like MultiBinSemifreddoLedidiWrapper, but the editable region is specified
+    in base pairs rather than whole bins. The conv tower is recomputed over the
+    bins covering the interval (plus context), while positions inside those
+    bins but outside the requested interval are held frozen. This matters when
+    the region of interest is not bin-aligned — e.g. a CRISPR deletion
+    footprint — and stray edits in the flanking bins would confound
+    positional attribution of the accepted edits.
+
+    Parameters
+    ----------
+    model : torch.nn.Module
+        Akita SeqNN in eval mode.
+    precomputed_full_output : torch.Tensor
+        Shape (1, C, 640); trunk activations cached from the initial sequence.
+    full_X : torch.Tensor
+        Shape (1, 4, L); full one-hot encoded sequence (frozen).
+    bp_start, bp_end : int
+        Editable interval in full-sequence coordinates, half-open.
+    context_bins : int
+        Conv-tower context bins on each side (default 5).
+    splice_buffer : int
+        Extra bins spliced back on each side of the recomputed block
+        (default 2, matching _splice_activations).
+    cropping_applied : int
+        Bins cropped from each side by Akita (default 64).
+
+    Notes
+    -----
+    forward() expects X_edit of shape (1, 4, n_edit_bins * 2048) — the full
+    covering block. Positions outside [bp_start, bp_end) are overwritten with
+    their frozen values before the forward pass, so changes there have no
+    effect on the output (Ledidi's input loss will drive them out).
+    """
+
+    def __init__(
+        self,
+        model,
+        precomputed_full_output: torch.Tensor,
+        full_X: torch.Tensor,
+        bp_start: int,
+        bp_end: int,
+        context_bins: int = 5,
+        splice_buffer: int = 2,
+        cropping_applied: int = 64,
+    ):
+        super().__init__()
+        assert 0 <= bp_start < bp_end <= full_X.shape[-1], "interval out of range"
+
+        self.model                   = model
+        self.precomputed_full_output = precomputed_full_output
+        self.context_bins            = context_bins
+        self.splice_buffer           = splice_buffer
+        self.cropping_applied        = cropping_applied
+        self.bp_start                = bp_start
+        self.bp_end                  = bp_end
+
+        # ── Covering bins, tower (640-bin) space ─────────────────────────────
+        self.tower_bin_start = bp_start // _BIN_SIZE
+        self.tower_bin_end   = math.ceil(bp_end / _BIN_SIZE)     # exclusive
+        self.n_edit_bins     = self.tower_bin_end - self.tower_bin_start
+
+        # ── Same bins in 512-bin map space ───────────────────────────────────
+        self.map_bin_start = self.tower_bin_start - cropping_applied
+        self.map_bin_end   = self.tower_bin_end   - cropping_applied
+        assert self.map_bin_start >= 0 and self.map_bin_end <= 512, (
+            f"editable region maps to bins {self.map_bin_start}–{self.map_bin_end}, "
+            f"outside the cropped 512-bin map"
+        )
+
+        # ── bp extents of the covering block and the conv-tower window ───────
+        self.edit_bp_start = self.tower_bin_start * _BIN_SIZE
+        self.edit_bp_end   = self.tower_bin_end   * _BIN_SIZE
+
+        self.seq_window_start = (self.tower_bin_start - context_bins) * _BIN_SIZE
+        self.seq_window_end   = (self.tower_bin_end   + context_bins) * _BIN_SIZE
+        assert self.seq_window_start >= 0, "not enough left context in the window"
+        assert self.seq_window_end <= full_X.shape[-1], "not enough right context"
+
+        # ── Splice range, tower space ────────────────────────────────────────
+        self.splice_start = self.tower_bin_start - splice_buffer
+        self.splice_end   = self.tower_bin_end   + splice_buffer
+        self.sub_x_splice = slice(
+            context_bins - splice_buffer,
+            context_bins + self.n_edit_bins + splice_buffer,
+        )
+
+        # ── Base-pair editable mask over the covering block ──────────────────
+        block_len = self.n_edit_bins * _BIN_SIZE
+        mask = torch.zeros(1, 1, block_len, dtype=torch.bool)
+        mask[:, :, bp_start - self.edit_bp_start : bp_end - self.edit_bp_start] = True
+
+        self.register_buffer("full_X", full_X.clone())
+        self.register_buffer("editable_mask", mask)
+        self.register_buffer(
+            "frozen_block",
+            full_X[:, :, self.edit_bp_start:self.edit_bp_end].clone(),
+        )
+
+        print(
+            f"RegionSemifreddoLedidiWrapper:\n"
+            f"  requested interval        : bp {bp_start:,}–{bp_end:,} "
+            f"({bp_end - bp_start:,} bp)\n"
+            f"  covering bins (map space) : {self.map_bin_start}–{self.map_bin_end - 1}"
+            f"  ({self.n_edit_bins} bins)\n"
+            f"  covering block bp         : {self.edit_bp_start:,}–{self.edit_bp_end:,}\n"
+            f"  editable fraction of block: {mask.float().mean():.1%}\n"
+            f"  conv-tower window bp      : {self.seq_window_start:,}–{self.seq_window_end:,}\n"
+            f"  splice range (tower space): {self.splice_start}–{self.splice_end - 1}"
+        )
+
+    def freeze(self, X_edit: torch.Tensor) -> torch.Tensor:
+        """Restore frozen values outside the requested interval."""
+        return torch.where(self.editable_mask, X_edit, self.frozen_block)
+
+    def forward(self, X_edit: torch.Tensor) -> torch.Tensor:
+        device = next(self.model.parameters()).device
+        X_edit = self.freeze(X_edit.to(device))
+
+        X_window = self.full_X.detach()[
+            :, :, self.seq_window_start:self.seq_window_end
+        ].clone().to(device)
+        ctx = self.context_bins * _BIN_SIZE
+        X_window[:, :, ctx : ctx + self.n_edit_bins * _BIN_SIZE] = X_edit
+
+        sub_x = self.model.conv_block_1(X_window)
+        sub_x = self.model.conv_tower(sub_x)
+
+        x = self.precomputed_full_output.clone().to(device)
+        x[:, :, self.splice_start:self.splice_end] = sub_x[:, :, self.sub_x_splice]
+
+        return _run_trunk(self.model, x)
